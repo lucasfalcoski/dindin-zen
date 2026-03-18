@@ -1,0 +1,96 @@
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const links = [
+  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/expenses', label: 'Despesas', icon: Receipt },
+  { to: '/groups', label: 'Grupos', icon: FolderOpen },
+  { to: '/reports', label: 'Relatórios', icon: BarChart3 },
+];
+
+export function AppLayout({ children }: { children: React.ReactNode }) {
+  const { signOut, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Top nav for desktop */}
+      <header className="hidden md:block border-b border-border bg-card sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-14">
+          <div className="flex items-center gap-1">
+            <span className="text-lg font-semibold tracking-tight text-foreground mr-6">Finanças</span>
+            {links.map(l => (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                end={l.to === '/'}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150',
+                    isActive
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  )
+                }
+              >
+                <l.icon className="h-4 w-4" />
+                {l.label}
+              </NavLink>
+            ))}
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground">{user?.email}</span>
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150"
+            >
+              <LogOut className="h-4 w-4" />
+              Sair
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main content */}
+      <main className="max-w-6xl mx-auto px-4 md:px-6 py-6 pb-24 md:pb-6">
+        {children}
+      </main>
+
+      {/* Bottom nav for mobile */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
+        <div className="flex items-center justify-around h-16">
+          {links.map(l => (
+            <NavLink
+              key={l.to}
+              to={l.to}
+              end={l.to === '/'}
+              className={({ isActive }) =>
+                cn(
+                  'flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition-colors duration-150',
+                  isActive ? 'text-primary' : 'text-muted-foreground'
+                )
+              }
+            >
+              <l.icon className="h-5 w-5" />
+              {l.label}
+            </NavLink>
+          ))}
+          <button
+            onClick={handleSignOut}
+            className="flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium text-muted-foreground"
+          >
+            <LogOut className="h-5 w-5" />
+            Sair
+          </button>
+        </div>
+      </nav>
+    </div>
+  );
+}
