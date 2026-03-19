@@ -132,3 +132,10 @@
     display: none;
   }
 }
+
+/* Ensure Radix scroll lock doesn't permanently block scroll after modal closes */
+body[data-scroll-locked] {
+  overflow: hidden !important;
+  padding-right: 0 !important;
+}
+
