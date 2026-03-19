@@ -53,6 +53,8 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
   const { data: groups } = useGroups();
   const { data: accounts } = useAccounts();
   const { data: creditCards } = useCreditCards();
+  const { data: families } = useMyFamilies();
+  const hasFamily = families && families.length > 0;
   const createExpense = useCreateExpense();
   const updateExpense = useUpdateExpense();
   const createInstallments = useCreateInstallments();
