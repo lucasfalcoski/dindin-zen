@@ -8,7 +8,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { formatBRL } from '@/lib/format';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Input } from '@/components/ui/input';
-import { Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Download, FileText, CalendarDays } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 type Period = 'week' | 'month' | 'quarter' | 'year' | 'custom';
 
@@ -36,63 +40,40 @@ export default function Reports() {
   const expenses = useMemo(() => {
     if (!allExpenses) return [];
     switch (viewMode) {
-      case 'personal':
-        return allExpenses.filter(e => e.user_id === user?.id);
-      case 'family':
-        return allExpenses.filter((e: any) => e.visibility === 'family');
-      case 'member':
-        return allExpenses.filter((e: any) => e.user_id === selectedMemberId && e.visibility === 'family');
-      default:
-        return allExpenses;
+      case 'personal': return allExpenses.filter(e => e.user_id === user?.id);
+      case 'family': return allExpenses.filter((e: any) => e.visibility === 'family');
+      case 'member': return allExpenses.filter((e: any) => e.user_id === selectedMemberId && e.visibility === 'family');
+      default: return allExpenses;
     }
   }, [allExpenses, viewMode, user?.id, selectedMemberId]);
 
-  const totalPeriod = useMemo(() => {
-    return expenses.reduce((s, e) => s + Number(e.amount), 0);
-  }, [expenses]);
+  const totalPeriod = useMemo(() => expenses.reduce((s, e) => s + Number(e.amount), 0), [expenses]);
 
   const breakdown = useMemo(() => {
     if (!expenses.length || !groups) return [];
     const byGroup: Record<string, number> = {};
-    expenses.forEach(e => {
-      byGroup[e.group_id] = (byGroup[e.group_id] || 0) + Number(e.amount);
-    });
+    expenses.forEach(e => { byGroup[e.group_id] = (byGroup[e.group_id] || 0) + Number(e.amount); });
     const days = startDate && endDate
       ? Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1)
       : 1;
     return groups
       .filter(g => byGroup[g.id])
-      .map(g => ({
-        ...g,
-        total: byGroup[g.id],
-        pct: totalPeriod > 0 ? (byGroup[g.id] / totalPeriod * 100) : 0,
-        avgDay: byGroup[g.id] / days,
-      }))
+      .map(g => ({ ...g, total: byGroup[g.id], pct: totalPeriod > 0 ? (byGroup[g.id] / totalPeriod * 100) : 0, avgDay: byGroup[g.id] / days }))
       .sort((a, b) => b.total - a.total);
   }, [expenses, groups, totalPeriod, startDate, endDate]);
 
   const dailyData = useMemo(() => {
     if (!expenses.length || !startDate || !endDate) return [];
     try {
-      const days = eachDayOfInterval({
-        start: new Date(startDate + 'T00:00:00'),
-        end: new Date(endDate + 'T00:00:00'),
-      });
+      const days = eachDayOfInterval({ start: new Date(startDate + 'T00:00:00'), end: new Date(endDate + 'T00:00:00') });
       const byDay: Record<string, number> = {};
       days.forEach(d => { byDay[format(d, 'yyyy-MM-dd')] = 0; });
-      expenses.forEach(e => {
-        if (e.date in byDay) byDay[e.date] += Number(e.amount);
-      });
-      return days.map(d => ({
-        date: format(d, 'dd/MM', { locale: ptBR }),
-        total: byDay[format(d, 'yyyy-MM-dd')],
-      }));
-    } catch {
-      return [];
-    }
+      expenses.forEach(e => { if (e.date in byDay) byDay[e.date] += Number(e.amount); });
+      return days.map(d => ({ date: format(d, 'dd/MM', { locale: ptBR }), total: byDay[format(d, 'yyyy-MM-dd')] }));
+    } catch { return []; }
   }, [expenses, startDate, endDate]);
 
-  const handleExport = () => {
+  const handleExportCSV = () => {
     if (!expenses.length) return;
     const header = 'Data,Descrição,Grupo,Valor,Recorrente,Notas\n';
     const rows = expenses.map(e => {
@@ -108,6 +89,32 @@ export default function Reports() {
     URL.revokeObjectURL(url);
   };
 
+  const handleExportPDF = () => {
+    if (!breakdown.length) return;
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text(`Relatório de Despesas`, 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Período: ${startDate} a ${endDate}`, 14, 28);
+    doc.text(`Total: ${formatBRL(totalPeriod)}`, 14, 35);
+
+    (doc as any).autoTable({
+      startY: 45,
+      head: [['Grupo', 'Total', '%', 'Média/dia']],
+      body: breakdown.map(b => [
+        `${b.icon} ${b.name}`,
+        formatBRL(b.total),
+        `${b.pct.toFixed(1)}%`,
+        formatBRL(b.avgDay),
+      ]),
+      foot: [['Total', formatBRL(totalPeriod), '100%', '']],
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [59, 130, 246] },
+    });
+
+    doc.save(`relatorio_${startDate}_${endDate}.pdf`);
+  };
+
   const periods: { value: Period; label: string }[] = [
     { value: 'week', label: 'Semana' },
     { value: 'month', label: 'Mês' },
@@ -120,14 +127,19 @@ export default function Reports() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Relatórios</h1>
-        <button
-          onClick={handleExport}
-          disabled={!expenses.length}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-accent text-foreground text-sm font-medium hover:bg-accent/80 transition-colors disabled:opacity-50"
-        >
-          <Download className="h-4 w-4" />
-          CSV
-        </button>
+        <div className="flex items-center gap-2">
+          <Link to="/reports/annual">
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <CalendarDays className="h-4 w-4" /> Anual
+            </Button>
+          </Link>
+          <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={!expenses.length} className="gap-1.5">
+            <Download className="h-4 w-4" /> CSV
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={!breakdown.length} className="gap-1.5">
+            <FileText className="h-4 w-4" /> PDF
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -176,9 +188,7 @@ export default function Reports() {
         </div>
         {isLoading ? (
           <div className="p-4 space-y-3">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-6 bg-muted rounded animate-pulse" />
-            ))}
+            {[...Array(4)].map((_, i) => <div key={i} className="h-6 bg-muted rounded animate-pulse" />)}
           </div>
         ) : breakdown.length > 0 ? (
           <div className="overflow-x-auto">
