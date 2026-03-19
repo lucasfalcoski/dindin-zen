@@ -248,7 +248,7 @@ export default function Dashboard() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
           {[...Array(7)].map((_, i) => (
             <div key={i} className="card-surface p-5 h-24 animate-pulse">
               <div className="h-3 w-20 bg-muted rounded mb-3" />
