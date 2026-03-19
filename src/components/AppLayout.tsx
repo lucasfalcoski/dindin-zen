@@ -7,9 +7,10 @@ import { GlobalSearch } from '@/components/GlobalSearch';
 import { QuickAddFAB } from '@/components/QuickAddFAB';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationAlerts } from '@/components/NotificationAlerts';
-import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users, Search, Tag, Gauge, Goal, TrendingUp, MoreHorizontal, X, User } from 'lucide-react';
+import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users, Search, Tag, Gauge, Goal, TrendingUp, MoreHorizontal, X, User, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { HelpGuide } from '@/components/HelpGuide';
 
 const links = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -51,6 +52,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   // Cmd+K / Ctrl+K shortcut + N for new expense
   useEffect(() => {
@@ -71,6 +73,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [navigate]);
+
+  // Listen for help guide event from OnboardingWizard
+  useEffect(() => {
+    const handler = () => setHelpOpen(true);
+    window.addEventListener('open-help-guide', handler);
+    return () => window.removeEventListener('open-help-guide', handler);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -118,6 +127,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             >
               <Search className="h-3.5 w-3.5" />
               <kbd className="hidden lg:inline-flex h-5 items-center gap-1 rounded border border-border bg-muted px-1.5 text-[10px] text-muted-foreground">⌘K</kbd>
+            </button>
+            <button
+              onClick={() => setHelpOpen(true)}
+              title="Ajuda"
+              className="p-2 rounded-lg text-muted-foreground hover:bg-accent transition-colors"
+            >
+              <HelpCircle className="h-4 w-4" />
             </button>
             <ThemeToggle />
             <ViewSelector />
@@ -216,6 +232,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               Meu Perfil
             </NavLink>
             <button
+              onClick={() => { setHelpOpen(true); setMoreOpen(false); }}
+              className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              <HelpCircle className="h-4 w-4" />
+              Ajuda
+            </button>
+            <button
               onClick={() => { handleSignOut(); setMoreOpen(false); }}
               className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             >
@@ -229,6 +252,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <QuickAddFAB />
       <NotificationAlerts />
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+      <HelpGuide open={helpOpen} onOpenChange={setHelpOpen} />
     </div>
   );
 }

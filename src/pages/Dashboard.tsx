@@ -10,6 +10,7 @@ import { useView } from '@/contexts/ViewContext';
 import { useFamilyProfiles } from '@/hooks/useProfiles';
 import { useTagsWithStats } from '@/hooks/useTags';
 import { SummaryCard } from '@/components/SummaryCard';
+import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { formatBRL, getMonthYear } from '@/lib/format';
@@ -273,6 +274,8 @@ export default function Dashboard() {
         </h1>
         <p className="text-sm text-muted-foreground capitalize">{getMonthYear()}</p>
       </div>
+
+      <ProfileCompletionBanner />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
         <SummaryCard label={`Despesas${viewLabel ? ` ${viewLabel}` : ' do mês'}`} value={stats.total} icon={<Wallet className="h-4 w-4 text-muted-foreground" />} />
