@@ -112,11 +112,13 @@
   .card-surface {
     @apply bg-card rounded-xl;
     box-shadow: var(--shadow-card);
+    overflow: hidden;
   }
 
   .card-surface-hover {
     @apply bg-card rounded-xl transition-shadow duration-150;
     box-shadow: var(--shadow-card);
+    overflow: hidden;
   }
 
   .card-surface-hover:hover {
@@ -130,6 +132,17 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Valores monetários não quebram linha */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* Safe area padding for iOS */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
 
