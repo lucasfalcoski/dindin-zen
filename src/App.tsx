@@ -6,6 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ViewProvider } from "@/contexts/ViewContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
+import { OnboardingWizard } from "@/components/OnboardingWizard";
 import Dashboard from "./pages/Dashboard";
 import Expenses from "./pages/Expenses";
 import IncomePage from "./pages/Income";
@@ -35,6 +36,7 @@ const ProtectedPage = ({ children }: { children: React.ReactNode }) => (
   <ProtectedRoute>
     <ViewProvider>
       <AppLayout>{children}</AppLayout>
+      <OnboardingWizard />
     </ViewProvider>
   </ProtectedRoute>
 );
