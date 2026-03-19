@@ -7,6 +7,8 @@ const links = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/expenses', label: 'Despesas', icon: Receipt },
   { to: '/income', label: 'Receitas', icon: DollarSign },
+  { to: '/accounts', label: 'Contas', icon: Building2 },
+  { to: '/credit-cards', label: 'Cartões', icon: CreditCard },
   { to: '/groups', label: 'Grupos', icon: FolderOpen },
   { to: '/reports', label: 'Relatórios', icon: BarChart3 },
 ];
