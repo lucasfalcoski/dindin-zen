@@ -168,15 +168,17 @@ export default function Reports() {
         {isLoading ? (
           <div className="h-48 animate-pulse bg-muted rounded-lg" />
         ) : dailyData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={dailyData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
-              <Tooltip formatter={(v: number) => formatBRL(v)} />
-              <Line type="monotone" dataKey="total" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="w-full min-w-0 overflow-x-auto">
+            <ResponsiveContainer width="100%" height={200} minWidth={280}>
+              <LineChart data={dailyData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
+                <Tooltip formatter={(v: number) => formatBRL(v)} />
+                <Line type="monotone" dataKey="total" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         ) : (
           <p className="text-sm text-muted-foreground py-8 text-center">Sem dados para o período</p>
         )}

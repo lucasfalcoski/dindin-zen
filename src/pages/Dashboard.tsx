@@ -13,7 +13,9 @@ import { SummaryCard } from '@/components/SummaryCard';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { formatBRL, getMonthYear } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useProfile } from '@/hooks/useProfiles';
 import { Plus, TrendingUp, Calendar, Wallet, BarChart3, DollarSign, PiggyBank, Percent, CreditCard, AlertTriangle, Users, Crown, Tag } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { Progress } from '@/components/ui/progress';
@@ -38,6 +40,7 @@ const MEMBER_COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { data: profile } = useProfile();
   const { viewMode, selectedMemberId, familyMembers } = useView();
   const [formOpen, setFormOpen] = useState(false);
   const now = new Date();
@@ -246,7 +249,7 @@ export default function Dashboard() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
           {[...Array(7)].map((_, i) => (
             <div key={i} className="card-surface p-5 h-24 animate-pulse">
               <div className="h-3 w-20 bg-muted rounded mb-3" />
@@ -261,17 +264,17 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground">
           {viewMode === 'family' ? (
             <span className="flex items-center gap-2"><Users className="h-6 w-6 text-primary" /> Dashboard Familiar</span>
           ) : (
-            <>Olá{user?.email ? `, ${user.email.split('@')[0]}` : ''} 👋</>
+            <>Olá{profile?.display_name ? `, ${profile.display_name}` : user?.email ? `, ${user.email.split('@')[0]}` : ''} 👋</>
           )}
         </h1>
         <p className="text-sm text-muted-foreground capitalize">{getMonthYear()}</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
         <SummaryCard label={`Despesas${viewLabel ? ` ${viewLabel}` : ' do mês'}`} value={stats.total} icon={<Wallet className="h-4 w-4 text-muted-foreground" />} />
         <SummaryCard label={`Receitas${viewLabel ? ` ${viewLabel}` : ' do mês'}`} value={stats.incTotal} icon={<DollarSign className="h-4 w-4 text-muted-foreground" />} />
         <SummaryCard
@@ -333,16 +336,18 @@ export default function Dashboard() {
           </h2>
           {donutData.length > 0 ? (
             <div className="flex items-center gap-4">
-              <ResponsiveContainer width="50%" height={180}>
-                <PieChart>
-                  <Pie data={donutData} dataKey="value" cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={2}>
-                    {donutData.map((d, i) => (
-                      <Cell key={i} fill={d.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(v: number) => formatBRL(v)} />
-                </PieChart>
-              </ResponsiveContainer>
+              <div className="w-full min-w-0 overflow-x-auto">
+                <ResponsiveContainer width="50%" height={180} minWidth={140}>
+                  <PieChart>
+                    <Pie data={donutData} dataKey="value" cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={2}>
+                      {donutData.map((d, i) => (
+                        <Cell key={i} fill={d.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(v: number) => formatBRL(v)} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
               <div className="flex-1 space-y-2">
                 {donutData.map(d => (
                   <div key={d.name} className="flex items-center gap-2 text-xs">
@@ -361,34 +366,38 @@ export default function Dashboard() {
         {viewMode === 'family' && familyBarData.length > 0 ? (
           <div className="card-surface p-5">
             <h2 className="label-caps mb-4">Gastos por membro/grupo</h2>
-            <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={familyBarData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
-                <Tooltip formatter={(v: number) => formatBRL(v)} />
-                <Legend wrapperStyle={{ fontSize: 10 }} />
-                {[...new Set(monthExpenses.map(e => e.user_id))].map((uid, i) => (
-                  <Bar key={uid} dataKey={getName(uid)} fill={MEMBER_COLORS[i % MEMBER_COLORS.length]} radius={[4, 4, 0, 0]} />
-                ))}
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="w-full min-w-0 overflow-x-auto">
+              <ResponsiveContainer width="100%" height={180} minWidth={280}>
+                <BarChart data={familyBarData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                  <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
+                  <Tooltip formatter={(v: number) => formatBRL(v)} />
+                  <Legend wrapperStyle={{ fontSize: 10 }} />
+                  {[...new Set(monthExpenses.map(e => e.user_id))].map((uid, i) => (
+                    <Bar key={uid} dataKey={getName(uid)} fill={MEMBER_COLORS[i % MEMBER_COLORS.length]} radius={[4, 4, 0, 0]} />
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         ) : (
           <div className="card-surface p-5">
             <h2 className="label-caps mb-4">Receitas vs Despesas (6 meses)</h2>
             {barData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={180}>
-                <BarChart data={barData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(v: number) => formatBRL(v)} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Bar dataKey="receitas" name="Receitas" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="despesas" name="Despesas" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className="w-full min-w-0 overflow-x-auto">
+                <ResponsiveContainer width="100%" height={180} minWidth={280}>
+                  <BarChart data={barData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
+                    <Tooltip formatter={(v: number) => formatBRL(v)} />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Bar dataKey="receitas" name="Receitas" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="despesas" name="Despesas" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             ) : (
               <p className="text-sm text-muted-foreground py-8 text-center">Sem dados</p>
             )}
@@ -403,12 +412,12 @@ export default function Dashboard() {
           <div className="space-y-3">
             {budgetAlerts.map(b => (
               <div key={b.group!.id} className="space-y-1">
-                <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center justify-between text-xs flex-wrap gap-1">
                   <span className="text-foreground font-medium flex items-center gap-1.5">
                     {b.group!.icon} {b.group!.name}
                     {b.pct >= 80 && <AlertTriangle className="h-3 w-3 text-amber-500" />}
                   </span>
-                  <span className={b.pct > 100 ? 'text-destructive font-medium' : 'text-muted-foreground'}>
+                  <span className={cn('whitespace-nowrap', b.pct > 100 ? 'text-destructive font-medium' : 'text-muted-foreground')}>
                     {formatBRL(b.spent)} / {formatBRL(b.budget)} ({b.pct.toFixed(0)}%)
                   </span>
                 </div>

@@ -231,7 +231,7 @@ export default function Goals() {
           {[...Array(3)].map((_, i) => <div key={i} className="h-48 bg-muted rounded-xl animate-pulse" />)}
         </div>
       ) : goals && goals.length > 0 ? (
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {goals.map(goal => <GoalCard key={goal.id} goal={goal} />)}
         </div>
       ) : (

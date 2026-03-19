@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useProfile } from '@/hooks/useProfiles';
 import { ViewSelector } from '@/components/ViewSelector';
 import { GlobalSearch } from '@/components/GlobalSearch';
 import { QuickAddFAB } from '@/components/QuickAddFAB';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationAlerts } from '@/components/NotificationAlerts';
-import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users, Search, Tag, Gauge, Goal, TrendingUp, MoreHorizontal, X } from 'lucide-react';
+import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users, Search, Tag, Gauge, Goal, TrendingUp, MoreHorizontal, X, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
@@ -46,6 +47,7 @@ const DindinLogo = () => (
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { signOut, user } = useAuth();
+  const { data: profile } = useProfile();
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -119,7 +121,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </button>
             <ThemeToggle />
             <ViewSelector />
-            <span className="text-xs text-muted-foreground hidden xl:inline">{user?.email}</span>
+            <Link to="/profile" className="text-xs text-muted-foreground hidden xl:inline truncate max-w-[120px] hover:text-foreground transition-colors">
+              {profile?.display_name || user?.email?.split('@')[0]}
+            </Link>
             <button
               onClick={handleSignOut}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150"
@@ -197,7 +201,20 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               Buscar
             </button>
           </div>
-          <div className="border-t border-border mt-4 pt-4">
+          <div className="border-t border-border mt-4 pt-4 space-y-1">
+            <NavLink
+              to="/profile"
+              onClick={() => setMoreOpen(false)}
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm transition-colors',
+                  isActive ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                )
+              }
+            >
+              <User className="h-4 w-4" />
+              Meu Perfil
+            </NavLink>
             <button
               onClick={() => { handleSignOut(); setMoreOpen(false); }}
               className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"

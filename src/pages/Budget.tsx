@@ -146,7 +146,7 @@ export default function BudgetPage() {
                       '--progress-color': over ? 'hsl(var(--destructive))' : pct >= 80 ? 'hsl(38, 92%, 50%)' : g.color,
                     } as React.CSSProperties}
                   />
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center justify-between text-xs flex-wrap gap-1">
                     <span className="text-muted-foreground">
                       {formatBRL(spent)} de {formatBRL(budget)}
                     </span>
