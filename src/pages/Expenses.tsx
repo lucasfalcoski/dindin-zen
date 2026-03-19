@@ -7,8 +7,10 @@ import { useView } from '@/contexts/ViewContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
-import { Plus } from 'lucide-react';
+import { ImportExpensesModal } from '@/components/ImportExpensesModal';
+import { Plus, Upload, Download } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 type Period = 'today' | 'week' | 'month' | 'custom';
 
