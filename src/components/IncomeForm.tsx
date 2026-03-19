@@ -91,7 +91,8 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
           category: data.category,
           recurrent: data.recurrent,
           notes: data.notes || undefined,
-        });
+          visibility: data.visibility,
+        } as any);
         toast({ title: 'Receita atualizada' });
       } else {
         await createIncome.mutateAsync({
@@ -101,7 +102,8 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
           category: data.category,
           recurrent: data.recurrent,
           notes: data.notes || undefined,
-        });
+          visibility: data.visibility,
+        } as any);
         toast({ title: 'Receita salva' });
       }
       onOpenChange(false);
