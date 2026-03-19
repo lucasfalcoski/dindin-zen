@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { useGroups, useCreateGroup, useDeleteGroup, ExpenseGroup } from '@/hooks/useGroups';
 import { useExpenses } from '@/hooks/useExpenses';
+import { useBudgets, useUpsertBudget } from '@/hooks/useBudgets';
 import { formatBRL } from '@/lib/format';
 import { Plus, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
