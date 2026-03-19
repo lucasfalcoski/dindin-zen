@@ -47,6 +47,41 @@ export type Database = {
         }
         Relationships: []
       }
+      budgets: {
+        Row: {
+          amount: number
+          created_at: string
+          group_id: string
+          id: string
+          month: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          group_id: string
+          id?: string
+          month: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          group_id?: string
+          id?: string
+          month?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budgets_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "expense_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       credit_cards: {
         Row: {
           account_id: string | null
