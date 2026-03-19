@@ -1,12 +1,88 @@
 import { useState, useEffect } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, ArrowDown } from 'lucide-react';
 import { useGroups } from '@/hooks/useGroups';
 import { useCreateExpense } from '@/hooks/useExpenses';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+function ExpenseFormContent({
+  amount,
+  setAmount,
+  description,
+  setDescription,
+  groupId,
+  setGroupId,
+  groups,
+  handleSave,
+  isPending,
+  autoFocus,
+}: {
+  amount: string;
+  setAmount: (v: string) => void;
+  description: string;
+  setDescription: (v: string) => void;
+  groupId: string;
+  setGroupId: (v: string) => void;
+  groups: Array<{ id: string; name: string; icon: string }> | undefined;
+  handleSave: () => void;
+  isPending: boolean;
+  autoFocus: boolean;
+}) {
+  return (
+    <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex-1 overflow-y-auto space-y-3 px-1">
+        <Input
+          type="number"
+          inputMode="decimal"
+          placeholder="Valor (R$)"
+          value={amount}
+          onChange={e => setAmount(e.target.value)}
+          className="text-2xl h-14 currency"
+          autoFocus={autoFocus}
+          min="0"
+          step="0.01"
+        />
+        <Input
+          placeholder="Descrição"
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSave()}
+        />
+        <div className="flex flex-wrap gap-1.5">
+          {(groups || []).slice(0, 8).map(g => (
+            <button
+              key={g.id}
+              onClick={() => setGroupId(g.id)}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
+                groupId === g.id
+                  ? 'bg-primary/10 text-primary ring-1 ring-primary/30'
+                  : 'bg-accent text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {g.icon} {g.name}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="sticky bottom-0 bg-card pt-3 pb-[env(safe-area-inset-bottom,0px)]">
+        <Button
+          onClick={handleSave}
+          disabled={!amount || !description.trim() || isPending}
+          className="w-full h-12 text-base"
+        >
+          Salvar despesa
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export function QuickAddFAB() {
   const [open, setOpen] = useState(false);
@@ -17,8 +93,8 @@ export function QuickAddFAB() {
   const createExpense = useCreateExpense();
   const { user } = useAuth();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
-  // Set default group
   useEffect(() => {
     if (groups && groups.length > 0 && !groupId) {
       setGroupId(groups[0].id);
@@ -49,75 +125,53 @@ export function QuickAddFAB() {
     );
   };
 
+  const formProps = {
+    amount,
+    setAmount,
+    description,
+    setDescription,
+    groupId,
+    setGroupId,
+    groups,
+    handleSave,
+    isPending: createExpense.isPending,
+    autoFocus: open,
+  };
+
   return (
     <>
-      {/* Backdrop */}
-      {open && (
-        <div
-          className="fixed inset-0 bg-black/40 z-[60] transition-opacity"
-          onClick={() => setOpen(false)}
-        />
+      {/* Mobile: Sheet from bottom */}
+      {isMobile && (
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetContent
+            side="bottom"
+            className="rounded-t-2xl max-h-[90vh] overflow-y-auto flex flex-col p-0"
+          >
+            <div className="bg-[#E05555] rounded-t-2xl px-5 py-4 flex items-center gap-2">
+              <ArrowDown className="h-5 w-5 text-white" />
+              <SheetTitle className="text-white text-base font-semibold">Nova Despesa</SheetTitle>
+            </div>
+            <div className="p-5 flex-1 flex flex-col min-h-0">
+              <ExpenseFormContent {...formProps} />
+            </div>
+          </SheetContent>
+        </Sheet>
       )}
 
-      {/* Bottom sheet */}
-      <div
-        className={cn(
-          'fixed left-0 right-0 bottom-0 z-[70] transition-transform duration-300 ease-out',
-          open ? 'translate-y-0' : 'translate-y-full'
-        )}
-      >
-        <div className="bg-card rounded-t-2xl border-t border-border p-5 pb-8 max-w-lg mx-auto shadow-2xl">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-semibold text-foreground">Despesa rápida</h3>
-            <button onClick={() => setOpen(false)} className="p-1 rounded-lg hover:bg-accent text-muted-foreground">
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            <Input
-              type="number"
-              inputMode="decimal"
-              placeholder="Valor (R$)"
-              value={amount}
-              onChange={e => setAmount(e.target.value)}
-              className="text-2xl h-14 currency"
-              autoFocus={open}
-              min="0"
-              step="0.01"
-            />
-            <Input
-              placeholder="Descrição"
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSave()}
-            />
-            <div className="flex flex-wrap gap-1.5">
-              {(groups || []).slice(0, 8).map(g => (
-                <button
-                  key={g.id}
-                  onClick={() => setGroupId(g.id)}
-                  className={cn(
-                    'px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
-                    groupId === g.id
-                      ? 'bg-primary/10 text-primary ring-1 ring-primary/30'
-                      : 'bg-accent text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  {g.icon} {g.name}
-                </button>
-              ))}
+      {/* Desktop: Dialog */}
+      {!isMobile && (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="max-h-[85vh] overflow-y-auto flex flex-col p-0 gap-0">
+            <div className="bg-[#E05555] px-6 py-4 flex items-center gap-2 rounded-t-lg">
+              <span className="text-lg">💸</span>
+              <DialogTitle className="text-white text-base font-semibold">Nova Despesa Rápida</DialogTitle>
             </div>
-            <Button
-              onClick={handleSave}
-              disabled={!amount || !description.trim() || createExpense.isPending}
-              className="w-full h-12 text-base"
-            >
-              Salvar despesa
-            </Button>
-          </div>
-        </div>
-      </div>
+            <div className="p-6 flex-1 flex flex-col min-h-0">
+              <ExpenseFormContent {...formProps} />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* FAB */}
       <button
