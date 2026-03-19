@@ -138,7 +138,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Bottom nav for mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 flex-shrink-0">
         <div className="flex items-center justify-around h-16">
           {mobileMainLinks.map(l => (
             <NavLink

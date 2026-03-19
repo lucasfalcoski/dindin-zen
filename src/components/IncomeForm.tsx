@@ -115,11 +115,12 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent className="flex flex-col max-h-[90dvh] p-0 gap-0 sm:max-w-md">
+        <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
           <DialogTitle>{editingIncome ? 'Editar receita' : 'Nova receita'}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
+          <div className="flex-1 overflow-y-auto px-6 pb-4 min-h-0 space-y-4">
           <div className="space-y-2">
             <Label>Valor (R$)</Label>
             <Input
@@ -193,10 +194,13 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
             <Label>Notas (opcional)</Label>
             <Textarea {...register('notes')} placeholder="Observações adicionais..." rows={2} />
           </div>
+          </div>
 
-          <Button type="submit" className="w-full" disabled={createIncome.isPending || updateIncome.isPending}>
-            {editingIncome ? 'Atualizar' : 'Salvar'}
-          </Button>
+          <div className="px-6 pb-6 pt-3 flex-shrink-0 border-t border-border bg-card rounded-b-lg">
+            <Button type="submit" className="w-full" disabled={createIncome.isPending || updateIncome.isPending}>
+              {editingIncome ? 'Atualizar' : 'Salvar'}
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

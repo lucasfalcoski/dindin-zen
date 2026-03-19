@@ -174,11 +174,12 @@ function CreditCardForm({ open, onOpenChange }: { open: boolean; onOpenChange: (
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent className="flex flex-col max-h-[90dvh] p-0 gap-0 sm:max-w-md">
+        <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
           <DialogTitle>Novo cartão de crédito</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <div className="flex-1 overflow-y-auto px-6 pb-4 min-h-0 space-y-4">
           <div className="space-y-2">
             <Label>Nome</Label>
             <Input value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Nubank Platinum" required />
@@ -216,7 +217,10 @@ function CreditCardForm({ open, onOpenChange }: { open: boolean; onOpenChange: (
             <Label>Cor</Label>
             <input type="color" value={color} onChange={e => setColor(e.target.value)} className="h-10 w-14 rounded-lg border border-input cursor-pointer" />
           </div>
-          <Button type="submit" className="w-full" disabled={createCard.isPending}>Salvar</Button>
+          </div>
+          <div className="px-6 pb-6 pt-3 flex-shrink-0 border-t border-border bg-card rounded-b-lg">
+            <Button type="submit" className="w-full" disabled={createCard.isPending}>Salvar</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

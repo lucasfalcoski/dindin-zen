@@ -172,11 +172,11 @@ export default function Goals() {
               <Plus className="h-4 w-4" /> Nova meta
             </Button>
           </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
+          <DialogContent className="flex flex-col max-h-[90dvh] p-0 gap-0">
+            <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
               <DialogTitle>Nova meta</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="flex-1 overflow-y-auto px-6 pb-4 min-h-0 space-y-4">
               <div>
                 <label className="label-caps block mb-1.5">Nome</label>
                 <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Ex: Viagem Europa" />
@@ -216,6 +216,8 @@ export default function Goals() {
                   ))}
                 </div>
               </div>
+            </div>
+            <div className="px-6 pb-6 pt-3 flex-shrink-0 border-t border-border bg-card rounded-b-lg">
               <Button onClick={handleCreate} disabled={createGoal.isPending} className="w-full">
                 Criar meta
               </Button>

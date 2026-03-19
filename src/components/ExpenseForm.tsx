@@ -458,9 +458,12 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
             <Textarea {...register('notes')} placeholder="Observações adicionais..." rows={2} />
           </div>
 
-          <Button type="submit" className="w-full" disabled={createExpense.isPending || updateExpense.isPending || createInstallments.isPending}>
-            {editingExpense ? 'Atualizar' : splitEnabled ? 'Dividir e salvar' : installmentsEnabled ? 'Criar parcelas' : 'Salvar'}
-          </Button>
+          </div>
+          <div className="px-6 pb-6 pt-3 flex-shrink-0 border-t border-border bg-card rounded-b-lg">
+            <Button type="submit" className="w-full" disabled={createExpense.isPending || updateExpense.isPending || createInstallments.isPending}>
+              {editingExpense ? 'Atualizar' : splitEnabled ? 'Dividir e salvar' : installmentsEnabled ? 'Criar parcelas' : 'Salvar'}
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
