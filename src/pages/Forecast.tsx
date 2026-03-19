@@ -219,7 +219,8 @@ export default function Forecast() {
       {/* Chart */}
       <div className="card-surface p-5">
         <h2 className="label-caps mb-4">Saldo projetado dia a dia</h2>
-        <ResponsiveContainer width="100%" height={280}>
+        <div className="w-full min-w-0 overflow-x-auto">
+        <ResponsiveContainer width="100%" height={280} minWidth={300}>
           <ComposedChart data={chartData}>
             <defs>
               <linearGradient id="saldoGradient" x1="0" y1="0" x2="0" y2="1">
