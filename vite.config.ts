@@ -33,10 +33,10 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       manifest: {
-        name: 'Meu Dinheiro Zen',
-        short_name: 'Dinheiro Zen',
+        name: 'Din-din Zen',
+        short_name: 'Din-din Zen',
         description: 'Controle suas finanças pessoais de forma simples e eficiente.',
-        theme_color: '#3b82f6',
+        theme_color: '#2C3E2D',
         background_color: '#f8fafc',
         display: 'standalone',
         orientation: 'portrait',
