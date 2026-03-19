@@ -19,6 +19,7 @@ export default function Groups() {
   const { data: groups, isLoading } = useGroups();
   const createGroup = useCreateGroup();
   const deleteGroup = useDeleteGroup();
+  const upsertBudget = useUpsertBudget();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
