@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useIncomes, Income, INCOME_CATEGORIES, IncomeCategory } from '@/hooks/useIncomes';
+import { useView } from '@/contexts/ViewContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { IncomeRow } from '@/components/IncomeRow';
 import { IncomeForm } from '@/components/IncomeForm';
 import { Plus } from 'lucide-react';
@@ -10,6 +12,8 @@ import { Input } from '@/components/ui/input';
 type Period = 'today' | 'week' | 'month' | 'custom';
 
 export default function IncomePage() {
+  const { user } = useAuth();
+  const { viewMode, selectedMemberId } = useView();
   const [period, setPeriod] = useState<Period>('month');
   const [customStart, setCustomStart] = useState('');
   const [customEnd, setCustomEnd] = useState('');
@@ -40,9 +44,24 @@ export default function IncomePage() {
     return { startDate, endDate, category: categoryFilter || undefined };
   }, [period, customStart, customEnd, categoryFilter]);
 
-  const { data: incomes, isLoading } = useIncomes(filters);
+  const { data: allIncomes, isLoading } = useIncomes(filters);
+
+  const incomes = useMemo(() => {
+    if (!allIncomes) return [];
+    switch (viewMode) {
+      case 'personal':
+        return allIncomes.filter(i => i.user_id === user?.id);
+      case 'family':
+        return allIncomes.filter((i: any) => i.visibility === 'family');
+      case 'member':
+        return allIncomes.filter((i: any) => i.user_id === selectedMemberId && i.visibility === 'family');
+      default:
+        return allIncomes;
+    }
+  }, [allIncomes, viewMode, user?.id, selectedMemberId]);
 
   const handleEdit = (income: Income) => {
+    if (income.user_id !== user?.id) return;
     setEditingIncome(income);
     setFormOpen(true);
   };
@@ -58,16 +77,17 @@ export default function IncomePage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Receitas</h1>
-        <button
-          onClick={() => { setEditingIncome(null); setFormOpen(true); }}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Nova
-        </button>
+        {viewMode === 'personal' && (
+          <button
+            onClick={() => { setEditingIncome(null); setFormOpen(true); }}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Nova
+          </button>
+        )}
       </div>
 
-      {/* Period filters */}
       <div className="flex flex-wrap gap-2">
         {periods.map(p => (
           <button
@@ -89,7 +109,6 @@ export default function IncomePage() {
         </div>
       )}
 
-      {/* Category filter */}
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setCategoryFilter('')}
@@ -112,7 +131,6 @@ export default function IncomePage() {
         ))}
       </div>
 
-      {/* List */}
       <div className="card-surface">
         {isLoading ? (
           <div className="space-y-0">
@@ -127,10 +145,10 @@ export default function IncomePage() {
               </div>
             ))}
           </div>
-        ) : incomes && incomes.length > 0 ? (
+        ) : incomes.length > 0 ? (
           <div className="divide-y divide-border/50">
             {incomes.map(i => (
-              <IncomeRow key={i.id} income={i} onEdit={handleEdit} />
+              <IncomeRow key={i.id} income={i} onEdit={i.user_id === user?.id ? handleEdit : undefined} />
             ))}
           </div>
         ) : (

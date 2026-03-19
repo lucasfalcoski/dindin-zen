@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, subMonths, subWeeks, eachDayOfInterval, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from 'date-fns';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, startOfQuarter, endOfQuarter, startOfYear, endOfYear } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useGroups } from '@/hooks/useGroups';
+import { useView } from '@/contexts/ViewContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { formatBRL } from '@/lib/format';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Input } from '@/components/ui/input';
@@ -11,6 +13,8 @@ import { Download } from 'lucide-react';
 type Period = 'week' | 'month' | 'quarter' | 'year' | 'custom';
 
 export default function Reports() {
+  const { user } = useAuth();
+  const { viewMode, selectedMemberId } = useView();
   const [period, setPeriod] = useState<Period>('month');
   const [customStart, setCustomStart] = useState('');
   const [customEnd, setCustomEnd] = useState('');
@@ -27,14 +31,28 @@ export default function Reports() {
     }
   }, [period, customStart, customEnd]);
 
-  const { data: expenses, isLoading } = useExpenses({ startDate, endDate });
+  const { data: allExpenses, isLoading } = useExpenses({ startDate, endDate });
+
+  const expenses = useMemo(() => {
+    if (!allExpenses) return [];
+    switch (viewMode) {
+      case 'personal':
+        return allExpenses.filter(e => e.user_id === user?.id);
+      case 'family':
+        return allExpenses.filter((e: any) => e.visibility === 'family');
+      case 'member':
+        return allExpenses.filter((e: any) => e.user_id === selectedMemberId && e.visibility === 'family');
+      default:
+        return allExpenses;
+    }
+  }, [allExpenses, viewMode, user?.id, selectedMemberId]);
 
   const totalPeriod = useMemo(() => {
-    return expenses?.reduce((s, e) => s + Number(e.amount), 0) || 0;
+    return expenses.reduce((s, e) => s + Number(e.amount), 0);
   }, [expenses]);
 
   const breakdown = useMemo(() => {
-    if (!expenses || !groups) return [];
+    if (!expenses.length || !groups) return [];
     const byGroup: Record<string, number> = {};
     expenses.forEach(e => {
       byGroup[e.group_id] = (byGroup[e.group_id] || 0) + Number(e.amount);
@@ -54,7 +72,7 @@ export default function Reports() {
   }, [expenses, groups, totalPeriod, startDate, endDate]);
 
   const dailyData = useMemo(() => {
-    if (!expenses || !startDate || !endDate) return [];
+    if (!expenses.length || !startDate || !endDate) return [];
     try {
       const days = eachDayOfInterval({
         start: new Date(startDate + 'T00:00:00'),
@@ -75,7 +93,7 @@ export default function Reports() {
   }, [expenses, startDate, endDate]);
 
   const handleExport = () => {
-    if (!expenses) return;
+    if (!expenses.length) return;
     const header = 'Data,Descrição,Grupo,Valor,Recorrente,Notas\n';
     const rows = expenses.map(e => {
       const group = groups?.find(g => g.id === e.group_id);
@@ -104,7 +122,7 @@ export default function Reports() {
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Relatórios</h1>
         <button
           onClick={handleExport}
-          disabled={!expenses?.length}
+          disabled={!expenses.length}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-accent text-foreground text-sm font-medium hover:bg-accent/80 transition-colors disabled:opacity-50"
         >
           <Download className="h-4 w-4" />
@@ -112,7 +130,6 @@ export default function Reports() {
         </button>
       </div>
 
-      {/* Period filter */}
       <div className="flex flex-wrap gap-2">
         {periods.map(p => (
           <button
@@ -134,7 +151,6 @@ export default function Reports() {
         </div>
       )}
 
-      {/* Daily line chart */}
       <div className="card-surface p-5">
         <h2 className="label-caps mb-4">Gastos diários</h2>
         {isLoading ? (
@@ -154,7 +170,6 @@ export default function Reports() {
         )}
       </div>
 
-      {/* Breakdown table */}
       <div className="card-surface overflow-hidden">
         <div className="p-4 pb-2">
           <h2 className="label-caps">Detalhamento por grupo</h2>
