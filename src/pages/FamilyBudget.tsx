@@ -75,6 +75,33 @@ export default function FamilyBudgetPage() {
     return { budgetTotal, spentTotal };
   }, [groups, budgetMap, spentMap]);
 
+  const getName = (userId: string) => {
+    if (userId === user?.id) return 'Você';
+    return profiles?.find(p => p.id === userId)?.display_name || 'Membro';
+  };
+
+  const handleBudgetChange = async (groupId: string, value: string) => {
+    if (!familyId) return;
+    const amount = parseFloat(value.replace(',', '.'));
+    if (isNaN(amount) || amount < 0) return;
+    try {
+      await upsertBudget.mutateAsync({ family_id: familyId, group_id: groupId, month: monthStr, amount });
+    } catch {
+      toast({ title: 'Erro ao salvar', variant: 'destructive' });
+    }
+  };
+
+  if (!familyId) {
+    return (
+      <div className="space-y-4">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Orçamento Familiar</h1>
+        <div className="card-surface p-8 text-center">
+          <p className="text-sm text-muted-foreground">Crie ou entre em uma família para usar o orçamento familiar.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-semibold tracking-tight text-foreground">Orçamento Familiar</h1>
