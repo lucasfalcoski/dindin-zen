@@ -89,8 +89,15 @@ export default function Expenses() {
     if (tagFilter && tagExpenseIds) {
       filtered = filtered.filter(e => tagExpenseIds.has(e.id));
     }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(e =>
+        e.description.toLowerCase().includes(q) ||
+        (e.notes && e.notes.toLowerCase().includes(q))
+      );
+    }
     return filtered;
-  }, [allExpenses, viewMode, user?.id, selectedMemberId, tagFilter, tagExpenseIds]);
+  }, [allExpenses, viewMode, user?.id, selectedMemberId, tagFilter, tagExpenseIds, searchQuery]);
 
   const handleEdit = (expense: Expense) => {
     if (expense.user_id !== user?.id) return; // Can only edit own
