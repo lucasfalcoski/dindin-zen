@@ -52,6 +52,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   // Cmd+K / Ctrl+K shortcut + N for new expense
   useEffect(() => {
