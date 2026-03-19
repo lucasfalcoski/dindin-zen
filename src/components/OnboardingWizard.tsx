@@ -128,7 +128,7 @@ export function OnboardingWizard() {
 
   const handleStep4 = async () => {
     if (familyName.trim()) {
-      await createFamily.mutateAsync({ name: familyName.trim() });
+      await createFamily.mutateAsync(familyName.trim());
     }
     finish();
   };
