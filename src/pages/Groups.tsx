@@ -31,6 +31,7 @@ export default function Groups() {
   const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
   const monthEnd = format(endOfMonth(now), 'yyyy-MM-dd');
   const { data: expenses } = useExpenses({ startDate: monthStart, endDate: monthEnd });
+  const { data: budgets } = useBudgets(monthStart);
 
   const totals = useMemo(() => {
     const map: Record<string, number> = {};
