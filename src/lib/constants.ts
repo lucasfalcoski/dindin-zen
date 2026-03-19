@@ -8,3 +8,12 @@ export const DEFAULT_GROUPS = [
   { name: 'Vestuário', color: '#ec4899', icon: '👕' },
   { name: 'Outros', color: '#64748b', icon: '📦' },
 ] as const;
+
+export const PAYMENT_METHODS = [
+  { value: 'dinheiro', label: 'Dinheiro' },
+  { value: 'debito', label: 'Débito' },
+  { value: 'credito', label: 'Crédito' },
+  { value: 'pix', label: 'Pix' },
+  { value: 'transferencia', label: 'Transferência' },
+  { value: 'outro', label: 'Outro' },
+] as const;
