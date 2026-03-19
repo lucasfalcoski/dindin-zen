@@ -3,6 +3,9 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { ViewSelector } from '@/components/ViewSelector';
 import { GlobalSearch } from '@/components/GlobalSearch';
+import { QuickAddFAB } from '@/components/QuickAddFAB';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { NotificationAlerts } from '@/components/NotificationAlerts';
 import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users, Search, Tag, Gauge, Goal, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -27,17 +30,26 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // Cmd+K / Ctrl+K shortcut
+  // Cmd+K / Ctrl+K shortcut + N for new expense
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setSearchOpen(true);
       }
+      if (e.key === 'n' || e.key === 'N') {
+        if (!e.metaKey && !e.ctrlKey && !e.altKey) {
+          navigate('/expenses?new=1');
+        }
+      }
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, []);
+  }, [navigate]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -45,12 +57,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background transition-colors duration-300">
       {/* Top nav for desktop */}
       <header className="hidden md:block border-b border-border bg-card sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-14">
           <div className="flex items-center gap-1">
-            <span className="text-lg font-semibold tracking-tight text-foreground mr-6">Finanças</span>
+            <span className="text-lg font-semibold tracking-tight text-foreground mr-6">💰 Dinheiro Zen</span>
             {links.map(l => (
               <NavLink
                 key={l.to}
@@ -79,6 +91,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <span className="hidden lg:inline">Buscar</span>
               <kbd className="hidden lg:inline-flex h-5 items-center gap-1 rounded border border-border bg-muted px-1.5 text-[10px] text-muted-foreground">⌘K</kbd>
             </button>
+            <ThemeToggle />
             <ViewSelector />
             <span className="text-xs text-muted-foreground">{user?.email}</span>
             <button
@@ -133,6 +146,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </nav>
 
+      <QuickAddFAB />
+      <NotificationAlerts />
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );
