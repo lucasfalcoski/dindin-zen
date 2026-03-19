@@ -10,6 +10,7 @@ import { useView } from '@/contexts/ViewContext';
 import { useFamilyProfiles } from '@/hooks/useProfiles';
 import { useTagsWithStats } from '@/hooks/useTags';
 import { SummaryCard } from '@/components/SummaryCard';
+import { ProfileCompletionBanner } from '@/components/ProfileCompletionBanner';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { formatBRL, getMonthYear } from '@/lib/format';
