@@ -18,6 +18,7 @@ const COLORS = ['#3b82f6','#f59e0b','#10b981','#ef4444','#8b5cf6','#06b6d4','#ec
 export default function Groups() {
   const { data: groups, isLoading } = useGroups();
   const createGroup = useCreateGroup();
+  const updateGroup = useUpdateGroup();
   const deleteGroup = useDeleteGroup();
   const upsertBudget = useUpsertBudget();
   const { toast } = useToast();
