@@ -43,6 +43,7 @@ export default function Dashboard() {
   const { data: monthIncomes } = useIncomes({ startDate: monthStart, endDate: monthEnd });
   const { data: groups } = useGroups();
   const { data: creditCards } = useCreditCards();
+  const { data: budgets } = useBudgets(monthStart);
 
   const months6ago = format(startOfMonth(subMonths(now, 5)), 'yyyy-MM-dd');
   const { data: sixMonthExpenses } = useExpenses({ startDate: months6ago, endDate: monthEnd });
