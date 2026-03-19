@@ -69,6 +69,7 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
         category: 'outro',
         recurrent: false,
         notes: '',
+        visibility: 'personal',
       });
     }
   }, [editingIncome, open, setValue, reset]);
