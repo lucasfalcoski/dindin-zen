@@ -126,6 +126,16 @@ export default function Groups() {
             <p className="currency text-xs text-muted-foreground mt-1">
               {formatBRL(totals[g.id] || 0)}
             </p>
+            <div className="mt-2" onClick={e => e.stopPropagation()}>
+              <Input
+                className="h-7 text-xs w-full"
+                defaultValue={budgetMap[g.id] ? budgetMap[g.id].toFixed(2) : ''}
+                placeholder="Orçamento R$"
+                inputMode="decimal"
+                onBlur={e => handleBudgetChange(g.id, e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
+              />
+            </div>
             {!g.is_default && (
               <button
                 onClick={e => { e.stopPropagation(); handleDelete(g); }}
