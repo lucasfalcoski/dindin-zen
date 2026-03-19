@@ -24,6 +24,7 @@ export default function Groups() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingGroup, setEditingGroup] = useState<ExpenseGroup | null>(null);
   const [name, setName] = useState('');
   const [color, setColor] = useState(COLORS[0]);
   const [icon, setIcon] = useState(EMOJIS[0]);
