@@ -8,14 +8,16 @@ import { useCreditCards } from '@/hooks/useCreditCards';
 import { useBudgets } from '@/hooks/useBudgets';
 import { useView } from '@/contexts/ViewContext';
 import { useFamilyProfiles } from '@/hooks/useProfiles';
+import { useTagsWithStats } from '@/hooks/useTags';
 import { SummaryCard } from '@/components/SummaryCard';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { formatBRL, getMonthYear } from '@/lib/format';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, TrendingUp, Calendar, Wallet, BarChart3, DollarSign, PiggyBank, Percent, CreditCard, AlertTriangle, Users, Crown } from 'lucide-react';
+import { Plus, TrendingUp, Calendar, Wallet, BarChart3, DollarSign, PiggyBank, Percent, CreditCard, AlertTriangle, Users, Crown, Tag } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 
 function getInvoicePeriod(closingDay: number) {
   const now = new Date();
