@@ -119,6 +119,8 @@ export function OnboardingWizard() {
       await createCard.mutateAsync({
         name: cardName,
         limit: parseFloat(cardLimit) || 0,
+        closing_day: 25,
+        due_day: 10,
       });
     }
     setStep(3);
