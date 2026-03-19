@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { ViewSelector } from '@/components/ViewSelector';
 import { GlobalSearch } from '@/components/GlobalSearch';
-import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users, Search, Tag } from 'lucide-react';
+import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users, Search, Tag, Gauge, Goal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const links = [
@@ -15,6 +15,8 @@ const links = [
   { to: '/groups', label: 'Grupos', icon: FolderOpen },
   { to: '/tags', label: 'Tags', icon: Tag },
   { to: '/budget', label: 'Orçamento', icon: Target },
+  { to: '/score', label: 'Score', icon: Gauge },
+  { to: '/goals', label: 'Metas', icon: Goal },
   { to: '/family', label: 'Família', icon: Users },
   { to: '/reports', label: 'Relatórios', icon: BarChart3 },
 ];
