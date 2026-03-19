@@ -79,9 +79,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const mobileMoreLinks = links.slice(4);
 
   return (
-    <div className="h-screen flex flex-col bg-background transition-colors duration-300 overflow-hidden">
+    <div className="flex flex-col h-dvh bg-background transition-colors duration-300">
       {/* Top nav for desktop */}
-      <header className="hidden md:block border-b border-border bg-card sticky top-0 z-50">
+      <header className="hidden md:block border-b border-border bg-card flex-shrink-0 z-50">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-14">
           <div className="flex items-center gap-1 min-w-0 flex-1">
             <div className="flex items-center gap-2 mr-4 shrink-0">
@@ -138,7 +138,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Bottom nav for mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 flex-shrink-0">
         <div className="flex items-center justify-around h-16">
           {mobileMainLinks.map(l => (
             <NavLink
