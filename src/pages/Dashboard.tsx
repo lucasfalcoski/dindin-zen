@@ -411,12 +411,12 @@ export default function Dashboard() {
           <div className="space-y-3">
             {budgetAlerts.map(b => (
               <div key={b.group!.id} className="space-y-1">
-                <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center justify-between text-xs flex-wrap gap-1">
                   <span className="text-foreground font-medium flex items-center gap-1.5">
                     {b.group!.icon} {b.group!.name}
                     {b.pct >= 80 && <AlertTriangle className="h-3 w-3 text-amber-500" />}
                   </span>
-                  <span className={b.pct > 100 ? 'text-destructive font-medium' : 'text-muted-foreground'}>
+                  <span className={cn('whitespace-nowrap', b.pct > 100 ? 'text-destructive font-medium' : 'text-muted-foreground')}>
                     {formatBRL(b.spent)} / {formatBRL(b.budget)} ({b.pct.toFixed(0)}%)
                   </span>
                 </div>
