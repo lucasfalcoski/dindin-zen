@@ -14,6 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounts: {
+        Row: {
+          balance: number
+          bank_name: string | null
+          color: string
+          created_at: string
+          id: string
+          name: string
+          type: Database["public"]["Enums"]["account_type"]
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          bank_name?: string | null
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          type?: Database["public"]["Enums"]["account_type"]
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          bank_name?: string | null
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          type?: Database["public"]["Enums"]["account_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      credit_cards: {
+        Row: {
+          account_id: string | null
+          closing_day: number
+          color: string
+          created_at: string
+          due_day: number
+          id: string
+          limit: number
+          name: string
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          closing_day?: number
+          color?: string
+          created_at?: string
+          due_day?: number
+          id?: string
+          limit?: number
+          name: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          closing_day?: number
+          color?: string
+          created_at?: string
+          due_day?: number
+          id?: string
+          limit?: number
+          name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_cards_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expense_groups: {
         Row: {
           color: string
@@ -46,39 +123,62 @@ export type Database = {
       }
       expenses: {
         Row: {
+          account_id: string | null
           amount: number
           created_at: string
+          credit_card_id: string | null
           date: string
           description: string
           group_id: string
           id: string
           notes: string | null
+          payment_method: Database["public"]["Enums"]["payment_method"]
           recurrent: boolean
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           amount: number
           created_at?: string
+          credit_card_id?: string | null
           date?: string
           description: string
           group_id: string
           id?: string
           notes?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"]
           recurrent?: boolean
           user_id: string
         }
         Update: {
+          account_id?: string | null
           amount?: number
           created_at?: string
+          credit_card_id?: string | null
           date?: string
           description?: string
           group_id?: string
           id?: string
           notes?: string | null
+          payment_method?: Database["public"]["Enums"]["payment_method"]
           recurrent?: boolean
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "expenses_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_credit_card_id_fkey"
+            columns: ["credit_card_id"]
+            isOneToOne: false
+            referencedRelation: "credit_cards"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "expenses_group_id_fkey"
             columns: ["group_id"]
@@ -132,11 +232,19 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      account_type: "corrente" | "poupanca" | "carteira" | "investimento"
       income_category:
         | "salario"
         | "freelance"
         | "investimento"
         | "presente"
+        | "outro"
+      payment_method:
+        | "dinheiro"
+        | "debito"
+        | "credito"
+        | "pix"
+        | "transferencia"
         | "outro"
     }
     CompositeTypes: {
@@ -265,11 +373,20 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      account_type: ["corrente", "poupanca", "carteira", "investimento"],
       income_category: [
         "salario",
         "freelance",
         "investimento",
         "presente",
+        "outro",
+      ],
+      payment_method: [
+        "dinheiro",
+        "debito",
+        "credito",
+        "pix",
+        "transferencia",
         "outro",
       ],
     },

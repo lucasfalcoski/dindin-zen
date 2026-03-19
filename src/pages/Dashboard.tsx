@@ -4,13 +4,28 @@ import { ptBR } from 'date-fns/locale';
 import { useExpenses, Expense } from '@/hooks/useExpenses';
 import { useIncomes } from '@/hooks/useIncomes';
 import { useGroups } from '@/hooks/useGroups';
+import { useCreditCards } from '@/hooks/useCreditCards';
 import { SummaryCard } from '@/components/SummaryCard';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { formatBRL, getMonthYear } from '@/lib/format';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, TrendingUp, Calendar, Wallet, BarChart3, DollarSign, PiggyBank, Percent } from 'lucide-react';
+import { Plus, TrendingUp, Calendar, Wallet, BarChart3, DollarSign, PiggyBank, Percent, CreditCard } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+
+function getInvoicePeriod(closingDay: number) {
+  const now = new Date();
+  const currentDay = now.getDate();
+  let start: Date, end: Date;
+  if (currentDay <= closingDay) {
+    start = new Date(now.getFullYear(), now.getMonth() - 1, closingDay + 1);
+    end = new Date(now.getFullYear(), now.getMonth(), closingDay);
+  } else {
+    start = new Date(now.getFullYear(), now.getMonth(), closingDay + 1);
+    end = new Date(now.getFullYear(), now.getMonth() + 1, closingDay);
+  }
+  return { start: format(start, 'yyyy-MM-dd'), end: format(end, 'yyyy-MM-dd') };
+}
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -25,8 +40,8 @@ export default function Dashboard() {
   const { data: monthExpenses, isLoading } = useExpenses({ startDate: monthStart, endDate: monthEnd });
   const { data: monthIncomes } = useIncomes({ startDate: monthStart, endDate: monthEnd });
   const { data: groups } = useGroups();
+  const { data: creditCards } = useCreditCards();
 
-  // Last 6 months for bar chart
   const months6ago = format(startOfMonth(subMonths(now, 5)), 'yyyy-MM-dd');
   const { data: sixMonthExpenses } = useExpenses({ startDate: months6ago, endDate: monthEnd });
   const { data: sixMonthIncomes } = useIncomes({ startDate: months6ago, endDate: monthEnd });
@@ -41,11 +56,9 @@ export default function Dashboard() {
       .reduce((s, e) => s + Number(e.amount), 0);
     const daysInMonth = now.getDate();
     const avgDay = daysInMonth > 0 ? expTotal / daysInMonth : 0;
-
     const incTotal = (monthIncomes || []).reduce((s, i) => s + Number(i.amount), 0);
     const balance = incTotal - expTotal;
     const savingsRate = incTotal > 0 ? (balance / incTotal) * 100 : 0;
-
     return { total: expTotal, week, today: todayTotal, avgDay, incTotal, balance, savingsRate };
   }, [monthExpenses, monthIncomes, weekStart, weekEnd, today]);
 
@@ -81,6 +94,19 @@ export default function Dashboard() {
     }));
   }, [sixMonthExpenses, sixMonthIncomes]);
 
+  // Credit card invoice totals
+  const cardInvoices = useMemo(() => {
+    if (!creditCards || !monthExpenses) return [];
+    return creditCards.map(card => {
+      const period = getInvoicePeriod(card.closing_day);
+      const cardExpenses = (monthExpenses || []).filter(
+        (e: any) => e.credit_card_id === card.id && e.date >= period.start && e.date <= period.end
+      );
+      const total = cardExpenses.reduce((s, e) => s + Number(e.amount), 0);
+      return { ...card, invoiceTotal: total };
+    }).filter(c => c.invoiceTotal > 0 || true); // show all cards
+  }, [creditCards, monthExpenses]);
+
   const recentExpenses = useMemo(() => {
     return (monthExpenses || []).slice(0, 5);
   }, [monthExpenses]);
@@ -102,7 +128,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Olá{user?.email ? `, ${user.email.split('@')[0]}` : ''} 👋
@@ -110,7 +135,6 @@ export default function Dashboard() {
         <p className="text-sm text-muted-foreground capitalize">{getMonthYear()}</p>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <SummaryCard label="Despesas do mês" value={stats.total} icon={<Wallet className="h-4 w-4 text-muted-foreground" />} />
         <SummaryCard label="Receitas do mês" value={stats.incTotal} icon={<DollarSign className="h-4 w-4 text-muted-foreground" />} />
@@ -132,9 +156,28 @@ export default function Dashboard() {
         <SummaryCard label="Média diária" value={stats.avgDay} icon={<BarChart3 className="h-4 w-4 text-muted-foreground" />} />
       </div>
 
-      {/* Charts */}
+      {/* Credit cards section */}
+      {cardInvoices.length > 0 && (
+        <div className="card-surface p-5">
+          <h2 className="label-caps mb-4">Faturas dos cartões</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {cardInvoices.map(c => (
+              <div key={c.id} className="flex items-center gap-3 p-3 rounded-lg bg-accent/50">
+                <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: c.color + '20' }}>
+                  <CreditCard className="h-4 w-4" style={{ color: c.color }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
+                  <p className="text-[11px] text-muted-foreground">Fatura atual</p>
+                </div>
+                <span className="currency text-sm font-semibold text-foreground">{formatBRL(c.invoiceTotal)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="grid md:grid-cols-2 gap-4">
-        {/* Donut */}
         <div className="card-surface p-5">
           <h2 className="label-caps mb-4">Gastos por grupo</h2>
           {donutData.length > 0 ? (
@@ -164,7 +207,6 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Bar chart — income vs expense */}
         <div className="card-surface p-5">
           <h2 className="label-caps mb-4">Receitas vs Despesas (6 meses)</h2>
           {barData.length > 0 ? (
@@ -185,7 +227,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Recent expenses */}
       <div className="card-surface">
         <div className="flex items-center justify-between p-4 pb-2">
           <h2 className="label-caps">Despesas recentes</h2>
@@ -203,7 +244,6 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* FAB */}
       <button
         onClick={() => setFormOpen(true)}
         className="fixed bottom-20 md:bottom-8 right-6 h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-150 hover:scale-105 z-40"

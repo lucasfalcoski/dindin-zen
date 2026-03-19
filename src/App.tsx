@@ -8,6 +8,8 @@ import { AppLayout } from "@/components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Expenses from "./pages/Expenses";
 import IncomePage from "./pages/Income";
+import AccountsPage from "./pages/Accounts";
+import CreditCardsPage from "./pages/CreditCards";
 import Groups from "./pages/Groups";
 import Reports from "./pages/Reports";
 import Login from "./pages/Login";
@@ -50,6 +52,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AppLayout><IncomePage /></AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/accounts"
+              element={
+                <ProtectedRoute>
+                  <AppLayout><AccountsPage /></AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/credit-cards"
+              element={
+                <ProtectedRoute>
+                  <AppLayout><CreditCardsPage /></AppLayout>
                 </ProtectedRoute>
               }
             />
