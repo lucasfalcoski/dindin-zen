@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { ViewSelector } from '@/components/ViewSelector';
-import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users } from 'lucide-react';
+import { GlobalSearch } from '@/components/GlobalSearch';
+import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users, Search, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const links = [
@@ -11,6 +13,7 @@ const links = [
   { to: '/accounts', label: 'Contas', icon: Building2 },
   { to: '/credit-cards', label: 'Cartões', icon: CreditCard },
   { to: '/groups', label: 'Grupos', icon: FolderOpen },
+  { to: '/tags', label: 'Tags', icon: Tag },
   { to: '/budget', label: 'Orçamento', icon: Target },
   { to: '/family', label: 'Família', icon: Users },
   { to: '/reports', label: 'Relatórios', icon: BarChart3 },
@@ -19,6 +22,19 @@ const links = [
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Cmd+K / Ctrl+K shortcut
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -52,6 +68,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             ))}
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border border-border"
+            >
+              <Search className="h-3.5 w-3.5" />
+              <span className="hidden lg:inline">Buscar</span>
+              <kbd className="hidden lg:inline-flex h-5 items-center gap-1 rounded border border-border bg-muted px-1.5 text-[10px] text-muted-foreground">⌘K</kbd>
+            </button>
             <ViewSelector />
             <span className="text-xs text-muted-foreground">{user?.email}</span>
             <button
@@ -73,7 +97,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Bottom nav for mobile */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
         <div className="flex items-center justify-around h-16">
-          {links.slice(0, 5).map(l => (
+          {links.slice(0, 4).map(l => (
             <NavLink
               key={l.to}
               to={l.to}
@@ -90,6 +114,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </NavLink>
           ))}
           <button
+            onClick={() => setSearchOpen(true)}
+            className="flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium text-muted-foreground"
+          >
+            <Search className="h-5 w-5" />
+            Buscar
+          </button>
+          <button
             onClick={handleSignOut}
             className="flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium text-muted-foreground"
           >
@@ -98,6 +129,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </button>
         </div>
       </nav>
+
+      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );
 }
