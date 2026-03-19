@@ -440,7 +440,7 @@ export function ImportExpensesModal({ open, onOpenChange }: ImportExpensesModalP
                               </SelectContent>
                             </Select>
                             {row.aiSuggested && (
-                              <Badge variant="secondary" className="text-[10px] px-1 py-0 bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                              <Badge variant="secondary" className="text-[10px] px-1 py-0 bg-primary/10 text-primary">
                                 IA
                               </Badge>
                             )}
