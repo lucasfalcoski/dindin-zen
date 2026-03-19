@@ -172,6 +172,7 @@ export type Database = {
           notes: string | null
           payment_method: Database["public"]["Enums"]["payment_method"]
           recurrent: boolean
+          split_group_id: string | null
           user_id: string
           visibility: Database["public"]["Enums"]["visibility_type"]
         }
@@ -190,6 +191,7 @@ export type Database = {
           notes?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"]
           recurrent?: boolean
+          split_group_id?: string | null
           user_id: string
           visibility?: Database["public"]["Enums"]["visibility_type"]
         }
@@ -208,6 +210,7 @@ export type Database = {
           notes?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"]
           recurrent?: boolean
+          split_group_id?: string | null
           user_id?: string
           visibility?: Database["public"]["Enums"]["visibility_type"]
         }
@@ -255,6 +258,48 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      family_budgets: {
+        Row: {
+          amount: number
+          created_at: string
+          family_id: string
+          group_id: string
+          id: string
+          month: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          family_id: string
+          group_id: string
+          id?: string
+          month: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          family_id?: string
+          group_id?: string
+          id?: string
+          month?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_budgets_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_budgets_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "expense_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       family_members: {
         Row: {
@@ -338,6 +383,68 @@ export type Database = {
           visibility?: Database["public"]["Enums"]["visibility_type"]
         }
         Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_color: string
+          created_at: string
+          display_name: string | null
+          id: string
+        }
+        Insert: {
+          avatar_color?: string
+          created_at?: string
+          display_name?: string | null
+          id: string
+        }
+        Update: {
+          avatar_color?: string
+          created_at?: string
+          display_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      settlements: {
+        Row: {
+          amount: number
+          created_at: string
+          family_id: string
+          from_user_id: string
+          id: string
+          notes: string | null
+          settled_at: string
+          to_user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          family_id: string
+          from_user_id: string
+          id?: string
+          notes?: string | null
+          settled_at?: string
+          to_user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          family_id?: string
+          from_user_id?: string
+          id?: string
+          notes?: string | null
+          settled_at?: string
+          to_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "settlements_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
