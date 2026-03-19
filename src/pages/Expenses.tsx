@@ -22,6 +22,7 @@ export default function Expenses() {
   const [customEnd, setCustomEnd] = useState('');
   const [groupFilter, setGroupFilter] = useState<string>('');
   const [formOpen, setFormOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const { data: groups } = useGroups();
 
