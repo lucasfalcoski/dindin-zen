@@ -153,12 +153,20 @@ export default function Groups() {
               />
             </div>
             {!g.is_default && (
-              <button
-                onClick={e => { e.stopPropagation(); handleDelete(g); }}
-                className="absolute top-3 right-3 p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
+              <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                <button
+                  onClick={e => { e.stopPropagation(); handleEdit(g); }}
+                  className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={e => { e.stopPropagation(); handleDelete(g); }}
+                  className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
             )}
           </div>
         ))}
