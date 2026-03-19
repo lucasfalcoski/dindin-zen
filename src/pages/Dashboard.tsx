@@ -263,11 +263,11 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight text-foreground">
           {viewMode === 'family' ? (
             <span className="flex items-center gap-2"><Users className="h-6 w-6 text-primary" /> Dashboard Familiar</span>
           ) : (
-            <>Olá{user?.email ? `, ${user.email.split('@')[0]}` : ''} 👋</>
+            <>Olá{profile?.display_name ? `, ${profile.display_name}` : user?.email ? `, ${user.email.split('@')[0]}` : ''} 👋</>
           )}
         </h1>
         <p className="text-sm text-muted-foreground capitalize">{getMonthYear()}</p>
