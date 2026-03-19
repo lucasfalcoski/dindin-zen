@@ -74,6 +74,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener('keydown', handler);
   }, [navigate]);
 
+  // Listen for help guide event from OnboardingWizard
+  useEffect(() => {
+    const handler = () => setHelpOpen(true);
+    window.addEventListener('open-help-guide', handler);
+    return () => window.removeEventListener('open-help-guide', handler);
+  }, []);
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/login');
