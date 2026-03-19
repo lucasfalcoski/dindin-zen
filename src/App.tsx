@@ -62,6 +62,7 @@ const App = () => (
             <Route path="/budget" element={<ProtectedPage><BudgetPage /></ProtectedPage>} />
             <Route path="/score" element={<ProtectedPage><Score /></ProtectedPage>} />
             <Route path="/goals" element={<ProtectedPage><Goals /></ProtectedPage>} />
+            <Route path="/forecast" element={<ProtectedPage><Forecast /></ProtectedPage>} />
             <Route path="/family" element={<ProtectedPage><FamilySettings /></ProtectedPage>} />
             <Route path="/family/balances" element={<ProtectedPage><FamilyBalances /></ProtectedPage>} />
             <Route path="/family/budget" element={<ProtectedPage><FamilyBudgetPage /></ProtectedPage>} />

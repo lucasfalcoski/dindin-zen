@@ -17,6 +17,7 @@ const links = [
   { to: '/budget', label: 'Orçamento', icon: Target },
   { to: '/score', label: 'Score', icon: Gauge },
   { to: '/goals', label: 'Metas', icon: Goal },
+  { to: '/forecast', label: 'Projeção', icon: TrendingUp },
   { to: '/family', label: 'Família', icon: Users },
   { to: '/reports', label: 'Relatórios', icon: BarChart3 },
 ];
