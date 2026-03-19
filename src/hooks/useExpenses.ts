@@ -24,6 +24,8 @@ interface ExpenseFilters {
   startDate?: string;
   endDate?: string;
   groupId?: string;
+  accountId?: string;
+  creditCardId?: string;
 }
 
 export function useExpenses(filters?: ExpenseFilters) {
