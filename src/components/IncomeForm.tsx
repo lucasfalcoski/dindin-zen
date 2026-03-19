@@ -60,6 +60,7 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
       setValue('category', editingIncome.category);
       setValue('recurrent', editingIncome.recurrent);
       setValue('notes', editingIncome.notes || '');
+      setValue('visibility', (editingIncome as any).visibility || 'personal');
     } else {
       reset({
         description: '',
