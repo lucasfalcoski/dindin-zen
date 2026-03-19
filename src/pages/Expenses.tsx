@@ -172,6 +172,8 @@ export default function Expenses() {
         onOpenChange={o => { setFormOpen(o); if (!o) setEditingExpense(null); }}
         editingExpense={editingExpense}
       />
+
+      <ImportExpensesModal open={importOpen} onOpenChange={setImportOpen} />
     </div>
   );
 }
