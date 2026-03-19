@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   useMyFamilies,
   useFamilyMembers,
@@ -13,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Users, Plus, Trash2, Copy, Check, Crown, Clock, Mail } from 'lucide-react';
+import { Users, Plus, Trash2, Copy, Check, Crown, Clock, Mail, ArrowRight, Target, Scale } from 'lucide-react';
 
 export default function FamilySettings() {
   const { user } = useAuth();
