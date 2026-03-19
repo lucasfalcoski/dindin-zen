@@ -2,14 +2,15 @@ import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useExpenses, Expense } from '@/hooks/useExpenses';
+import { useIncomes } from '@/hooks/useIncomes';
 import { useGroups } from '@/hooks/useGroups';
 import { SummaryCard } from '@/components/SummaryCard';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { formatBRL, getMonthYear } from '@/lib/format';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, TrendingUp, Calendar, Wallet, BarChart3 } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { Plus, TrendingUp, Calendar, Wallet, BarChart3, DollarSign, PiggyBank, Percent } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -22,24 +23,31 @@ export default function Dashboard() {
   const today = format(now, 'yyyy-MM-dd');
 
   const { data: monthExpenses, isLoading } = useExpenses({ startDate: monthStart, endDate: monthEnd });
+  const { data: monthIncomes } = useIncomes({ startDate: monthStart, endDate: monthEnd });
   const { data: groups } = useGroups();
 
   // Last 6 months for bar chart
   const months6ago = format(startOfMonth(subMonths(now, 5)), 'yyyy-MM-dd');
   const { data: sixMonthExpenses } = useExpenses({ startDate: months6ago, endDate: monthEnd });
+  const { data: sixMonthIncomes } = useIncomes({ startDate: months6ago, endDate: monthEnd });
 
   const stats = useMemo(() => {
-    if (!monthExpenses) return { total: 0, week: 0, today: 0, avgDay: 0 };
-    const total = monthExpenses.reduce((s, e) => s + Number(e.amount), 0);
-    const week = monthExpenses
+    const expTotal = (monthExpenses || []).reduce((s, e) => s + Number(e.amount), 0);
+    const week = (monthExpenses || [])
       .filter(e => e.date >= weekStart && e.date <= weekEnd)
       .reduce((s, e) => s + Number(e.amount), 0);
-    const todayTotal = monthExpenses
+    const todayTotal = (monthExpenses || [])
       .filter(e => e.date === today)
       .reduce((s, e) => s + Number(e.amount), 0);
     const daysInMonth = now.getDate();
-    return { total, week, today: todayTotal, avgDay: daysInMonth > 0 ? total / daysInMonth : 0 };
-  }, [monthExpenses, weekStart, weekEnd, today]);
+    const avgDay = daysInMonth > 0 ? expTotal / daysInMonth : 0;
+
+    const incTotal = (monthIncomes || []).reduce((s, i) => s + Number(i.amount), 0);
+    const balance = incTotal - expTotal;
+    const savingsRate = incTotal > 0 ? (balance / incTotal) * 100 : 0;
+
+    return { total: expTotal, week, today: todayTotal, avgDay, incTotal, balance, savingsRate };
+  }, [monthExpenses, monthIncomes, weekStart, weekEnd, today]);
 
   const donutData = useMemo(() => {
     if (!monthExpenses || !groups) return [];
@@ -54,22 +62,24 @@ export default function Dashboard() {
   }, [monthExpenses, groups]);
 
   const barData = useMemo(() => {
-    if (!sixMonthExpenses) return [];
-    const byMonth: Record<string, number> = {};
+    const byMonth: Record<string, { despesas: number; receitas: number }> = {};
     for (let i = 5; i >= 0; i--) {
       const m = subMonths(now, i);
-      const key = format(m, 'yyyy-MM');
-      byMonth[key] = 0;
+      byMonth[format(m, 'yyyy-MM')] = { despesas: 0, receitas: 0 };
     }
-    sixMonthExpenses.forEach(e => {
+    (sixMonthExpenses || []).forEach(e => {
       const key = e.date.substring(0, 7);
-      if (key in byMonth) byMonth[key] += Number(e.amount);
+      if (key in byMonth) byMonth[key].despesas += Number(e.amount);
+    });
+    (sixMonthIncomes || []).forEach(i => {
+      const key = i.date.substring(0, 7);
+      if (key in byMonth) byMonth[key].receitas += Number(i.amount);
     });
     return Object.entries(byMonth).map(([k, v]) => ({
       month: format(new Date(k + '-01'), 'MMM', { locale: ptBR }),
-      total: v,
+      ...v,
     }));
-  }, [sixMonthExpenses]);
+  }, [sixMonthExpenses, sixMonthIncomes]);
 
   const recentExpenses = useMemo(() => {
     return (monthExpenses || []).slice(0, 5);
@@ -79,7 +89,7 @@ export default function Dashboard() {
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
+          {[...Array(7)].map((_, i) => (
             <div key={i} className="card-surface p-5 h-24 animate-pulse">
               <div className="h-3 w-20 bg-muted rounded mb-3" />
               <div className="h-6 w-28 bg-muted rounded" />
@@ -102,7 +112,21 @@ export default function Dashboard() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <SummaryCard label="Total do mês" value={stats.total} icon={<Wallet className="h-4 w-4 text-muted-foreground" />} />
+        <SummaryCard label="Despesas do mês" value={stats.total} icon={<Wallet className="h-4 w-4 text-muted-foreground" />} />
+        <SummaryCard label="Receitas do mês" value={stats.incTotal} icon={<DollarSign className="h-4 w-4 text-muted-foreground" />} />
+        <SummaryCard
+          label="Saldo do mês"
+          value={stats.balance}
+          icon={<PiggyBank className="h-4 w-4 text-muted-foreground" />}
+          valueClassName={stats.balance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}
+        />
+        <SummaryCard
+          label="Taxa de poupança"
+          value={stats.savingsRate}
+          icon={<Percent className="h-4 w-4 text-muted-foreground" />}
+          formatFn={(v) => `${v.toFixed(1)}%`}
+          valueClassName={stats.savingsRate >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'}
+        />
         <SummaryCard label="Total da semana" value={stats.week} icon={<Calendar className="h-4 w-4 text-muted-foreground" />} />
         <SummaryCard label="Total de hoje" value={stats.today} icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />} />
         <SummaryCard label="Média diária" value={stats.avgDay} icon={<BarChart3 className="h-4 w-4 text-muted-foreground" />} />
@@ -140,17 +164,19 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Bar chart */}
+        {/* Bar chart — income vs expense */}
         <div className="card-surface p-5">
-          <h2 className="label-caps mb-4">Últimos 6 meses</h2>
+          <h2 className="label-caps mb-4">Receitas vs Despesas (6 meses)</h2>
           {barData.length > 0 ? (
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={barData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
-                <Tooltip formatter={(v: number) => formatBRL(v)} labelFormatter={l => l} />
-                <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                <Tooltip formatter={(v: number) => formatBRL(v)} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <Bar dataKey="receitas" name="Receitas" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="despesas" name="Despesas" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
