@@ -19,6 +19,7 @@ const incomeSchema = z.object({
   category: z.enum(['salario', 'freelance', 'investimento', 'presente', 'outro'] as const),
   recurrent: z.boolean().default(false),
   notes: z.string().max(500).optional(),
+  visibility: z.enum(['personal', 'family'] as const).default('personal'),
 });
 
 type FormData = z.infer<typeof incomeSchema>;
