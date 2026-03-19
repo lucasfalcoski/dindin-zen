@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const links = [
@@ -10,6 +10,7 @@ const links = [
   { to: '/accounts', label: 'Contas', icon: Building2 },
   { to: '/credit-cards', label: 'Cartões', icon: CreditCard },
   { to: '/groups', label: 'Grupos', icon: FolderOpen },
+  { to: '/budget', label: 'Orçamento', icon: Target },
   { to: '/reports', label: 'Relatórios', icon: BarChart3 },
 ];
 

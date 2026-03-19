@@ -88,6 +88,14 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/budget"
+              element={
+                <ProtectedRoute>
+                  <AppLayout><BudgetPage /></AppLayout>
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
