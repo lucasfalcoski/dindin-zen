@@ -61,6 +61,7 @@ export default function Dashboard() {
   const months6ago = format(startOfMonth(subMonths(now, 5)), 'yyyy-MM-dd');
   const { data: sixMonthExpenses } = useExpenses({ startDate: months6ago, endDate: monthEnd });
   const { data: sixMonthIncomes } = useIncomes({ startDate: months6ago, endDate: monthEnd });
+  const { data: tagsStats } = useTagsWithStats();
 
   // Filter data based on view mode
   const monthExpenses = useMemo(() => {
