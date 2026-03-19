@@ -10,6 +10,7 @@ import { NotificationAlerts } from '@/components/NotificationAlerts';
 import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users, Search, Tag, Gauge, Goal, TrendingUp, MoreHorizontal, X, User, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { HelpGuide } from '@/components/HelpGuide';
 
 const links = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
