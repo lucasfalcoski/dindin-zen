@@ -232,6 +232,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               Meu Perfil
             </NavLink>
             <button
+              onClick={() => { setHelpOpen(true); setMoreOpen(false); }}
+              className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              <HelpCircle className="h-4 w-4" />
+              Ajuda
+            </button>
+            <button
               onClick={() => { handleSignOut(); setMoreOpen(false); }}
               className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             >
