@@ -42,6 +42,8 @@ export function useExpenses(filters?: ExpenseFilters) {
       if (filters?.startDate) query = query.gte('date', filters.startDate);
       if (filters?.endDate) query = query.lte('date', filters.endDate);
       if (filters?.groupId) query = query.eq('group_id', filters.groupId);
+      if (filters?.accountId) query = query.eq('account_id', filters.accountId);
+      if (filters?.creditCardId) query = query.eq('credit_card_id', filters.creditCardId);
 
       const { data, error } = await query;
       if (error) throw error;
