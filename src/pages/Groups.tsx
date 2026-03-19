@@ -41,6 +41,22 @@ export default function Groups() {
     return map;
   }, [expenses]);
 
+  const budgetMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    budgets?.forEach(b => { map[b.group_id] = Number(b.amount); });
+    return map;
+  }, [budgets]);
+
+  const handleBudgetChange = async (groupId: string, value: string) => {
+    const amount = parseFloat(value.replace(',', '.'));
+    if (isNaN(amount) || amount < 0) return;
+    try {
+      await upsertBudget.mutateAsync({ group_id: groupId, month: monthStart, amount });
+    } catch {
+      toast({ title: 'Erro ao salvar orçamento', variant: 'destructive' });
+    }
+  };
+
   const handleCreate = async () => {
     if (!name.trim()) return;
     try {
