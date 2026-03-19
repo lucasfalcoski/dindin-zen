@@ -259,6 +259,7 @@ export default function Forecast() {
             />
           </ComposedChart>
         </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Timeline */}
