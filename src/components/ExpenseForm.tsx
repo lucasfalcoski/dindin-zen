@@ -448,6 +448,11 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
           )}
 
           <div className="space-y-2">
+            <Label>Tags (opcional)</Label>
+            <TagInput selectedTagIds={selectedTagIds} onChange={setSelectedTagIds} />
+          </div>
+
+          <div className="space-y-2">
             <Label>Notas (opcional)</Label>
             <Textarea {...register('notes')} placeholder="Observações adicionais..." rows={2} />
           </div>
