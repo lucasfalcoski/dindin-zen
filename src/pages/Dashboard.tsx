@@ -5,13 +5,15 @@ import { useExpenses, Expense } from '@/hooks/useExpenses';
 import { useIncomes } from '@/hooks/useIncomes';
 import { useGroups } from '@/hooks/useGroups';
 import { useCreditCards } from '@/hooks/useCreditCards';
+import { useBudgets } from '@/hooks/useBudgets';
 import { SummaryCard } from '@/components/SummaryCard';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { formatBRL, getMonthYear } from '@/lib/format';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, TrendingUp, Calendar, Wallet, BarChart3, DollarSign, PiggyBank, Percent, CreditCard } from 'lucide-react';
+import { Plus, TrendingUp, Calendar, Wallet, BarChart3, DollarSign, PiggyBank, Percent, CreditCard, AlertTriangle } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import { Progress } from '@/components/ui/progress';
 
 function getInvoicePeriod(closingDay: number) {
   const now = new Date();
@@ -41,6 +43,7 @@ export default function Dashboard() {
   const { data: monthIncomes } = useIncomes({ startDate: monthStart, endDate: monthEnd });
   const { data: groups } = useGroups();
   const { data: creditCards } = useCreditCards();
+  const { data: budgets } = useBudgets(monthStart);
 
   const months6ago = format(startOfMonth(subMonths(now, 5)), 'yyyy-MM-dd');
   const { data: sixMonthExpenses } = useExpenses({ startDate: months6ago, endDate: monthEnd });
@@ -114,6 +117,26 @@ export default function Dashboard() {
   const recurringExpenses = useMemo(() => {
     return (monthExpenses || []).filter(e => e.recurrent);
   }, [monthExpenses]);
+
+  // Budget data for dashboard
+  const budgetAlerts = useMemo(() => {
+    if (!budgets || !groups || !monthExpenses) return [];
+    const spentMap: Record<string, number> = {};
+    monthExpenses.forEach(e => {
+      spentMap[e.group_id] = (spentMap[e.group_id] || 0) + Number(e.amount);
+    });
+    return budgets
+      .filter(b => Number(b.amount) > 0)
+      .map(b => {
+        const group = groups.find(g => g.id === b.group_id);
+        const spent = spentMap[b.group_id] || 0;
+        const budget = Number(b.amount);
+        const pct = (spent / budget) * 100;
+        return { group, spent, budget, pct };
+      })
+      .filter(b => b.group)
+      .sort((a, b) => b.pct - a.pct);
+  }, [budgets, groups, monthExpenses]);
 
   if (isLoading) {
     return (
@@ -230,6 +253,37 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* Budget progress bars */}
+      {budgetAlerts.length > 0 && (
+        <div className="card-surface p-5">
+          <h2 className="label-caps mb-4">Orçamento por grupo</h2>
+          <div className="space-y-3">
+            {budgetAlerts.map(b => (
+              <div key={b.group!.id} className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-foreground font-medium flex items-center gap-1.5">
+                    {b.group!.icon} {b.group!.name}
+                    {b.pct >= 80 && (
+                      <AlertTriangle className="h-3 w-3 text-amber-500" />
+                    )}
+                  </span>
+                  <span className={b.pct > 100 ? 'text-destructive font-medium' : 'text-muted-foreground'}>
+                    {formatBRL(b.spent)} / {formatBRL(b.budget)} ({b.pct.toFixed(0)}%)
+                  </span>
+                </div>
+                <Progress
+                  value={Math.min(b.pct, 100)}
+                  className="h-1.5"
+                  style={{
+                    '--progress-color': b.pct > 100 ? 'hsl(var(--destructive))' : b.pct >= 80 ? 'hsl(38, 92%, 50%)' : b.group!.color,
+                  } as React.CSSProperties}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Recurring expenses section */}
       {recurringExpenses.length > 0 && (

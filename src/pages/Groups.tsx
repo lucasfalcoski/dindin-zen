@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { useGroups, useCreateGroup, useDeleteGroup, ExpenseGroup } from '@/hooks/useGroups';
 import { useExpenses } from '@/hooks/useExpenses';
+import { useBudgets, useUpsertBudget } from '@/hooks/useBudgets';
 import { formatBRL } from '@/lib/format';
 import { Plus, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -18,6 +19,7 @@ export default function Groups() {
   const { data: groups, isLoading } = useGroups();
   const createGroup = useCreateGroup();
   const deleteGroup = useDeleteGroup();
+  const upsertBudget = useUpsertBudget();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -29,6 +31,7 @@ export default function Groups() {
   const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
   const monthEnd = format(endOfMonth(now), 'yyyy-MM-dd');
   const { data: expenses } = useExpenses({ startDate: monthStart, endDate: monthEnd });
+  const { data: budgets } = useBudgets(monthStart);
 
   const totals = useMemo(() => {
     const map: Record<string, number> = {};
@@ -37,6 +40,22 @@ export default function Groups() {
     });
     return map;
   }, [expenses]);
+
+  const budgetMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    budgets?.forEach(b => { map[b.group_id] = Number(b.amount); });
+    return map;
+  }, [budgets]);
+
+  const handleBudgetChange = async (groupId: string, value: string) => {
+    const amount = parseFloat(value.replace(',', '.'));
+    if (isNaN(amount) || amount < 0) return;
+    try {
+      await upsertBudget.mutateAsync({ group_id: groupId, month: monthStart, amount });
+    } catch {
+      toast({ title: 'Erro ao salvar orçamento', variant: 'destructive' });
+    }
+  };
 
   const handleCreate = async () => {
     if (!name.trim()) return;
@@ -107,6 +126,16 @@ export default function Groups() {
             <p className="currency text-xs text-muted-foreground mt-1">
               {formatBRL(totals[g.id] || 0)}
             </p>
+            <div className="mt-2" onClick={e => e.stopPropagation()}>
+              <Input
+                className="h-7 text-xs w-full"
+                defaultValue={budgetMap[g.id] ? budgetMap[g.id].toFixed(2) : ''}
+                placeholder="Orçamento R$"
+                inputMode="decimal"
+                onBlur={e => handleBudgetChange(g.id, e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
+              />
+            </div>
             {!g.is_default && (
               <button
                 onClick={e => { e.stopPropagation(); handleDelete(g); }}
