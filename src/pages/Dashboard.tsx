@@ -275,6 +275,8 @@ export default function Dashboard() {
         <p className="text-sm text-muted-foreground capitalize">{getMonthYear()}</p>
       </div>
 
+      <ProfileCompletionBanner />
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
         <SummaryCard label={`Despesas${viewLabel ? ` ${viewLabel}` : ' do mês'}`} value={stats.total} icon={<Wallet className="h-4 w-4 text-muted-foreground" />} />
         <SummaryCard label={`Receitas${viewLabel ? ` ${viewLabel}` : ' do mês'}`} value={stats.incTotal} icon={<DollarSign className="h-4 w-4 text-muted-foreground" />} />

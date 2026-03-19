@@ -87,6 +87,9 @@ export function OnboardingWizard() {
     if (user) localStorage.setItem(`onboarding_done_${user.id}`, 'true');
     setShow(false);
     toast({ title: '🎉 Tudo pronto!', description: 'Seu app está configurado.' });
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('open-help-guide'));
+    }, 700);
   };
 
   const handleStep1 = async () => {

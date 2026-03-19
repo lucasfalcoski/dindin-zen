@@ -252,6 +252,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <QuickAddFAB />
       <NotificationAlerts />
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+      <HelpGuide open={helpOpen} onOpenChange={setHelpOpen} />
     </div>
   );
 }
