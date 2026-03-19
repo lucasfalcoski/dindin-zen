@@ -173,6 +173,7 @@ export type Database = {
           payment_method: Database["public"]["Enums"]["payment_method"]
           recurrent: boolean
           user_id: string
+          visibility: Database["public"]["Enums"]["visibility_type"]
         }
         Insert: {
           account_id?: string | null
@@ -190,6 +191,7 @@ export type Database = {
           payment_method?: Database["public"]["Enums"]["payment_method"]
           recurrent?: boolean
           user_id: string
+          visibility?: Database["public"]["Enums"]["visibility_type"]
         }
         Update: {
           account_id?: string | null
@@ -207,6 +209,7 @@ export type Database = {
           payment_method?: Database["public"]["Enums"]["payment_method"]
           recurrent?: boolean
           user_id?: string
+          visibility?: Database["public"]["Enums"]["visibility_type"]
         }
         Relationships: [
           {
@@ -232,6 +235,71 @@ export type Database = {
           },
         ]
       }
+      families: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      family_members: {
+        Row: {
+          family_id: string
+          id: string
+          invite_token: string | null
+          invited_at: string | null
+          invited_email: string | null
+          joined_at: string | null
+          role: Database["public"]["Enums"]["family_role"]
+          status: Database["public"]["Enums"]["family_status"]
+          user_id: string | null
+        }
+        Insert: {
+          family_id: string
+          id?: string
+          invite_token?: string | null
+          invited_at?: string | null
+          invited_email?: string | null
+          joined_at?: string | null
+          role?: Database["public"]["Enums"]["family_role"]
+          status?: Database["public"]["Enums"]["family_status"]
+          user_id?: string | null
+        }
+        Update: {
+          family_id?: string
+          id?: string
+          invite_token?: string | null
+          invited_at?: string | null
+          invited_email?: string | null
+          joined_at?: string | null
+          role?: Database["public"]["Enums"]["family_role"]
+          status?: Database["public"]["Enums"]["family_status"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incomes: {
         Row: {
           amount: number
@@ -243,6 +311,7 @@ export type Database = {
           notes: string | null
           recurrent: boolean
           user_id: string
+          visibility: Database["public"]["Enums"]["visibility_type"]
         }
         Insert: {
           amount: number
@@ -254,6 +323,7 @@ export type Database = {
           notes?: string | null
           recurrent?: boolean
           user_id: string
+          visibility?: Database["public"]["Enums"]["visibility_type"]
         }
         Update: {
           amount?: number
@@ -265,6 +335,7 @@ export type Database = {
           notes?: string | null
           recurrent?: boolean
           user_id?: string
+          visibility?: Database["public"]["Enums"]["visibility_type"]
         }
         Relationships: []
       }
@@ -273,10 +344,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      accept_invite: { Args: { _token: string }; Returns: Json }
+      get_user_family_ids: { Args: { _user_id: string }; Returns: string[] }
+      is_family_admin: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_family_member: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       account_type: "corrente" | "poupanca" | "carteira" | "investimento"
+      family_role: "admin" | "member"
+      family_status: "pending" | "active"
       income_category:
         | "salario"
         | "freelance"
@@ -290,6 +372,7 @@ export type Database = {
         | "pix"
         | "transferencia"
         | "outro"
+      visibility_type: "personal" | "family"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -418,6 +501,8 @@ export const Constants = {
   public: {
     Enums: {
       account_type: ["corrente", "poupanca", "carteira", "investimento"],
+      family_role: ["admin", "member"],
+      family_status: ["pending", "active"],
       income_category: [
         "salario",
         "freelance",
@@ -433,6 +518,7 @@ export const Constants = {
         "transferencia",
         "outro",
       ],
+      visibility_type: ["personal", "family"],
     },
   },
 } as const
