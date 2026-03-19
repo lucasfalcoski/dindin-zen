@@ -29,6 +29,16 @@ export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
     toast({ title: 'Despesa removida' });
   };
 
+  const handleCancelInstallments = async () => {
+    if (!expense.installment_group_id) return;
+    const today = format(new Date(), 'yyyy-MM-dd');
+    await cancelInstallments.mutateAsync({
+      installmentGroupId: expense.installment_group_id,
+      keepBeforeDate: today,
+    });
+    toast({ title: 'Parcelas futuras canceladas' });
+  };
+
   return (
     <div className="group grid grid-cols-[auto_1fr_auto] gap-3 items-center py-3 px-4 hover:bg-accent/50 rounded-lg transition-colors duration-150">
       <div className="flex-shrink-0">
