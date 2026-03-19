@@ -81,7 +81,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col h-dvh bg-background transition-colors duration-300">
       {/* Top nav for desktop */}
-      <header className="hidden md:block border-b border-border bg-card sticky top-0 z-50">
+      <header className="hidden md:block border-b border-border bg-card flex-shrink-0 z-50">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-14">
           <div className="flex items-center gap-1 min-w-0 flex-1">
             <div className="flex items-center gap-2 mr-4 shrink-0">
