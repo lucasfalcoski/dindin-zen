@@ -28,6 +28,7 @@ import AnnualReport from "./pages/AnnualReport";
 import Score from "./pages/Score";
 import Goals from "./pages/Goals";
 import Forecast from "./pages/Forecast";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
