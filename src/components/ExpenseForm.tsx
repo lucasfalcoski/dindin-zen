@@ -68,7 +68,11 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
   const createExpense = useCreateExpense();
   const updateExpense = useUpdateExpense();
   const createInstallments = useCreateInstallments();
+  const setExpenseTags = useSetExpenseTags();
+  const { data: existingTags } = useExpenseTags(editingExpense?.id);
   const { toast } = useToast();
+
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   const [splitMembers, setSplitMembers] = useState<Record<string, boolean>>({});
   const [splitAmounts, setSplitAmounts] = useState<Record<string, string>>({});
