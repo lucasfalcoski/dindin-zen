@@ -62,13 +62,27 @@ export default function Groups() {
   const handleCreate = async () => {
     if (!name.trim()) return;
     try {
-      await createGroup.mutateAsync({ name: name.trim(), color, icon });
-      toast({ title: 'Grupo criado' });
+      if (editingGroup) {
+        await updateGroup.mutateAsync({ id: editingGroup.id, name: name.trim(), color, icon });
+        toast({ title: 'Grupo atualizado' });
+      } else {
+        await createGroup.mutateAsync({ name: name.trim(), color, icon });
+        toast({ title: 'Grupo criado' });
+      }
       setDialogOpen(false);
+      setEditingGroup(null);
       setName('');
     } catch {
-      toast({ title: 'Erro ao criar grupo', variant: 'destructive' });
+      toast({ title: 'Erro ao salvar grupo', variant: 'destructive' });
     }
+  };
+
+  const handleEdit = (group: ExpenseGroup) => {
+    setEditingGroup(group);
+    setName(group.name);
+    setColor(group.color);
+    setIcon(group.icon);
+    setDialogOpen(true);
   };
 
   const handleDelete = async (group: ExpenseGroup) => {
