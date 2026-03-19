@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { useGroups } from '@/hooks/useGroups';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCreditCards } from '@/hooks/useCreditCards';
+import { useMyFamilies } from '@/hooks/useFamily';
 import { useCreateExpense, useUpdateExpense, Expense, useCreateInstallments } from '@/hooks/useExpenses';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,6 +38,7 @@ const expenseSchema = z.object({
   credit_card_id: z.string().optional(),
   installments_enabled: z.boolean().default(false),
   installment_total: z.string().optional(),
+  visibility: z.enum(['personal', 'family'] as const).default('personal'),
 });
 
 type FormData = z.infer<typeof expenseSchema>;
@@ -51,6 +53,8 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
   const { data: groups } = useGroups();
   const { data: accounts } = useAccounts();
   const { data: creditCards } = useCreditCards();
+  const { data: families } = useMyFamilies();
+  const hasFamily = families && families.length > 0;
   const createExpense = useCreateExpense();
   const updateExpense = useUpdateExpense();
   const createInstallments = useCreateInstallments();
@@ -70,6 +74,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       credit_card_id: '',
       installments_enabled: false,
       installment_total: '2',
+      visibility: 'personal',
     },
   });
 
@@ -91,6 +96,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       setValue('credit_card_id', (editingExpense as any).credit_card_id || '');
       setValue('installments_enabled', false);
       setValue('installment_total', '2');
+      setValue('visibility', (editingExpense as any).visibility || 'personal');
     } else {
       reset({
         description: '',
@@ -104,6 +110,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
         credit_card_id: '',
         installments_enabled: false,
         installment_total: '2',
+        visibility: 'personal',
       });
     }
   }, [editingExpense, open, groups, setValue, reset]);
@@ -125,6 +132,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       payment_method: data.payment_method,
       account_id: data.account_id || null,
       credit_card_id: data.credit_card_id || null,
+      visibility: data.visibility,
     };
 
     try {
@@ -298,6 +306,20 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
                 </div>
               )}
             </>
+          )}
+
+          {hasFamily && (
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="visibility">Compartilhar com a família</Label>
+                <p className="text-[11px] text-muted-foreground">Todos os membros poderão ver</p>
+              </div>
+              <Switch
+                id="visibility"
+                checked={watch('visibility') === 'family'}
+                onCheckedChange={v => setValue('visibility', v ? 'family' : 'personal')}
+              />
+            </div>
           )}
 
           <div className="space-y-2">

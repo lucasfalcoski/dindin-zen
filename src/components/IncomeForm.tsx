@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useCreateIncome, useUpdateIncome, Income, INCOME_CATEGORIES, IncomeCategory } from '@/hooks/useIncomes';
+import { useMyFamilies } from '@/hooks/useFamily';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,6 +19,7 @@ const incomeSchema = z.object({
   category: z.enum(['salario', 'freelance', 'investimento', 'presente', 'outro'] as const),
   recurrent: z.boolean().default(false),
   notes: z.string().max(500).optional(),
+  visibility: z.enum(['personal', 'family'] as const).default('personal'),
 });
 
 type FormData = z.infer<typeof incomeSchema>;
@@ -31,6 +33,8 @@ interface IncomeFormProps {
 export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProps) {
   const createIncome = useCreateIncome();
   const updateIncome = useUpdateIncome();
+  const { data: families } = useMyFamilies();
+  const hasFamily = families && families.length > 0;
   const { toast } = useToast();
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormData>({
@@ -42,6 +46,7 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
       category: 'outro',
       recurrent: false,
       notes: '',
+      visibility: 'personal',
     },
   });
 
@@ -55,6 +60,7 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
       setValue('category', editingIncome.category);
       setValue('recurrent', editingIncome.recurrent);
       setValue('notes', editingIncome.notes || '');
+      setValue('visibility', (editingIncome as any).visibility || 'personal');
     } else {
       reset({
         description: '',
@@ -63,6 +69,7 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
         category: 'outro',
         recurrent: false,
         notes: '',
+        visibility: 'personal',
       });
     }
   }, [editingIncome, open, setValue, reset]);
@@ -84,7 +91,8 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
           category: data.category,
           recurrent: data.recurrent,
           notes: data.notes || undefined,
-        });
+          visibility: data.visibility,
+        } as any);
         toast({ title: 'Receita atualizada' });
       } else {
         await createIncome.mutateAsync({
@@ -94,7 +102,8 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
           category: data.category,
           recurrent: data.recurrent,
           notes: data.notes || undefined,
-        });
+          visibility: data.visibility,
+        } as any);
         toast({ title: 'Receita salva' });
       }
       onOpenChange(false);
@@ -165,6 +174,20 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
               onCheckedChange={v => setValue('recurrent', v)}
             />
           </div>
+
+          {hasFamily && (
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="income-visibility">Compartilhar com a família</Label>
+                <p className="text-[11px] text-muted-foreground">Todos os membros poderão ver</p>
+              </div>
+              <Switch
+                id="income-visibility"
+                checked={watch('visibility') === 'family'}
+                onCheckedChange={v => setValue('visibility', v ? 'family' : 'personal')}
+              />
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label>Notas (opcional)</Label>

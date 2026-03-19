@@ -13,6 +13,8 @@ import CreditCardsPage from "./pages/CreditCards";
 import Groups from "./pages/Groups";
 import Reports from "./pages/Reports";
 import BudgetPage from "./pages/Budget";
+import FamilySettings from "./pages/FamilySettings";
+import InvitePage from "./pages/InvitePage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -96,6 +98,15 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/family"
+              element={
+                <ProtectedRoute>
+                  <AppLayout><FamilySettings /></AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/invite/:token" element={<InvitePage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
