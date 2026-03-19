@@ -416,7 +416,7 @@ export function ImportExpensesModal({ open, onOpenChange }: ImportExpensesModalP
                           {row.isDuplicate && (
                             <Tooltip>
                               <TooltipTrigger>
-                                <AlertTriangle className="h-3 w-3 inline ml-1 text-yellow-500" />
+                                <AlertTriangle className="h-3 w-3 inline ml-1 text-destructive" />
                               </TooltipTrigger>
                               <TooltipContent>Possível duplicata</TooltipContent>
                             </Tooltip>
