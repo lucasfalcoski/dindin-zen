@@ -216,8 +216,8 @@ export default function Groups() {
                 ))}
               </div>
             </div>
-            <Button onClick={handleCreate} className="w-full" disabled={createGroup.isPending}>
-              {createGroup.isPending ? 'Criando...' : 'Criar grupo'}
+            <Button onClick={handleCreate} className="w-full" disabled={createGroup.isPending || updateGroup.isPending}>
+              {editingGroup ? (updateGroup.isPending ? 'Salvando...' : 'Salvar') : (createGroup.isPending ? 'Criando...' : 'Criar grupo')}
             </Button>
           </div>
         </DialogContent>
