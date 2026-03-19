@@ -4,7 +4,7 @@ import { useGroups, useCreateGroup, useDeleteGroup, useUpdateGroup, ExpenseGroup
 import { useExpenses } from '@/hooks/useExpenses';
 import { useBudgets, useUpsertBudget } from '@/hooks/useBudgets';
 import { formatBRL } from '@/lib/format';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Pencil } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
