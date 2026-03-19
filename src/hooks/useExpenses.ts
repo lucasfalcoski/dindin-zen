@@ -112,7 +112,7 @@ export function useCreateInstallments() {
           group_id: params.group_id,
           recurrent: false,
           notes: params.notes || null,
-          payment_method: params.payment_method || 'outro',
+          payment_method: (params.payment_method || 'outro') as any,
           account_id: params.account_id || null,
           credit_card_id: params.credit_card_id || null,
           user_id: user!.id,
@@ -121,7 +121,7 @@ export function useCreateInstallments() {
           installment_group_id: groupId,
         });
       }
-      const { error } = await supabase.from('expenses').insert(rows);
+      const { error } = await supabase.from('expenses').insert(rows as any);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['expenses'] }),
