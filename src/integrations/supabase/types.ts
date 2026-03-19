@@ -88,6 +88,42 @@ export type Database = {
           },
         ]
       }
+      incomes: {
+        Row: {
+          amount: number
+          category: Database["public"]["Enums"]["income_category"]
+          created_at: string
+          date: string
+          description: string
+          id: string
+          notes: string | null
+          recurrent: boolean
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category?: Database["public"]["Enums"]["income_category"]
+          created_at?: string
+          date?: string
+          description: string
+          id?: string
+          notes?: string | null
+          recurrent?: boolean
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: Database["public"]["Enums"]["income_category"]
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          notes?: string | null
+          recurrent?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -96,7 +132,12 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      income_category:
+        | "salario"
+        | "freelance"
+        | "investimento"
+        | "presente"
+        | "outro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -223,6 +264,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      income_category: [
+        "salario",
+        "freelance",
+        "investimento",
+        "presente",
+        "outro",
+      ],
+    },
   },
 } as const
