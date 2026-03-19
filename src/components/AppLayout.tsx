@@ -15,6 +15,8 @@ const links = [
   { to: '/groups', label: 'Grupos', icon: FolderOpen },
   { to: '/tags', label: 'Tags', icon: Tag },
   { to: '/budget', label: 'Orçamento', icon: Target },
+  { to: '/score', label: 'Score', icon: Gauge },
+  { to: '/goals', label: 'Metas', icon: Goal },
   { to: '/family', label: 'Família', icon: Users },
   { to: '/reports', label: 'Relatórios', icon: BarChart3 },
 ];
