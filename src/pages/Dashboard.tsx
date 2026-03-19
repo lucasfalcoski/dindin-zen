@@ -335,16 +335,18 @@ export default function Dashboard() {
           </h2>
           {donutData.length > 0 ? (
             <div className="flex items-center gap-4">
-              <ResponsiveContainer width="50%" height={180}>
-                <PieChart>
-                  <Pie data={donutData} dataKey="value" cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={2}>
-                    {donutData.map((d, i) => (
-                      <Cell key={i} fill={d.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(v: number) => formatBRL(v)} />
-                </PieChart>
-              </ResponsiveContainer>
+              <div className="w-full min-w-0 overflow-x-auto">
+                <ResponsiveContainer width="50%" height={180} minWidth={140}>
+                  <PieChart>
+                    <Pie data={donutData} dataKey="value" cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={2}>
+                      {donutData.map((d, i) => (
+                        <Cell key={i} fill={d.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(v: number) => formatBRL(v)} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
               <div className="flex-1 space-y-2">
                 {donutData.map(d => (
                   <div key={d.name} className="flex items-center gap-2 text-xs">
