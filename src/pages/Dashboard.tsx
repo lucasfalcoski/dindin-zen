@@ -18,6 +18,7 @@ import { Plus, TrendingUp, Calendar, Wallet, BarChart3, DollarSign, PiggyBank, P
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { InsightsSection } from '@/components/InsightsSection';
 
 function getInvoicePeriod(closingDay: number) {
   const now = new Date();
@@ -448,6 +449,9 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Insights */}
+      {viewMode === 'personal' && <InsightsSection />}
 
       {/* Recent expenses */}
       <div className="card-surface">
