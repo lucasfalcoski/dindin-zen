@@ -5,15 +5,18 @@ import { z } from 'zod';
 import { useGroups } from '@/hooks/useGroups';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCreditCards } from '@/hooks/useCreditCards';
-import { useMyFamilies } from '@/hooks/useFamily';
+import { useMyFamilies, useFamilyMembers } from '@/hooks/useFamily';
 import { useCreateExpense, useUpdateExpense, Expense, useCreateInstallments } from '@/hooks/useExpenses';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { supabase } from '@/lib/supabase';
 
 export type PaymentMethod = 'dinheiro' | 'debito' | 'credito' | 'pix' | 'transferencia' | 'outro';
 
@@ -39,6 +42,7 @@ const expenseSchema = z.object({
   installments_enabled: z.boolean().default(false),
   installment_total: z.string().optional(),
   visibility: z.enum(['personal', 'family'] as const).default('personal'),
+  split_enabled: z.boolean().default(false),
 });
 
 type FormData = z.infer<typeof expenseSchema>;
@@ -50,15 +54,22 @@ interface ExpenseFormProps {
 }
 
 export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormProps) {
+  const { user } = useAuth();
   const { data: groups } = useGroups();
   const { data: accounts } = useAccounts();
   const { data: creditCards } = useCreditCards();
   const { data: families } = useMyFamilies();
   const hasFamily = families && families.length > 0;
+  const familyId = families?.[0]?.id;
+  const { data: members } = useFamilyMembers(familyId);
+  const activeMembers = (members || []).filter(m => m.status === 'active' && m.user_id);
   const createExpense = useCreateExpense();
   const updateExpense = useUpdateExpense();
   const createInstallments = useCreateInstallments();
   const { toast } = useToast();
+
+  const [splitMembers, setSplitMembers] = useState<Record<string, boolean>>({});
+  const [splitAmounts, setSplitAmounts] = useState<Record<string, string>>({});
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(expenseSchema),
@@ -75,6 +86,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       installments_enabled: false,
       installment_total: '2',
       visibility: 'personal',
+      split_enabled: false,
     },
   });
 
@@ -82,6 +94,33 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
   const selectedPayment = watch('payment_method');
   const installmentsEnabled = watch('installments_enabled');
   const isRecurrent = watch('recurrent');
+  const isFamilyVisible = watch('visibility') === 'family';
+  const splitEnabled = watch('split_enabled');
+  const watchedAmount = watch('amount');
+
+  // Auto-calculate split amounts
+  useEffect(() => {
+    if (!splitEnabled) return;
+    const totalAmount = parseFloat((watchedAmount || '0').replace(',', '.'));
+    if (isNaN(totalAmount) || totalAmount <= 0) return;
+
+    const selectedIds = Object.entries(splitMembers).filter(([, v]) => v).map(([k]) => k);
+    if (selectedIds.length === 0) return;
+
+    const perPerson = totalAmount / selectedIds.length;
+    const newAmounts: Record<string, string> = {};
+    selectedIds.forEach(id => { newAmounts[id] = perPerson.toFixed(2); });
+    setSplitAmounts(newAmounts);
+  }, [splitEnabled, splitMembers, watchedAmount]);
+
+  // Init split members when enabling
+  useEffect(() => {
+    if (splitEnabled && activeMembers.length > 0) {
+      const initial: Record<string, boolean> = {};
+      activeMembers.forEach(m => { if (m.user_id) initial[m.user_id] = true; });
+      setSplitMembers(initial);
+    }
+  }, [splitEnabled, activeMembers.length]);
 
   useEffect(() => {
     if (editingExpense) {
@@ -97,6 +136,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       setValue('installments_enabled', false);
       setValue('installment_total', '2');
       setValue('visibility', (editingExpense as any).visibility || 'personal');
+      setValue('split_enabled', false);
     } else {
       reset({
         description: '',
@@ -111,7 +151,10 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
         installments_enabled: false,
         installment_total: '2',
         visibility: 'personal',
+        split_enabled: false,
       });
+      setSplitMembers({});
+      setSplitAmounts({});
     }
   }, [editingExpense, open, groups, setValue, reset]);
 
@@ -139,6 +182,26 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       if (editingExpense) {
         await updateExpense.mutateAsync({ id: editingExpense.id, ...payload });
         toast({ title: 'Despesa atualizada' });
+      } else if (data.split_enabled && isFamilyVisible) {
+        // Create split expenses
+        const splitGroupId = crypto.randomUUID();
+        const selectedIds = Object.entries(splitMembers).filter(([, v]) => v).map(([k]) => k);
+        if (selectedIds.length === 0) {
+          toast({ title: 'Selecione pelo menos um membro', variant: 'destructive' });
+          return;
+        }
+
+        const rows = selectedIds.map(uid => ({
+          ...payload,
+          user_id: uid,
+          amount: parseFloat(splitAmounts[uid] || '0'),
+          split_group_id: splitGroupId,
+          visibility: 'family',
+        }));
+
+        const { error } = await supabase.from('expenses').insert(rows as any);
+        if (error) throw error;
+        toast({ title: `Despesa dividida entre ${selectedIds.length} membros` });
       } else if (data.installments_enabled && !data.recurrent) {
         const total = parseInt(data.installment_total || '2', 10);
         if (total < 2 || total > 72) {
@@ -316,10 +379,58 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
               </div>
               <Switch
                 id="visibility"
-                checked={watch('visibility') === 'family'}
-                onCheckedChange={v => setValue('visibility', v ? 'family' : 'personal')}
+                checked={isFamilyVisible}
+                onCheckedChange={v => {
+                  setValue('visibility', v ? 'family' : 'personal');
+                  if (!v) setValue('split_enabled', false);
+                }}
               />
             </div>
+          )}
+
+          {/* Split between members */}
+          {hasFamily && isFamilyVisible && !editingExpense && (
+            <>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="split">Dividir entre membros</Label>
+                  <p className="text-[11px] text-muted-foreground">Cria registro individual para cada um</p>
+                </div>
+                <Switch
+                  id="split"
+                  checked={splitEnabled}
+                  onCheckedChange={v => setValue('split_enabled', v)}
+                />
+              </div>
+
+              {splitEnabled && activeMembers.length > 0 && (
+                <div className="space-y-2 rounded-lg bg-accent/50 p-3">
+                  <p className="text-xs text-muted-foreground font-medium">Selecione os membros:</p>
+                  {activeMembers.map(m => {
+                    const uid = m.user_id!;
+                    const isMe = uid === user?.id;
+                    const label = isMe ? 'Você' : (m.invited_email?.split('@')[0] || 'Membro');
+                    return (
+                      <div key={uid} className="flex items-center gap-3">
+                        <Checkbox
+                          checked={!!splitMembers[uid]}
+                          onCheckedChange={v => setSplitMembers(prev => ({ ...prev, [uid]: !!v }))}
+                        />
+                        <span className="text-sm text-foreground flex-1">{label}</span>
+                        <Input
+                          className="w-24 h-7 text-xs text-right"
+                          value={splitAmounts[uid] || ''}
+                          onChange={e => setSplitAmounts(prev => ({ ...prev, [uid]: e.target.value }))}
+                          placeholder="0,00"
+                          inputMode="decimal"
+                          disabled={!splitMembers[uid]}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
           )}
 
           <div className="space-y-2">
@@ -328,7 +439,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
           </div>
 
           <Button type="submit" className="w-full" disabled={createExpense.isPending || updateExpense.isPending || createInstallments.isPending}>
-            {editingExpense ? 'Atualizar' : installmentsEnabled ? 'Criar parcelas' : 'Salvar'}
+            {editingExpense ? 'Atualizar' : splitEnabled ? 'Dividir e salvar' : installmentsEnabled ? 'Criar parcelas' : 'Salvar'}
           </Button>
         </form>
       </DialogContent>

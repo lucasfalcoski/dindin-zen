@@ -3,6 +3,8 @@ import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-f
 import { ptBR } from 'date-fns/locale';
 import { useExpenses, Expense } from '@/hooks/useExpenses';
 import { useGroups } from '@/hooks/useGroups';
+import { useView } from '@/contexts/ViewContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { Plus } from 'lucide-react';
@@ -11,6 +13,8 @@ import { Input } from '@/components/ui/input';
 type Period = 'today' | 'week' | 'month' | 'custom';
 
 export default function Expenses() {
+  const { user } = useAuth();
+  const { viewMode, selectedMemberId } = useView();
   const [period, setPeriod] = useState<Period>('month');
   const [customStart, setCustomStart] = useState('');
   const [customEnd, setCustomEnd] = useState('');
@@ -42,9 +46,24 @@ export default function Expenses() {
     return { startDate, endDate, groupId: groupFilter || undefined };
   }, [period, customStart, customEnd, groupFilter]);
 
-  const { data: expenses, isLoading } = useExpenses(filters);
+  const { data: allExpenses, isLoading } = useExpenses(filters);
+
+  const expenses = useMemo(() => {
+    if (!allExpenses) return [];
+    switch (viewMode) {
+      case 'personal':
+        return allExpenses.filter(e => e.user_id === user?.id);
+      case 'family':
+        return allExpenses.filter((e: any) => e.visibility === 'family');
+      case 'member':
+        return allExpenses.filter((e: any) => e.user_id === selectedMemberId && e.visibility === 'family');
+      default:
+        return allExpenses;
+    }
+  }, [allExpenses, viewMode, user?.id, selectedMemberId]);
 
   const handleEdit = (expense: Expense) => {
+    if (expense.user_id !== user?.id) return; // Can only edit own
     setEditingExpense(expense);
     setFormOpen(true);
   };
@@ -60,16 +79,17 @@ export default function Expenses() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Despesas</h1>
-        <button
-          onClick={() => { setEditingExpense(null); setFormOpen(true); }}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Nova
-        </button>
+        {viewMode === 'personal' && (
+          <button
+            onClick={() => { setEditingExpense(null); setFormOpen(true); }}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Nova
+          </button>
+        )}
       </div>
 
-      {/* Filters */}
       <div className="flex flex-wrap gap-2">
         {periods.map(p => (
           <button
@@ -91,7 +111,6 @@ export default function Expenses() {
         </div>
       )}
 
-      {/* Group filter */}
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setGroupFilter('')}
@@ -114,7 +133,6 @@ export default function Expenses() {
         ))}
       </div>
 
-      {/* List */}
       <div className="card-surface">
         {isLoading ? (
           <div className="space-y-0">
@@ -129,10 +147,10 @@ export default function Expenses() {
               </div>
             ))}
           </div>
-        ) : expenses && expenses.length > 0 ? (
+        ) : expenses.length > 0 ? (
           <div className="divide-y divide-border/50">
             {expenses.map(e => (
-              <ExpenseRow key={e.id} expense={e} onEdit={handleEdit} />
+              <ExpenseRow key={e.id} expense={e} onEdit={e.user_id === user?.id ? handleEdit : undefined} />
             ))}
           </div>
         ) : (
