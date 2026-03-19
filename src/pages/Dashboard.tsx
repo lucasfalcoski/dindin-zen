@@ -254,6 +254,37 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Budget progress bars */}
+      {budgetAlerts.length > 0 && (
+        <div className="card-surface p-5">
+          <h2 className="label-caps mb-4">Orçamento por grupo</h2>
+          <div className="space-y-3">
+            {budgetAlerts.map(b => (
+              <div key={b.group!.id} className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-foreground font-medium flex items-center gap-1.5">
+                    {b.group!.icon} {b.group!.name}
+                    {b.pct >= 80 && (
+                      <AlertTriangle className="h-3 w-3 text-amber-500" />
+                    )}
+                  </span>
+                  <span className={b.pct > 100 ? 'text-destructive font-medium' : 'text-muted-foreground'}>
+                    {formatBRL(b.spent)} / {formatBRL(b.budget)} ({b.pct.toFixed(0)}%)
+                  </span>
+                </div>
+                <Progress
+                  value={Math.min(b.pct, 100)}
+                  className="h-1.5"
+                  style={{
+                    '--progress-color': b.pct > 100 ? 'hsl(var(--destructive))' : b.pct >= 80 ? 'hsl(38, 92%, 50%)' : b.group!.color,
+                  } as React.CSSProperties}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Recurring expenses section */}
       {recurringExpenses.length > 0 && (
         <div className="card-surface">
