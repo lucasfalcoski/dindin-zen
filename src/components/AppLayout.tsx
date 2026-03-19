@@ -128,6 +128,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <Search className="h-3.5 w-3.5" />
               <kbd className="hidden lg:inline-flex h-5 items-center gap-1 rounded border border-border bg-muted px-1.5 text-[10px] text-muted-foreground">⌘K</kbd>
             </button>
+            <button
+              onClick={() => setHelpOpen(true)}
+              title="Ajuda"
+              className="p-2 rounded-lg text-muted-foreground hover:bg-accent transition-colors"
+            >
+              <HelpCircle className="h-4 w-4" />
+            </button>
             <ThemeToggle />
             <ViewSelector />
             <Link to="/profile" className="text-xs text-muted-foreground hidden xl:inline truncate max-w-[120px] hover:text-foreground transition-colors">
