@@ -117,7 +117,7 @@ export default function Groups() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Grupos</h1>
         <button
-          onClick={() => setDialogOpen(true)}
+          onClick={() => { setEditingGroup(null); setName(''); setColor(COLORS[0]); setIcon(EMOJIS[0]); setDialogOpen(true); }}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
         >
           <Plus className="h-4 w-4" />
