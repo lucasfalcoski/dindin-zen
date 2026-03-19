@@ -56,6 +56,22 @@ const App = () => (
               }
             />
             <Route
+              path="/accounts"
+              element={
+                <ProtectedRoute>
+                  <AppLayout><AccountsPage /></AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/credit-cards"
+              element={
+                <ProtectedRoute>
+                  <AppLayout><CreditCardsPage /></AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/groups"
               element={
                 <ProtectedRoute>
