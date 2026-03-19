@@ -69,6 +69,15 @@ export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
       <div className="flex items-center gap-2">
         <span className="currency text-sm text-foreground font-medium">{formatBRL(expense.amount)}</span>
         <div className="hidden group-hover:flex items-center gap-1">
+          {isInstallment && (
+            <button
+              onClick={handleCancelInstallments}
+              className="p-1.5 rounded-md text-muted-foreground hover:text-orange-600 hover:bg-orange-100 dark:hover:bg-orange-900/20 transition-colors"
+              title="Cancelar parcelas futuras"
+            >
+              <XCircle className="h-3.5 w-3.5" />
+            </button>
+          )}
           {onEdit && (
             <button
               onClick={() => onEdit(expense)}
