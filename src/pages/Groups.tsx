@@ -176,7 +176,7 @@ export default function Groups() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Novo grupo</DialogTitle>
+            <DialogTitle>{editingGroup ? 'Editar grupo' : 'Novo grupo'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
