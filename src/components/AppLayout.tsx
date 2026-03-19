@@ -121,7 +121,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </button>
             <ThemeToggle />
             <ViewSelector />
-            <span className="text-xs text-muted-foreground hidden xl:inline">{user?.email}</span>
+            <Link to="/profile" className="text-xs text-muted-foreground hidden xl:inline truncate max-w-[120px] hover:text-foreground transition-colors">
+              {profile?.display_name || user?.email?.split('@')[0]}
+            </Link>
             <button
               onClick={handleSignOut}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150"
