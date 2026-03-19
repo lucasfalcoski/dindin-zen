@@ -140,8 +140,10 @@ export function useAcceptInvite() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (token: string) => {
+      if (!token || token.length < 10) throw new Error('Token inválido');
       const { data, error } = await supabase.rpc('accept_invite', { _token: token });
       if (error) throw error;
+      if (!data) throw new Error('Resposta vazia do servidor');
       return data as { success?: boolean; error?: string; family_name?: string };
     },
     onSuccess: () => {
