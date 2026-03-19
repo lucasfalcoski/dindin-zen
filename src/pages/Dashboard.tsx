@@ -365,18 +365,20 @@ export default function Dashboard() {
         {viewMode === 'family' && familyBarData.length > 0 ? (
           <div className="card-surface p-5">
             <h2 className="label-caps mb-4">Gastos por membro/grupo</h2>
-            <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={familyBarData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
-                <Tooltip formatter={(v: number) => formatBRL(v)} />
-                <Legend wrapperStyle={{ fontSize: 10 }} />
-                {[...new Set(monthExpenses.map(e => e.user_id))].map((uid, i) => (
-                  <Bar key={uid} dataKey={getName(uid)} fill={MEMBER_COLORS[i % MEMBER_COLORS.length]} radius={[4, 4, 0, 0]} />
-                ))}
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="w-full min-w-0 overflow-x-auto">
+              <ResponsiveContainer width="100%" height={180} minWidth={280}>
+                <BarChart data={familyBarData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                  <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${v}`} />
+                  <Tooltip formatter={(v: number) => formatBRL(v)} />
+                  <Legend wrapperStyle={{ fontSize: 10 }} />
+                  {[...new Set(monthExpenses.map(e => e.user_id))].map((uid, i) => (
+                    <Bar key={uid} dataKey={getName(uid)} fill={MEMBER_COLORS[i % MEMBER_COLORS.length]} radius={[4, 4, 0, 0]} />
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         ) : (
           <div className="card-surface p-5">
