@@ -36,6 +36,7 @@ const ProtectedPage = ({ children }: { children: React.ReactNode }) => (
   <ProtectedRoute>
     <ViewProvider>
       <AppLayout>{children}</AppLayout>
+      <OnboardingWizard />
     </ViewProvider>
   </ProtectedRoute>
 );
