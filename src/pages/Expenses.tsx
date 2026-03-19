@@ -28,6 +28,7 @@ export default function Expenses() {
   const [tagFilter, setTagFilter] = useState<string>('');
   const [formOpen, setFormOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const { data: groups } = useGroups();
   const { data: tags } = useTags();
