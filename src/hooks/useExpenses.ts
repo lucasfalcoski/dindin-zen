@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { format, addMonths } from 'date-fns';
 
 export interface Expense {
   id: string;
@@ -12,6 +13,9 @@ export interface Expense {
   recurrent: boolean;
   notes: string | null;
   created_at: string;
+  installment_total: number | null;
+  installment_current: number | null;
+  installment_group_id: string | null;
   expense_groups?: {
     id: string;
     name: string;
@@ -64,6 +68,9 @@ export function useCreateExpense() {
       group_id: string;
       recurrent: boolean;
       notes?: string;
+      payment_method?: string;
+      account_id?: string | null;
+      credit_card_id?: string | null;
     }) => {
       const { data, error } = await supabase
         .from('expenses')
@@ -72,6 +79,65 @@ export function useCreateExpense() {
         .single();
       if (error) throw error;
       return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['expenses'] }),
+  });
+}
+
+export function useCreateInstallments() {
+  const qc = useQueryClient();
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: async (params: {
+      description: string;
+      amount: number;
+      date: string;
+      group_id: string;
+      recurrent: boolean;
+      notes?: string;
+      payment_method?: string;
+      account_id?: string | null;
+      credit_card_id?: string | null;
+      installment_total: number;
+    }) => {
+      const groupId = crypto.randomUUID();
+      const baseDate = new Date(params.date + 'T12:00:00');
+      const rows = [];
+      for (let i = 0; i < params.installment_total; i++) {
+        const installmentDate = addMonths(baseDate, i);
+        rows.push({
+          description: params.description,
+          amount: params.amount,
+          date: format(installmentDate, 'yyyy-MM-dd'),
+          group_id: params.group_id,
+          recurrent: false,
+          notes: params.notes || null,
+          payment_method: params.payment_method || 'outro',
+          account_id: params.account_id || null,
+          credit_card_id: params.credit_card_id || null,
+          user_id: user!.id,
+          installment_total: params.installment_total,
+          installment_current: i + 1,
+          installment_group_id: groupId,
+        });
+      }
+      const { error } = await supabase.from('expenses').insert(rows);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['expenses'] }),
+  });
+}
+
+export function useCancelInstallments() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ installmentGroupId, keepBeforeDate }: { installmentGroupId: string; keepBeforeDate: string }) => {
+      const { error } = await supabase
+        .from('expenses')
+        .delete()
+        .eq('installment_group_id', installmentGroupId)
+        .gt('date', keepBeforeDate);
+      if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['expenses'] }),
   });

@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { useGroups } from '@/hooks/useGroups';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCreditCards } from '@/hooks/useCreditCards';
-import { useCreateExpense, useUpdateExpense, Expense } from '@/hooks/useExpenses';
+import { useCreateExpense, useUpdateExpense, Expense, useCreateInstallments } from '@/hooks/useExpenses';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,6 +35,8 @@ const expenseSchema = z.object({
   payment_method: z.enum(['dinheiro', 'debito', 'credito', 'pix', 'transferencia', 'outro'] as const).default('outro'),
   account_id: z.string().optional(),
   credit_card_id: z.string().optional(),
+  installments_enabled: z.boolean().default(false),
+  installment_total: z.string().optional(),
 });
 
 type FormData = z.infer<typeof expenseSchema>;
@@ -51,6 +53,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
   const { data: creditCards } = useCreditCards();
   const createExpense = useCreateExpense();
   const updateExpense = useUpdateExpense();
+  const createInstallments = useCreateInstallments();
   const { toast } = useToast();
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormData>({
@@ -65,11 +68,15 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       payment_method: 'outro',
       account_id: '',
       credit_card_id: '',
+      installments_enabled: false,
+      installment_total: '2',
     },
   });
 
   const selectedGroupId = watch('group_id');
   const selectedPayment = watch('payment_method');
+  const installmentsEnabled = watch('installments_enabled');
+  const isRecurrent = watch('recurrent');
 
   useEffect(() => {
     if (editingExpense) {
@@ -82,6 +89,8 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       setValue('payment_method', (editingExpense as any).payment_method || 'outro');
       setValue('account_id', (editingExpense as any).account_id || '');
       setValue('credit_card_id', (editingExpense as any).credit_card_id || '');
+      setValue('installments_enabled', false);
+      setValue('installment_total', '2');
     } else {
       reset({
         description: '',
@@ -93,6 +102,8 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
         payment_method: 'outro',
         account_id: '',
         credit_card_id: '',
+        installments_enabled: false,
+        installment_total: '2',
       });
     }
   }, [editingExpense, open, groups, setValue, reset]);
@@ -120,6 +131,14 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       if (editingExpense) {
         await updateExpense.mutateAsync({ id: editingExpense.id, ...payload });
         toast({ title: 'Despesa atualizada' });
+      } else if (data.installments_enabled && !data.recurrent) {
+        const total = parseInt(data.installment_total || '2', 10);
+        if (total < 2 || total > 72) {
+          toast({ title: 'Parcelas devem ser entre 2 e 72', variant: 'destructive' });
+          return;
+        }
+        await createInstallments.mutateAsync({ ...payload, installment_total: total });
+        toast({ title: `${total} parcelas criadas` });
       } else {
         await createExpense.mutateAsync(payload);
         toast({ title: 'Despesa salva' });
@@ -205,7 +224,6 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
             </div>
           </div>
 
-          {/* Show account or credit card based on payment method */}
           {selectedPayment === 'credito' ? (
             creditCards && creditCards.length > 0 && (
               <div className="space-y-2">
@@ -248,18 +266,47 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
             <Label htmlFor="recurrent">Recorrente</Label>
             <Switch
               id="recurrent"
-              checked={watch('recurrent')}
-              onCheckedChange={v => setValue('recurrent', v)}
+              checked={isRecurrent}
+              onCheckedChange={v => {
+                setValue('recurrent', v);
+                if (v) setValue('installments_enabled', false);
+              }}
             />
           </div>
+
+          {!isRecurrent && !editingExpense && (
+            <>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="installments">Parcelar</Label>
+                <Switch
+                  id="installments"
+                  checked={installmentsEnabled}
+                  onCheckedChange={v => setValue('installments_enabled', v)}
+                />
+              </div>
+
+              {installmentsEnabled && (
+                <div className="space-y-2">
+                  <Label>Número de parcelas</Label>
+                  <Input
+                    {...register('installment_total')}
+                    type="number"
+                    min={2}
+                    max={72}
+                    placeholder="12"
+                  />
+                </div>
+              )}
+            </>
+          )}
 
           <div className="space-y-2">
             <Label>Notas (opcional)</Label>
             <Textarea {...register('notes')} placeholder="Observações adicionais..." rows={2} />
           </div>
 
-          <Button type="submit" className="w-full" disabled={createExpense.isPending || updateExpense.isPending}>
-            {editingExpense ? 'Atualizar' : 'Salvar'}
+          <Button type="submit" className="w-full" disabled={createExpense.isPending || updateExpense.isPending || createInstallments.isPending}>
+            {editingExpense ? 'Atualizar' : installmentsEnabled ? 'Criar parcelas' : 'Salvar'}
           </Button>
         </form>
       </DialogContent>

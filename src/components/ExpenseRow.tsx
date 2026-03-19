@@ -1,9 +1,10 @@
-import { Expense, useDeleteExpense } from '@/hooks/useExpenses';
+import { Expense, useDeleteExpense, useCancelInstallments } from '@/hooks/useExpenses';
 import { formatBRL, formatDate } from '@/lib/format';
 import { GroupBadge } from './GroupBadge';
-import { Trash2, Pencil } from 'lucide-react';
+import { Trash2, Pencil, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
+import { format } from 'date-fns';
 
 interface ExpenseRowProps {
   expense: Expense;
@@ -12,9 +13,11 @@ interface ExpenseRowProps {
 
 export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
   const deleteExpense = useDeleteExpense();
+  const cancelInstallments = useCancelInstallments();
   const { toast } = useToast();
   const [confirming, setConfirming] = useState(false);
   const group = expense.expense_groups;
+  const isInstallment = expense.installment_total && expense.installment_current;
 
   const handleDelete = async () => {
     if (!confirming) {
