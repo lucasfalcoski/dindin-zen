@@ -74,7 +74,7 @@ export function useCreateExpense() {
     }) => {
       const { data, error } = await supabase
         .from('expenses')
-        .insert({ ...expense, user_id: user!.id })
+        .insert({ ...expense, user_id: user!.id } as any)
         .select('*, expense_groups(id, name, color, icon)')
         .single();
       if (error) throw error;
