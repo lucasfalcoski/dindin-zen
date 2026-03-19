@@ -3,14 +3,18 @@ import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-f
 import { ptBR } from 'date-fns/locale';
 import { useExpenses, Expense } from '@/hooks/useExpenses';
 import { useGroups } from '@/hooks/useGroups';
+import { useTags } from '@/hooks/useTags';
 import { useView } from '@/contexts/ViewContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { ImportExpensesModal } from '@/components/ImportExpensesModal';
-import { Plus, Upload, Download } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/lib/supabase';
+import { useQuery } from '@tanstack/react-query';
 
 type Period = 'today' | 'week' | 'month' | 'custom';
 
@@ -21,10 +25,12 @@ export default function Expenses() {
   const [customStart, setCustomStart] = useState('');
   const [customEnd, setCustomEnd] = useState('');
   const [groupFilter, setGroupFilter] = useState<string>('');
+  const [tagFilter, setTagFilter] = useState<string>('');
   const [formOpen, setFormOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const { data: groups } = useGroups();
+  const { data: tags } = useTags();
 
   const now = new Date();
   const filters = useMemo(() => {
