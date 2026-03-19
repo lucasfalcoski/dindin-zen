@@ -118,6 +118,26 @@ export default function Dashboard() {
     return (monthExpenses || []).filter(e => e.recurrent);
   }, [monthExpenses]);
 
+  // Budget data for dashboard
+  const budgetAlerts = useMemo(() => {
+    if (!budgets || !groups || !monthExpenses) return [];
+    const spentMap: Record<string, number> = {};
+    monthExpenses.forEach(e => {
+      spentMap[e.group_id] = (spentMap[e.group_id] || 0) + Number(e.amount);
+    });
+    return budgets
+      .filter(b => Number(b.amount) > 0)
+      .map(b => {
+        const group = groups.find(g => g.id === b.group_id);
+        const spent = spentMap[b.group_id] || 0;
+        const budget = Number(b.amount);
+        const pct = (spent / budget) * 100;
+        return { group, spent, budget, pct };
+      })
+      .filter(b => b.group)
+      .sort((a, b) => b.pct - a.pct);
+  }, [budgets, groups, monthExpenses]);
+
   if (isLoading) {
     return (
       <div className="space-y-6">
