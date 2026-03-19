@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { ViewSelector } from '@/components/ViewSelector';
 import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -51,6 +52,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             ))}
           </div>
           <div className="flex items-center gap-3">
+            <ViewSelector />
             <span className="text-xs text-muted-foreground">{user?.email}</span>
             <button
               onClick={handleSignOut}
@@ -71,7 +73,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Bottom nav for mobile */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
         <div className="flex items-center justify-around h-16">
-          {links.map(l => (
+          {links.slice(0, 5).map(l => (
             <NavLink
               key={l.to}
               to={l.to}
