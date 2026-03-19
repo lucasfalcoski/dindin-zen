@@ -281,6 +281,36 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
           </p>
         </div>
       )}
+
+      {/* Family sub-pages */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Link
+          to="/family/balances"
+          className="card-surface p-4 flex items-center gap-3 hover:bg-accent/50 transition-colors rounded-lg"
+        >
+          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Scale className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-foreground">Quem deve pra quem</p>
+            <p className="text-xs text-muted-foreground">Saldos de despesas divididas</p>
+          </div>
+          <ArrowRight className="h-4 w-4 text-muted-foreground" />
+        </Link>
+        <Link
+          to="/family/budget"
+          className="card-surface p-4 flex items-center gap-3 hover:bg-accent/50 transition-colors rounded-lg"
+        >
+          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Target className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-foreground">Orçamento Familiar</p>
+            <p className="text-xs text-muted-foreground">Orçamento consolidado da família</p>
+          </div>
+          <ArrowRight className="h-4 w-4 text-muted-foreground" />
+        </Link>
+      </div>
     </div>
   );
 }
