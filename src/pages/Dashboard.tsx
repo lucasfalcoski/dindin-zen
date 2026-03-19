@@ -424,6 +424,31 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Top tags widget */}
+      {viewMode === 'personal' && tagsStats && tagsStats.length > 0 && (
+        <div className="card-surface p-5">
+          <h2 className="label-caps mb-4 flex items-center gap-2">
+            <Tag className="h-3.5 w-3.5" />
+            Top tags do mês
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {tagsStats
+              .filter(t => t.total > 0)
+              .sort((a, b) => b.total - a.total)
+              .slice(0, 8)
+              .map(t => (
+                <div key={t.id} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent/50">
+                  <Badge variant="outline" className="text-xs" style={{ borderColor: t.color, color: t.color }}>
+                    {t.name}
+                  </Badge>
+                  <span className="text-xs font-medium text-foreground">{formatBRL(t.total)}</span>
+                  <span className="text-[10px] text-muted-foreground">({t.count})</span>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* Recent expenses */}
       <div className="card-surface">
         <div className="flex items-center justify-between p-4 pb-2">
