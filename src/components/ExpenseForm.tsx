@@ -96,6 +96,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       setValue('credit_card_id', (editingExpense as any).credit_card_id || '');
       setValue('installments_enabled', false);
       setValue('installment_total', '2');
+      setValue('visibility', (editingExpense as any).visibility || 'personal');
     } else {
       reset({
         description: '',
@@ -109,6 +110,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
         credit_card_id: '',
         installments_enabled: false,
         installment_total: '2',
+        visibility: 'personal',
       });
     }
   }, [editingExpense, open, groups, setValue, reset]);
