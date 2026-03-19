@@ -201,7 +201,20 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               Buscar
             </button>
           </div>
-          <div className="border-t border-border mt-4 pt-4">
+          <div className="border-t border-border mt-4 pt-4 space-y-1">
+            <NavLink
+              to="/profile"
+              onClick={() => setMoreOpen(false)}
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm transition-colors',
+                  isActive ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                )
+              }
+            >
+              <User className="h-4 w-4" />
+              Meu Perfil
+            </NavLink>
             <button
               onClick={() => { handleSignOut(); setMoreOpen(false); }}
               className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"

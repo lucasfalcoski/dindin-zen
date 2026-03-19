@@ -20,7 +20,6 @@ export function useProfile() {
         .eq('id', user!.id)
         .maybeSingle();
       if (error) throw error;
-      // Auto-create if missing (for existing users)
       if (!data) {
         const { data: created, error: createErr } = await supabase
           .from('profiles')
@@ -33,6 +32,21 @@ export function useProfile() {
       return data as Profile;
     },
     enabled: !!user,
+  });
+}
+
+export function useUpdateProfile() {
+  const qc = useQueryClient();
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: async (updates: { display_name?: string; avatar_color?: string }) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user!.id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['profile'] }),
   });
 }
 
