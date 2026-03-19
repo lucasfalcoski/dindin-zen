@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 const links = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/expenses', label: 'Despesas', icon: Receipt },
+  { to: '/income', label: 'Receitas', icon: DollarSign },
   { to: '/groups', label: 'Grupos', icon: FolderOpen },
   { to: '/reports', label: 'Relatórios', icon: BarChart3 },
 ];

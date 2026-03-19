@@ -46,6 +46,14 @@ const App = () => (
               }
             />
             <Route
+              path="/income"
+              element={
+                <ProtectedRoute>
+                  <AppLayout><IncomePage /></AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/groups"
               element={
                 <ProtectedRoute>
