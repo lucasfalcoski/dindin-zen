@@ -143,6 +143,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       setValue('installment_total', '2');
       setValue('visibility', (editingExpense as any).visibility || 'personal');
       setValue('split_enabled', false);
+      setSelectedTagIds(existingTags?.map(t => t.id) || []);
     } else {
       reset({
         description: '',
