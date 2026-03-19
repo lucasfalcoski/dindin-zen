@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
-import { useGroups, useCreateGroup, useDeleteGroup, ExpenseGroup } from '@/hooks/useGroups';
+import { useGroups, useCreateGroup, useDeleteGroup, useUpdateGroup, ExpenseGroup } from '@/hooks/useGroups';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useBudgets, useUpsertBudget } from '@/hooks/useBudgets';
 import { formatBRL } from '@/lib/format';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Pencil } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -18,11 +18,13 @@ const COLORS = ['#3b82f6','#f59e0b','#10b981','#ef4444','#8b5cf6','#06b6d4','#ec
 export default function Groups() {
   const { data: groups, isLoading } = useGroups();
   const createGroup = useCreateGroup();
+  const updateGroup = useUpdateGroup();
   const deleteGroup = useDeleteGroup();
   const upsertBudget = useUpsertBudget();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingGroup, setEditingGroup] = useState<ExpenseGroup | null>(null);
   const [name, setName] = useState('');
   const [color, setColor] = useState(COLORS[0]);
   const [icon, setIcon] = useState(EMOJIS[0]);
@@ -60,13 +62,27 @@ export default function Groups() {
   const handleCreate = async () => {
     if (!name.trim()) return;
     try {
-      await createGroup.mutateAsync({ name: name.trim(), color, icon });
-      toast({ title: 'Grupo criado' });
+      if (editingGroup) {
+        await updateGroup.mutateAsync({ id: editingGroup.id, name: name.trim(), color, icon });
+        toast({ title: 'Grupo atualizado' });
+      } else {
+        await createGroup.mutateAsync({ name: name.trim(), color, icon });
+        toast({ title: 'Grupo criado' });
+      }
       setDialogOpen(false);
+      setEditingGroup(null);
       setName('');
     } catch {
-      toast({ title: 'Erro ao criar grupo', variant: 'destructive' });
+      toast({ title: 'Erro ao salvar grupo', variant: 'destructive' });
     }
+  };
+
+  const handleEdit = (group: ExpenseGroup) => {
+    setEditingGroup(group);
+    setName(group.name);
+    setColor(group.color);
+    setIcon(group.icon);
+    setDialogOpen(true);
   };
 
   const handleDelete = async (group: ExpenseGroup) => {
@@ -101,7 +117,7 @@ export default function Groups() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Grupos</h1>
         <button
-          onClick={() => setDialogOpen(true)}
+          onClick={() => { setEditingGroup(null); setName(''); setColor(COLORS[0]); setIcon(EMOJIS[0]); setDialogOpen(true); }}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
         >
           <Plus className="h-4 w-4" />
@@ -137,12 +153,20 @@ export default function Groups() {
               />
             </div>
             {!g.is_default && (
-              <button
-                onClick={e => { e.stopPropagation(); handleDelete(g); }}
-                className="absolute top-3 right-3 p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
+              <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                <button
+                  onClick={e => { e.stopPropagation(); handleEdit(g); }}
+                  className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={e => { e.stopPropagation(); handleDelete(g); }}
+                  className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
             )}
           </div>
         ))}
@@ -152,7 +176,7 @@ export default function Groups() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Novo grupo</DialogTitle>
+            <DialogTitle>{editingGroup ? 'Editar grupo' : 'Novo grupo'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -192,8 +216,8 @@ export default function Groups() {
                 ))}
               </div>
             </div>
-            <Button onClick={handleCreate} className="w-full" disabled={createGroup.isPending}>
-              {createGroup.isPending ? 'Criando...' : 'Criar grupo'}
+            <Button onClick={handleCreate} className="w-full" disabled={createGroup.isPending || updateGroup.isPending}>
+              {editingGroup ? (updateGroup.isPending ? 'Salvando...' : 'Salvar') : (createGroup.isPending ? 'Criando...' : 'Criar grupo')}
             </Button>
           </div>
         </DialogContent>

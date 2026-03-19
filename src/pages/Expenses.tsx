@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { ImportExpensesModal } from '@/components/ImportExpensesModal';
-import { Plus, Upload } from 'lucide-react';
+import { Plus, Upload, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,6 +28,7 @@ export default function Expenses() {
   const [tagFilter, setTagFilter] = useState<string>('');
   const [formOpen, setFormOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const { data: groups } = useGroups();
   const { data: tags } = useTags();
@@ -88,8 +89,15 @@ export default function Expenses() {
     if (tagFilter && tagExpenseIds) {
       filtered = filtered.filter(e => tagExpenseIds.has(e.id));
     }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(e =>
+        e.description.toLowerCase().includes(q) ||
+        (e.notes && e.notes.toLowerCase().includes(q))
+      );
+    }
     return filtered;
-  }, [allExpenses, viewMode, user?.id, selectedMemberId, tagFilter, tagExpenseIds]);
+  }, [allExpenses, viewMode, user?.id, selectedMemberId, tagFilter, tagExpenseIds, searchQuery]);
 
   const handleEdit = (expense: Expense) => {
     if (expense.user_id !== user?.id) return; // Can only edit own
@@ -145,6 +153,16 @@ export default function Expenses() {
           <Input type="date" value={customEnd} onChange={e => setCustomEnd(e.target.value)} />
         </div>
       )}
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Buscar por descrição..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          className="pl-9"
+        />
+      </div>
 
       <div className="flex flex-wrap gap-2">
         <button
