@@ -74,6 +74,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       credit_card_id: '',
       installments_enabled: false,
       installment_total: '2',
+      visibility: 'personal',
     },
   });
 
