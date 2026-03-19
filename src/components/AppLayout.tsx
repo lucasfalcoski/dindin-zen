@@ -79,7 +79,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const mobileMoreLinks = links.slice(4);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
+    <div className="h-screen flex flex-col bg-background transition-colors duration-300 overflow-hidden">
       {/* Top nav for desktop */}
       <header className="hidden md:block border-b border-border bg-card sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-14">
@@ -131,8 +131,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 pb-24 md:pb-6">
+      <main className="flex-1 overflow-y-auto min-h-0">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 pb-28 md:pb-6">
           {children}
         </div>
       </main>
