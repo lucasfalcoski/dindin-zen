@@ -7,6 +7,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Expenses from "./pages/Expenses";
+import IncomePage from "./pages/Income";
 import Groups from "./pages/Groups";
 import Reports from "./pages/Reports";
 import Login from "./pages/Login";
