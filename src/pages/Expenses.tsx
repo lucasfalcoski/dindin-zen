@@ -168,6 +168,31 @@ export default function Expenses() {
         ))}
       </div>
 
+      {tags && tags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {tagFilter && (
+            <button
+              onClick={() => setTagFilter('')}
+              className="px-2 py-1 rounded-md text-xs bg-foreground/10 text-foreground font-medium"
+            >
+              Todas tags ×
+            </button>
+          )}
+          {tags.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setTagFilter(tagFilter === t.id ? '' : t.id)}
+              className={`px-2 py-1 rounded-md text-xs transition-colors border ${
+                tagFilter === t.id ? 'ring-2 ring-primary font-medium' : 'opacity-70 hover:opacity-100'
+              }`}
+              style={{ borderColor: t.color, color: t.color }}
+            >
+              {t.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="card-surface">
         {isLoading ? (
           <div className="space-y-0">
