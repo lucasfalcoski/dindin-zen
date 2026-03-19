@@ -57,19 +57,39 @@ export default function Expenses() {
 
   const { data: allExpenses, isLoading } = useExpenses(filters);
 
+  // Fetch expense IDs for tag filter
+  const { data: tagExpenseIds } = useQuery({
+    queryKey: ['tag_filter_expenses', tagFilter],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('expense_tags')
+        .select('expense_id')
+        .eq('tag_id', tagFilter);
+      if (error) throw error;
+      return new Set(data.map(d => d.expense_id));
+    },
+    enabled: !!tagFilter,
+  });
+
   const expenses = useMemo(() => {
     if (!allExpenses) return [];
+    let filtered = allExpenses;
     switch (viewMode) {
       case 'personal':
-        return allExpenses.filter(e => e.user_id === user?.id);
+        filtered = filtered.filter(e => e.user_id === user?.id);
+        break;
       case 'family':
-        return allExpenses.filter((e: any) => e.visibility === 'family');
+        filtered = filtered.filter((e: any) => e.visibility === 'family');
+        break;
       case 'member':
-        return allExpenses.filter((e: any) => e.user_id === selectedMemberId && e.visibility === 'family');
-      default:
-        return allExpenses;
+        filtered = filtered.filter((e: any) => e.user_id === selectedMemberId && e.visibility === 'family');
+        break;
     }
-  }, [allExpenses, viewMode, user?.id, selectedMemberId]);
+    if (tagFilter && tagExpenseIds) {
+      filtered = filtered.filter(e => tagExpenseIds.has(e.id));
+    }
+    return filtered;
+  }, [allExpenses, viewMode, user?.id, selectedMemberId, tagFilter, tagExpenseIds]);
 
   const handleEdit = (expense: Expense) => {
     if (expense.user_id !== user?.id) return; // Can only edit own
