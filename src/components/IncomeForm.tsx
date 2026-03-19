@@ -33,6 +33,8 @@ interface IncomeFormProps {
 export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProps) {
   const createIncome = useCreateIncome();
   const updateIncome = useUpdateIncome();
+  const { data: families } = useMyFamilies();
+  const hasFamily = families && families.length > 0;
   const { toast } = useToast();
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormData>({
