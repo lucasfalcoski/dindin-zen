@@ -98,6 +98,15 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/family"
+              element={
+                <ProtectedRoute>
+                  <AppLayout><FamilySettings /></AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/invite/:token" element={<InvitePage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
