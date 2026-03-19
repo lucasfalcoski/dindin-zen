@@ -7,8 +7,10 @@ import { useView } from '@/contexts/ViewContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
-import { Plus } from 'lucide-react';
+import { ImportExpensesModal } from '@/components/ImportExpensesModal';
+import { Plus, Upload, Download } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 type Period = 'today' | 'week' | 'month' | 'custom';
 
@@ -20,6 +22,7 @@ export default function Expenses() {
   const [customEnd, setCustomEnd] = useState('');
   const [groupFilter, setGroupFilter] = useState<string>('');
   const [formOpen, setFormOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const { data: groups } = useGroups();
 
@@ -80,13 +83,19 @@ export default function Expenses() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">Despesas</h1>
         {viewMode === 'personal' && (
-          <button
-            onClick={() => { setEditingExpense(null); setFormOpen(true); }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            Nova
-          </button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setImportOpen(true)} className="gap-1.5">
+              <Upload className="h-4 w-4" />
+              Importar
+            </Button>
+            <button
+              onClick={() => { setEditingExpense(null); setFormOpen(true); }}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+            >
+              <Plus className="h-4 w-4" />
+              Nova
+            </button>
+          </div>
         )}
       </div>
 
@@ -163,6 +172,8 @@ export default function Expenses() {
         onOpenChange={o => { setFormOpen(o); if (!o) setEditingExpense(null); }}
         editingExpense={editingExpense}
       />
+
+      <ImportExpensesModal open={importOpen} onOpenChange={setImportOpen} />
     </div>
   );
 }
