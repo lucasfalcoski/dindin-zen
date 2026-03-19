@@ -38,6 +38,7 @@ const expenseSchema = z.object({
   credit_card_id: z.string().optional(),
   installments_enabled: z.boolean().default(false),
   installment_total: z.string().optional(),
+  visibility: z.enum(['personal', 'family'] as const).default('personal'),
 });
 
 type FormData = z.infer<typeof expenseSchema>;
