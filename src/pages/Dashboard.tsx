@@ -39,6 +39,7 @@ const MEMBER_COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { data: profile } = useProfile();
   const { viewMode, selectedMemberId, familyMembers } = useView();
   const [formOpen, setFormOpen] = useState(false);
   const now = new Date();
