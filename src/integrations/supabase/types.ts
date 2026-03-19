@@ -156,6 +156,36 @@ export type Database = {
         }
         Relationships: []
       }
+      expense_tags: {
+        Row: {
+          expense_id: string
+          tag_id: string
+        }
+        Insert: {
+          expense_id: string
+          tag_id: string
+        }
+        Update: {
+          expense_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expense_tags_expense_id_fkey"
+            columns: ["expense_id"]
+            isOneToOne: false
+            referencedRelation: "expenses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expense_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expenses: {
         Row: {
           account_id: string | null
@@ -445,6 +475,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tags: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {

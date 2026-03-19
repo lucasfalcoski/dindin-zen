@@ -7,6 +7,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useCreditCards } from '@/hooks/useCreditCards';
 import { useMyFamilies, useFamilyMembers } from '@/hooks/useFamily';
 import { useCreateExpense, useUpdateExpense, Expense, useCreateInstallments } from '@/hooks/useExpenses';
+import { useSetExpenseTags, useExpenseTags } from '@/hooks/useTags';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
+import { TagInput } from '@/components/TagInput';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/lib/supabase';
@@ -66,7 +68,11 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
   const createExpense = useCreateExpense();
   const updateExpense = useUpdateExpense();
   const createInstallments = useCreateInstallments();
+  const setExpenseTags = useSetExpenseTags();
+  const { data: existingTags } = useExpenseTags(editingExpense?.id);
   const { toast } = useToast();
+
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   const [splitMembers, setSplitMembers] = useState<Record<string, boolean>>({});
   const [splitAmounts, setSplitAmounts] = useState<Record<string, string>>({});
@@ -137,6 +143,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       setValue('installment_total', '2');
       setValue('visibility', (editingExpense as any).visibility || 'personal');
       setValue('split_enabled', false);
+      setSelectedTagIds(existingTags?.map(t => t.id) || []);
     } else {
       reset({
         description: '',
@@ -155,6 +162,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       });
       setSplitMembers({});
       setSplitAmounts({});
+      setSelectedTagIds([]);
     }
   }, [editingExpense, open, groups, setValue, reset]);
 
@@ -179,18 +187,18 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
     };
 
     try {
+      let savedExpenseId: string | null = null;
       if (editingExpense) {
         await updateExpense.mutateAsync({ id: editingExpense.id, ...payload });
+        savedExpenseId = editingExpense.id;
         toast({ title: 'Despesa atualizada' });
       } else if (data.split_enabled && isFamilyVisible) {
-        // Create split expenses
         const splitGroupId = crypto.randomUUID();
         const selectedIds = Object.entries(splitMembers).filter(([, v]) => v).map(([k]) => k);
         if (selectedIds.length === 0) {
           toast({ title: 'Selecione pelo menos um membro', variant: 'destructive' });
           return;
         }
-
         const rows = selectedIds.map(uid => ({
           ...payload,
           user_id: uid,
@@ -198,7 +206,6 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
           split_group_id: splitGroupId,
           visibility: 'family',
         }));
-
         const { error } = await supabase.from('expenses').insert(rows as any);
         if (error) throw error;
         toast({ title: `Despesa dividida entre ${selectedIds.length} membros` });
@@ -211,9 +218,16 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
         await createInstallments.mutateAsync({ ...payload, installment_total: total });
         toast({ title: `${total} parcelas criadas` });
       } else {
-        await createExpense.mutateAsync(payload);
+        const result = await createExpense.mutateAsync(payload);
+        savedExpenseId = result.id;
         toast({ title: 'Despesa salva' });
       }
+
+      // Save tags
+      if (savedExpenseId && selectedTagIds.length > 0) {
+        await setExpenseTags.mutateAsync({ expenseId: savedExpenseId, tagIds: selectedTagIds });
+      }
+
       onOpenChange(false);
       reset();
     } catch {
@@ -432,6 +446,11 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
               )}
             </>
           )}
+
+          <div className="space-y-2">
+            <Label>Tags (opcional)</Label>
+            <TagInput selectedTagIds={selectedTagIds} onChange={setSelectedTagIds} />
+          </div>
 
           <div className="space-y-2">
             <Label>Notas (opcional)</Label>

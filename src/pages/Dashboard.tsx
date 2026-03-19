@@ -8,14 +8,16 @@ import { useCreditCards } from '@/hooks/useCreditCards';
 import { useBudgets } from '@/hooks/useBudgets';
 import { useView } from '@/contexts/ViewContext';
 import { useFamilyProfiles } from '@/hooks/useProfiles';
+import { useTagsWithStats } from '@/hooks/useTags';
 import { SummaryCard } from '@/components/SummaryCard';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { formatBRL, getMonthYear } from '@/lib/format';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, TrendingUp, Calendar, Wallet, BarChart3, DollarSign, PiggyBank, Percent, CreditCard, AlertTriangle, Users, Crown } from 'lucide-react';
+import { Plus, TrendingUp, Calendar, Wallet, BarChart3, DollarSign, PiggyBank, Percent, CreditCard, AlertTriangle, Users, Crown, Tag } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 
 function getInvoicePeriod(closingDay: number) {
   const now = new Date();
@@ -59,6 +61,7 @@ export default function Dashboard() {
   const months6ago = format(startOfMonth(subMonths(now, 5)), 'yyyy-MM-dd');
   const { data: sixMonthExpenses } = useExpenses({ startDate: months6ago, endDate: monthEnd });
   const { data: sixMonthIncomes } = useIncomes({ startDate: months6ago, endDate: monthEnd });
+  const { data: tagsStats } = useTagsWithStats();
 
   // Filter data based on view mode
   const monthExpenses = useMemo(() => {
@@ -417,6 +420,31 @@ export default function Dashboard() {
                 />
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Top tags widget */}
+      {viewMode === 'personal' && tagsStats && tagsStats.length > 0 && (
+        <div className="card-surface p-5">
+          <h2 className="label-caps mb-4 flex items-center gap-2">
+            <Tag className="h-3.5 w-3.5" />
+            Top tags do mês
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {tagsStats
+              .filter(t => t.total > 0)
+              .sort((a, b) => b.total - a.total)
+              .slice(0, 8)
+              .map(t => (
+                <div key={t.id} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent/50">
+                  <Badge variant="outline" className="text-xs" style={{ borderColor: t.color, color: t.color }}>
+                    {t.name}
+                  </Badge>
+                  <span className="text-xs font-medium text-foreground">{formatBRL(t.total)}</span>
+                  <span className="text-[10px] text-muted-foreground">({t.count})</span>
+                </div>
+              ))}
           </div>
         </div>
       )}

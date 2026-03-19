@@ -3,14 +3,18 @@ import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-f
 import { ptBR } from 'date-fns/locale';
 import { useExpenses, Expense } from '@/hooks/useExpenses';
 import { useGroups } from '@/hooks/useGroups';
+import { useTags } from '@/hooks/useTags';
 import { useView } from '@/contexts/ViewContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { ImportExpensesModal } from '@/components/ImportExpensesModal';
-import { Plus, Upload, Download } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/lib/supabase';
+import { useQuery } from '@tanstack/react-query';
 
 type Period = 'today' | 'week' | 'month' | 'custom';
 
@@ -21,10 +25,12 @@ export default function Expenses() {
   const [customStart, setCustomStart] = useState('');
   const [customEnd, setCustomEnd] = useState('');
   const [groupFilter, setGroupFilter] = useState<string>('');
+  const [tagFilter, setTagFilter] = useState<string>('');
   const [formOpen, setFormOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const { data: groups } = useGroups();
+  const { data: tags } = useTags();
 
   const now = new Date();
   const filters = useMemo(() => {
@@ -51,19 +57,39 @@ export default function Expenses() {
 
   const { data: allExpenses, isLoading } = useExpenses(filters);
 
+  // Fetch expense IDs for tag filter
+  const { data: tagExpenseIds } = useQuery({
+    queryKey: ['tag_filter_expenses', tagFilter],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('expense_tags')
+        .select('expense_id')
+        .eq('tag_id', tagFilter);
+      if (error) throw error;
+      return new Set(data.map(d => d.expense_id));
+    },
+    enabled: !!tagFilter,
+  });
+
   const expenses = useMemo(() => {
     if (!allExpenses) return [];
+    let filtered = allExpenses;
     switch (viewMode) {
       case 'personal':
-        return allExpenses.filter(e => e.user_id === user?.id);
+        filtered = filtered.filter(e => e.user_id === user?.id);
+        break;
       case 'family':
-        return allExpenses.filter((e: any) => e.visibility === 'family');
+        filtered = filtered.filter((e: any) => e.visibility === 'family');
+        break;
       case 'member':
-        return allExpenses.filter((e: any) => e.user_id === selectedMemberId && e.visibility === 'family');
-      default:
-        return allExpenses;
+        filtered = filtered.filter((e: any) => e.user_id === selectedMemberId && e.visibility === 'family');
+        break;
     }
-  }, [allExpenses, viewMode, user?.id, selectedMemberId]);
+    if (tagFilter && tagExpenseIds) {
+      filtered = filtered.filter(e => tagExpenseIds.has(e.id));
+    }
+    return filtered;
+  }, [allExpenses, viewMode, user?.id, selectedMemberId, tagFilter, tagExpenseIds]);
 
   const handleEdit = (expense: Expense) => {
     if (expense.user_id !== user?.id) return; // Can only edit own
@@ -141,6 +167,31 @@ export default function Expenses() {
           </button>
         ))}
       </div>
+
+      {tags && tags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {tagFilter && (
+            <button
+              onClick={() => setTagFilter('')}
+              className="px-2 py-1 rounded-md text-xs bg-foreground/10 text-foreground font-medium"
+            >
+              Todas tags ×
+            </button>
+          )}
+          {tags.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setTagFilter(tagFilter === t.id ? '' : t.id)}
+              className={`px-2 py-1 rounded-md text-xs transition-colors border ${
+                tagFilter === t.id ? 'ring-2 ring-primary font-medium' : 'opacity-70 hover:opacity-100'
+              }`}
+              style={{ borderColor: t.color, color: t.color }}
+            >
+              {t.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="card-surface">
         {isLoading ? (

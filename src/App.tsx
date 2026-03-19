@@ -22,6 +22,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Tags from "./pages/Tags";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/credit-cards" element={<ProtectedPage><CreditCardsPage /></ProtectedPage>} />
             <Route path="/groups" element={<ProtectedPage><Groups /></ProtectedPage>} />
             <Route path="/reports" element={<ProtectedPage><Reports /></ProtectedPage>} />
+            <Route path="/tags" element={<ProtectedPage><Tags /></ProtectedPage>} />
             <Route path="/budget" element={<ProtectedPage><BudgetPage /></ProtectedPage>} />
             <Route path="/family" element={<ProtectedPage><FamilySettings /></ProtectedPage>} />
             <Route path="/family/balances" element={<ProtectedPage><FamilyBalances /></ProtectedPage>} />
