@@ -175,6 +175,20 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
             />
           </div>
 
+          {hasFamily && (
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="income-visibility">Compartilhar com a família</Label>
+                <p className="text-[11px] text-muted-foreground">Todos os membros poderão ver</p>
+              </div>
+              <Switch
+                id="income-visibility"
+                checked={watch('visibility') === 'family'}
+                onCheckedChange={v => setValue('visibility', v ? 'family' : 'personal')}
+              />
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label>Notas (opcional)</Label>
             <Textarea {...register('notes')} placeholder="Observações adicionais..." rows={2} />
