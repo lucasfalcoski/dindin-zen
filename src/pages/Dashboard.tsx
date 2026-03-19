@@ -5,13 +5,15 @@ import { useExpenses, Expense } from '@/hooks/useExpenses';
 import { useIncomes } from '@/hooks/useIncomes';
 import { useGroups } from '@/hooks/useGroups';
 import { useCreditCards } from '@/hooks/useCreditCards';
+import { useBudgets } from '@/hooks/useBudgets';
 import { SummaryCard } from '@/components/SummaryCard';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { formatBRL, getMonthYear } from '@/lib/format';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, TrendingUp, Calendar, Wallet, BarChart3, DollarSign, PiggyBank, Percent, CreditCard } from 'lucide-react';
+import { Plus, TrendingUp, Calendar, Wallet, BarChart3, DollarSign, PiggyBank, Percent, CreditCard, AlertTriangle } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import { Progress } from '@/components/ui/progress';
 
 function getInvoicePeriod(closingDay: number) {
   const now = new Date();
