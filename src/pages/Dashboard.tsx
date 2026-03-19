@@ -111,6 +111,10 @@ export default function Dashboard() {
     return (monthExpenses || []).slice(0, 5);
   }, [monthExpenses]);
 
+  const recurringExpenses = useMemo(() => {
+    return (monthExpenses || []).filter(e => e.recurrent);
+  }, [monthExpenses]);
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -226,6 +230,21 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* Recurring expenses section */}
+      {recurringExpenses.length > 0 && (
+        <div className="card-surface">
+          <div className="flex items-center justify-between p-4 pb-2">
+            <h2 className="label-caps">🔄 Recorrentes do mês</h2>
+            <span className="text-xs text-muted-foreground">{recurringExpenses.length} lançamento(s)</span>
+          </div>
+          <div className="divide-y divide-border/50">
+            {recurringExpenses.map(e => (
+              <ExpenseRow key={e.id} expense={e} />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="card-surface">
         <div className="flex items-center justify-between p-4 pb-2">

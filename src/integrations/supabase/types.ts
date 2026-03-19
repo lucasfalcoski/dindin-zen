@@ -131,6 +131,9 @@ export type Database = {
           description: string
           group_id: string
           id: string
+          installment_current: number | null
+          installment_group_id: string | null
+          installment_total: number | null
           notes: string | null
           payment_method: Database["public"]["Enums"]["payment_method"]
           recurrent: boolean
@@ -145,6 +148,9 @@ export type Database = {
           description: string
           group_id: string
           id?: string
+          installment_current?: number | null
+          installment_group_id?: string | null
+          installment_total?: number | null
           notes?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"]
           recurrent?: boolean
@@ -159,6 +165,9 @@ export type Database = {
           description?: string
           group_id?: string
           id?: string
+          installment_current?: number | null
+          installment_group_id?: string | null
+          installment_total?: number | null
           notes?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"]
           recurrent?: boolean
