@@ -24,6 +24,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Tags from "./pages/Tags";
 import AnnualReport from "./pages/AnnualReport";
+import Score from "./pages/Score";
+import Goals from "./pages/Goals";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
