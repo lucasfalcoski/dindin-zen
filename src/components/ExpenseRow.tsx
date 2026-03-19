@@ -52,7 +52,14 @@ export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
         )}
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-medium text-foreground truncate">{expense.description}</p>
+        <p className="text-sm font-medium text-foreground truncate">
+          {expense.description}
+          {isInstallment && (
+            <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent text-muted-foreground">
+              {expense.installment_current}/{expense.installment_total}
+            </span>
+          )}
+        </p>
         <p className="text-xs text-muted-foreground">
           {formatDate(expense.date)}
           {group && <span> · {group.name}</span>}
