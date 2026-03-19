@@ -111,6 +111,10 @@ export default function Dashboard() {
     return (monthExpenses || []).slice(0, 5);
   }, [monthExpenses]);
 
+  const recurringExpenses = useMemo(() => {
+    return (monthExpenses || []).filter(e => e.recurrent);
+  }, [monthExpenses]);
+
   if (isLoading) {
     return (
       <div className="space-y-6">
