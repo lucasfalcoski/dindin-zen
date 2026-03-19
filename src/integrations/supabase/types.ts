@@ -375,6 +375,77 @@ export type Database = {
           },
         ]
       }
+      goal_contributions: {
+        Row: {
+          amount: number
+          created_at: string
+          date: string
+          goal_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          date?: string
+          goal_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          date?: string
+          goal_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_contributions_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      goals: {
+        Row: {
+          color: string
+          created_at: string
+          current_amount: number
+          deadline: string | null
+          icon: string
+          id: string
+          name: string
+          target_amount: number
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          current_amount?: number
+          deadline?: string | null
+          icon?: string
+          id?: string
+          name: string
+          target_amount: number
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          current_amount?: number
+          deadline?: string | null
+          icon?: string
+          id?: string
+          name?: string
+          target_amount?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       incomes: {
         Row: {
           amount: number
