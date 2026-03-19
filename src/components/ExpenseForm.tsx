@@ -187,18 +187,18 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
     };
 
     try {
+      let savedExpenseId: string | null = null;
       if (editingExpense) {
         await updateExpense.mutateAsync({ id: editingExpense.id, ...payload });
+        savedExpenseId = editingExpense.id;
         toast({ title: 'Despesa atualizada' });
       } else if (data.split_enabled && isFamilyVisible) {
-        // Create split expenses
         const splitGroupId = crypto.randomUUID();
         const selectedIds = Object.entries(splitMembers).filter(([, v]) => v).map(([k]) => k);
         if (selectedIds.length === 0) {
           toast({ title: 'Selecione pelo menos um membro', variant: 'destructive' });
           return;
         }
-
         const rows = selectedIds.map(uid => ({
           ...payload,
           user_id: uid,
@@ -206,7 +206,6 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
           split_group_id: splitGroupId,
           visibility: 'family',
         }));
-
         const { error } = await supabase.from('expenses').insert(rows as any);
         if (error) throw error;
         toast({ title: `Despesa dividida entre ${selectedIds.length} membros` });
@@ -219,9 +218,16 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
         await createInstallments.mutateAsync({ ...payload, installment_total: total });
         toast({ title: `${total} parcelas criadas` });
       } else {
-        await createExpense.mutateAsync(payload);
+        const result = await createExpense.mutateAsync(payload);
+        savedExpenseId = result.id;
         toast({ title: 'Despesa salva' });
       }
+
+      // Save tags
+      if (savedExpenseId && selectedTagIds.length > 0) {
+        await setExpenseTags.mutateAsync({ expenseId: savedExpenseId, tagIds: selectedTagIds });
+      }
+
       onOpenChange(false);
       reset();
     } catch {
