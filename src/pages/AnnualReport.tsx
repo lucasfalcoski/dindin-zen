@@ -167,7 +167,7 @@ export default function AnnualReport() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-4">
         <SummaryCard label="Total gasto" value={stats.totalExp} icon={<Wallet className="h-4 w-4 text-muted-foreground" />} />
         <SummaryCard label="Total recebido" value={stats.totalInc} icon={<DollarSign className="h-4 w-4 text-muted-foreground" />} />
         <SummaryCard
