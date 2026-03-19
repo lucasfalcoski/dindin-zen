@@ -253,7 +253,6 @@ export default function Forecast() {
               name="Saldo"
               stroke="hsl(var(--primary))"
               strokeWidth={2}
-              strokeDasharray={(idx: number) => ''}
               dot={false}
               activeDot={{ r: 4, fill: 'hsl(var(--primary))' }}
             />
