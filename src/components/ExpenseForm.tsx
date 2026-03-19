@@ -132,6 +132,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       payment_method: data.payment_method,
       account_id: data.account_id || null,
       credit_card_id: data.credit_card_id || null,
+      visibility: data.visibility,
     };
 
     try {
