@@ -162,6 +162,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       });
       setSplitMembers({});
       setSplitAmounts({});
+      setSelectedTagIds([]);
     }
   }, [editingExpense, open, groups, setValue, reset]);
 
