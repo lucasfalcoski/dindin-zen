@@ -183,19 +183,21 @@ export default function AnnualReport() {
       {/* Stacked bar chart with cumulative line */}
       <div className="card-surface p-5">
         <h2 className="label-caps mb-4">Receitas vs Despesas por mês</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <ComposedChart data={monthlyData}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-            <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-            <YAxis yAxisId="left" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
-            <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
-            <Tooltip formatter={(v: number) => formatBRL(v)} />
-            <Legend wrapperStyle={{ fontSize: 11 }} />
-            <Bar yAxisId="left" dataKey="receitas" name="Receitas" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} stackId="stack" />
-            <Bar yAxisId="left" dataKey="despesas" name="Despesas" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} stackId="stack" />
-            <Line yAxisId="right" type="monotone" dataKey="saldo" name="Saldo acumulado" stroke="hsl(var(--foreground))" strokeWidth={2} dot={{ fill: 'hsl(var(--foreground))', r: 3 }} />
-          </ComposedChart>
-        </ResponsiveContainer>
+        <div className="w-full min-w-0 overflow-x-auto">
+          <ResponsiveContainer width="100%" height={300} minWidth={400}>
+            <ComposedChart data={monthlyData}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+              <YAxis yAxisId="left" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
+              <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={v => `R$${(v / 1000).toFixed(0)}k`} />
+              <Tooltip formatter={(v: number) => formatBRL(v)} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Bar yAxisId="left" dataKey="receitas" name="Receitas" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} stackId="stack" />
+              <Bar yAxisId="left" dataKey="despesas" name="Despesas" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} stackId="stack" />
+              <Line yAxisId="right" type="monotone" dataKey="saldo" name="Saldo acumulado" stroke="hsl(var(--foreground))" strokeWidth={2} dot={{ fill: 'hsl(var(--foreground))', r: 3 }} />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Heatmap */}

@@ -189,7 +189,7 @@ export default function Forecast() {
       )}
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
         <SummaryCard
           label="Saldo atual"
           value={currentBalance}
