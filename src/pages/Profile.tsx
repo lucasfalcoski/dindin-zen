@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { LogOut, ChevronRight, Plus, Pencil, Check, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { EmojiAvatar, EmojiPicker } from '@/components/EmojiAvatar';
 
 const AVATAR_COLORS = ['#6BAE7A', '#D4AF6A', '#2C3E2D', '#3b82f6', '#ef4444', '#8b5cf6'];
 
