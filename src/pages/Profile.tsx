@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LogOut, ChevronRight, Plus, Pencil, Check, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EmojiAvatar, EmojiPicker } from '@/components/EmojiAvatar';
+import WhatsAppConnect from '@/components/WhatsAppConnect';
 
 const AVATAR_COLORS = ['#6BAE7A', '#D4AF6A', '#2C3E2D', '#3b82f6', '#ef4444', '#8b5cf6'];
 
@@ -172,7 +173,10 @@ export default function Profile() {
         </Link>
       </div>
 
-      {/* Seção 5 — Preferências */}
+      {/* Seção 5 — WhatsApp */}
+      <WhatsAppConnect />
+
+      {/* Seção 6 — Preferências */}
       <div className="card-surface p-5 space-y-4">
         <h2 className="label-caps">Preferências</h2>
         <div>
