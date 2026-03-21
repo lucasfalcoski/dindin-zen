@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 export default function Register() {
   const { signUp, user } = useAuth();
   const { toast } = useToast();
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,12 +18,16 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!fullName.trim()) {
+      toast({ title: 'Nome obrigatório', description: 'Informe seu nome completo.', variant: 'destructive' });
+      return;
+    }
     if (password.length < 6) {
       toast({ title: 'Senha muito curta', description: 'A senha deve ter pelo menos 6 caracteres.', variant: 'destructive' });
       return;
     }
     setLoading(true);
-    const { error } = await signUp(email, password);
+    const { error } = await signUp(email, password, fullName.trim());
     setLoading(false);
     if (error) {
       toast({ title: 'Erro ao criar conta', description: error.message, variant: 'destructive' });
@@ -37,6 +42,10 @@ export default function Register() {
         <h1 className="text-2xl font-semibold tracking-tight text-foreground mb-1">Criar conta</h1>
         <p className="text-sm text-muted-foreground mb-6">Comece a controlar suas finanças agora</p>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="fullName">Nome completo</Label>
+            <Input id="fullName" type="text" value={fullName} onChange={e => setFullName(e.target.value)} required placeholder="Seu nome completo" />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="email">E-mail</Label>
             <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="seu@email.com" />
