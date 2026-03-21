@@ -6,6 +6,7 @@ export interface Profile {
   id: string;
   display_name: string | null;
   avatar_color: string;
+  avatar_emoji: string | null;
   created_at: string;
 }
 
