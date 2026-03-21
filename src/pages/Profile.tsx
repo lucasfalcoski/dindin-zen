@@ -173,7 +173,10 @@ export default function Profile() {
         </Link>
       </div>
 
-      {/* Seção 5 — Preferências */}
+      {/* Seção 5 — WhatsApp */}
+      <WhatsAppConnect />
+
+      {/* Seção 6 — Preferências */}
       <div className="card-surface p-5 space-y-4">
         <h2 className="label-caps">Preferências</h2>
         <div>
