@@ -8,6 +8,7 @@ import { formatBRL } from '@/lib/format';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Check, ArrowRight } from 'lucide-react';
+import { EmojiAvatar } from '@/components/EmojiAvatar';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 
 interface Balance {
