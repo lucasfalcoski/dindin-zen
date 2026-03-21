@@ -70,12 +70,12 @@ export default function Profile() {
       {/* Seção 1 — Identidade */}
       <div className="card-surface p-6 space-y-4">
         <div className="flex items-center gap-4">
-          <div
-            className="h-16 w-16 rounded-full flex items-center justify-center text-xl font-bold text-white shrink-0"
-            style={{ backgroundColor: profile?.avatar_color || '#3b82f6' }}
-          >
-            {initials}
-          </div>
+          <EmojiAvatar
+            emoji={profile?.avatar_emoji}
+            color={profile?.avatar_color}
+            userId={user?.id}
+            size="lg"
+          />
           <div className="flex-1 min-w-0">
             {editingName ? (
               <div className="flex items-center gap-2">
