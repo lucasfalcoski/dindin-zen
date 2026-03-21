@@ -8,6 +8,7 @@ import { formatBRL } from '@/lib/format';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Check, ArrowRight } from 'lucide-react';
+import { EmojiAvatar } from '@/components/EmojiAvatar';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 
 interface Balance {
@@ -148,14 +149,10 @@ export default function FamilyBalances() {
           balances.map((b, i) => (
             <div key={i} className="flex items-center gap-3 p-4">
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center text-xs font-medium">
-                  {getName(b.fromId)[0].toUpperCase()}
-                </div>
+                <EmojiAvatar userId={b.fromId} size="sm" />
                 <span className="text-sm font-medium text-foreground truncate">{getName(b.fromId)}</span>
                 <ArrowRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center text-xs font-medium">
-                  {getName(b.toId)[0].toUpperCase()}
-                </div>
+                <EmojiAvatar userId={b.toId} size="sm" />
                 <span className="text-sm font-medium text-foreground truncate">{getName(b.toId)}</span>
               </div>
               <span className="currency text-sm font-semibold text-destructive">{formatBRL(b.amount)}</span>

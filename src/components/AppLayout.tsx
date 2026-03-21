@@ -8,6 +8,7 @@ import { QuickAddFAB } from '@/components/QuickAddFAB';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationAlerts } from '@/components/NotificationAlerts';
 import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users, Search, Tag, Gauge, Goal, TrendingUp, MoreHorizontal, X, User, HelpCircle } from 'lucide-react';
+import { EmojiAvatar } from '@/components/EmojiAvatar';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { HelpGuide } from '@/components/HelpGuide';
@@ -137,8 +138,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </button>
             <ThemeToggle />
             <ViewSelector />
-            <Link to="/profile" className="text-xs text-muted-foreground hidden xl:inline truncate max-w-[120px] hover:text-foreground transition-colors">
-              {profile?.display_name || user?.email?.split('@')[0]}
+            <Link to="/profile" className="hidden xl:flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <EmojiAvatar emoji={profile?.avatar_emoji} color={profile?.avatar_color} userId={user?.id} size="sm" />
+              <span className="text-xs text-muted-foreground truncate max-w-[120px]">
+                {profile?.display_name || user?.email?.split('@')[0]}
+              </span>
             </Link>
             <button
               onClick={handleSignOut}

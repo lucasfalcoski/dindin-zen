@@ -6,6 +6,7 @@ export interface Profile {
   id: string;
   display_name: string | null;
   avatar_color: string;
+  avatar_emoji: string | null;
   created_at: string;
 }
 
@@ -39,7 +40,7 @@ export function useUpdateProfile() {
   const qc = useQueryClient();
   const { user } = useAuth();
   return useMutation({
-    mutationFn: async (updates: { display_name?: string; avatar_color?: string }) => {
+    mutationFn: async (updates: { display_name?: string; avatar_color?: string; avatar_emoji?: string }) => {
       const { error } = await supabase
         .from('profiles')
         .update(updates)

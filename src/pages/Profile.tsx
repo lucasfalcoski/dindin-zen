@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { LogOut, ChevronRight, Plus, Pencil, Check, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { EmojiAvatar, EmojiPicker } from '@/components/EmojiAvatar';
 
 const AVATAR_COLORS = ['#6BAE7A', '#D4AF6A', '#2C3E2D', '#3b82f6', '#ef4444', '#8b5cf6'];
 
@@ -69,12 +70,12 @@ export default function Profile() {
       {/* Seção 1 — Identidade */}
       <div className="card-surface p-6 space-y-4">
         <div className="flex items-center gap-4">
-          <div
-            className="h-16 w-16 rounded-full flex items-center justify-center text-xl font-bold text-white shrink-0"
-            style={{ backgroundColor: profile?.avatar_color || '#3b82f6' }}
-          >
-            {initials}
-          </div>
+          <EmojiAvatar
+            emoji={profile?.avatar_emoji}
+            color={profile?.avatar_color}
+            userId={user?.id}
+            size="lg"
+          />
           <div className="flex-1 min-w-0">
             {editingName ? (
               <div className="flex items-center gap-2">
@@ -174,6 +175,13 @@ export default function Profile() {
       {/* Seção 5 — Preferências */}
       <div className="card-surface p-5 space-y-4">
         <h2 className="label-caps">Preferências</h2>
+        <div>
+          <p className="text-sm text-foreground mb-2">Emoji do avatar</p>
+          <EmojiPicker
+            value={profile?.avatar_emoji}
+            onChange={(emoji) => updateProfile.mutate({ avatar_emoji: emoji })}
+          />
+        </div>
         <div>
           <p className="text-sm text-foreground mb-2">Cor do avatar</p>
           <div className="flex gap-3">
