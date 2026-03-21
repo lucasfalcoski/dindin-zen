@@ -176,6 +176,13 @@ export default function Profile() {
       <div className="card-surface p-5 space-y-4">
         <h2 className="label-caps">Preferências</h2>
         <div>
+          <p className="text-sm text-foreground mb-2">Emoji do avatar</p>
+          <EmojiPicker
+            value={profile?.avatar_emoji}
+            onChange={(emoji) => updateProfile.mutate({ avatar_emoji: emoji })}
+          />
+        </div>
+        <div>
           <p className="text-sm text-foreground mb-2">Cor do avatar</p>
           <div className="flex gap-3">
             {AVATAR_COLORS.map(c => (
