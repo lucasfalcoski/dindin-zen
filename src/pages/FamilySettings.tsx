@@ -207,9 +207,7 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
         <div className="divide-y divide-border/50">
           {members?.map(m => (
             <div key={m.id} className="flex items-center gap-3 p-4">
-              <div className="h-9 w-9 rounded-full bg-accent flex items-center justify-center text-sm font-medium text-foreground">
-                {(m.invited_email || '?')[0].toUpperCase()}
-              </div>
+              <EmojiAvatar userId={m.user_id || m.id} size="sm" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <p className="text-sm font-medium text-foreground truncate">
