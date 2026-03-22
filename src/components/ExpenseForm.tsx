@@ -153,7 +153,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       reset({
         description: '',
         amount: '',
-        date: new Date().toISOString().split('T')[0],
+        date: todayString(),
         group_id: groups?.[0]?.id || '',
         recurrent: false,
         notes: '',
