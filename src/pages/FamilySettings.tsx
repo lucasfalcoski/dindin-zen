@@ -16,6 +16,11 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Users, Plus, Trash2, Copy, Check, Crown, Clock, Mail, ArrowRight, Target, Scale } from 'lucide-react';
 import { EmojiAvatar } from '@/components/EmojiAvatar';
+import { FamilySharingSettings } from '@/components/FamilySharingSettings';
+import { FamilyOverview } from '@/components/FamilyOverview';
+import { FamilyBalanceTab } from '@/components/FamilyBalanceTab';
+
+type TabId = 'members' | 'overview' | 'balance';
 
 export default function FamilySettings() {
   const { user } = useAuth();
@@ -26,7 +31,7 @@ export default function FamilySettings() {
   const [createOpen, setCreateOpen] = useState(false);
   const [familyName, setFamilyName] = useState('');
 
-  const myFamily = families?.[0]; // For now, one family per user
+  const myFamily = families?.[0];
 
   const handleCreate = async () => {
     if (!familyName.trim()) return;
@@ -107,12 +112,19 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
   const inviteMember = useInviteMember();
   const removeMember = useRemoveMember();
 
+  const [activeTab, setActiveTab] = useState<TabId>('members');
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(family.name);
   const [inviteEmail, setInviteEmail] = useState('');
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
 
   const isAdmin = family.created_by === userId;
+
+  const tabs: { id: TabId; label: string; icon: string }[] = [
+    { id: 'members', label: 'Membros', icon: '👥' },
+    { id: 'overview', label: 'Visão Geral', icon: '📊' },
+    { id: 'balance', label: 'Acerto de Contas', icon: '⚖️' },
+  ];
 
   const handleUpdateName = async () => {
     if (!name.trim() || name === family.name) {
@@ -134,7 +146,6 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
       const member = await inviteMember.mutateAsync({ familyId: family.id, email: inviteEmail.trim() });
       toast({ title: 'Convite criado!' });
       setInviteEmail('');
-      // Auto-copy invite link
       const link = `${window.location.origin}/invite/${member.invite_token}`;
       await navigator.clipboard.writeText(link);
       setCopiedToken(member.invite_token);
@@ -199,117 +210,132 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
         </div>
       </div>
 
-      {/* Members list */}
-      <div className="card-surface">
-        <div className="p-4 pb-2">
-          <h3 className="label-caps">Membros</h3>
-        </div>
-        <div className="divide-y divide-border/50">
-          {members?.map(m => (
-            <div key={m.id} className="flex items-center gap-3 p-4">
-              <EmojiAvatar userId={m.user_id || m.id} size="sm" />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {m.invited_email || 'Sem email'}
-                  </p>
-                  {m.role === 'admin' && (
-                    <Crown className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
-                  )}
-                </div>
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  {m.status === 'pending' ? (
-                    <>
-                      <Clock className="h-3 w-3" />
-                      <span>Pendente</span>
-                    </>
-                  ) : (
-                    <span>Ativo</span>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                {m.status === 'pending' && (
-                  <button
-                    onClick={() => handleCopyLink(m.invite_token)}
-                    className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                    title="Copiar link de convite"
-                  >
-                    {copiedToken === m.invite_token ? (
-                      <Check className="h-3.5 w-3.5 text-emerald-500" />
-                    ) : (
-                      <Copy className="h-3.5 w-3.5" />
-                    )}
-                  </button>
-                )}
-                {isAdmin && m.user_id !== userId && (
-                  <button
-                    onClick={() => handleRemove(m.id)}
-                    className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* Tabs */}
+      <div className="flex gap-2">
+        {tabs.map(t => (
+          <button
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === t.id
+                ? 'bg-primary/10 text-primary'
+                : 'bg-accent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <span>{t.icon}</span>
+            {t.label}
+          </button>
+        ))}
       </div>
 
-      {/* Invite section (admin only) */}
-      {isAdmin && (
-        <div className="card-surface p-5">
-          <h3 className="label-caps mb-3">Convidar membro</h3>
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <Input
-                value={inviteEmail}
-                onChange={e => setInviteEmail(e.target.value)}
-                placeholder="email@exemplo.com"
-                type="email"
-                onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }}
-              />
+      {activeTab === 'members' && (
+        <>
+          {/* Members list */}
+          <div className="card-surface">
+            <div className="p-4 pb-2">
+              <h3 className="label-caps">Membros</h3>
             </div>
-            <Button onClick={handleInvite} disabled={inviteMember.isPending} className="gap-1.5">
-              <Mail className="h-4 w-4" />
-              Convidar
-            </Button>
+            <div className="divide-y divide-border/50">
+              {members?.map(m => (
+                <div key={m.id} className="flex items-center gap-3 p-4">
+                  <EmojiAvatar userId={m.user_id || m.id} size="sm" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        {m.invited_email || 'Sem email'}
+                      </p>
+                      {m.role === 'admin' && (
+                        <Crown className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      {m.status === 'pending' ? (
+                        <>
+                          <Clock className="h-3 w-3" />
+                          <span>Pendente</span>
+                        </>
+                      ) : (
+                        <span>Ativo</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {m.status === 'pending' && (
+                      <button
+                        onClick={() => handleCopyLink(m.invite_token)}
+                        className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                        title="Copiar link de convite"
+                      >
+                        {copiedToken === m.invite_token ? (
+                          <Check className="h-3.5 w-3.5 text-emerald-500" />
+                        ) : (
+                          <Copy className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                    )}
+                    {isAdmin && m.user_id !== userId && (
+                      <button
+                        onClick={() => handleRemove(m.id)}
+                        className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            Um link de convite será gerado e copiado automaticamente.
-          </p>
-        </div>
+
+          {/* Invite section (admin only) */}
+          {isAdmin && (
+            <div className="card-surface p-5">
+              <h3 className="label-caps mb-3">Convidar membro</h3>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    value={inviteEmail}
+                    onChange={e => setInviteEmail(e.target.value)}
+                    placeholder="email@exemplo.com"
+                    type="email"
+                    onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }}
+                  />
+                </div>
+                <Button onClick={handleInvite} disabled={inviteMember.isPending} className="gap-1.5">
+                  <Mail className="h-4 w-4" />
+                  Convidar
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Um link de convite será gerado e copiado automaticamente.
+              </p>
+            </div>
+          )}
+
+          {/* Sharing settings */}
+          <FamilySharingSettings />
+
+          {/* Family sub-pages */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Link
+              to="/family/budget"
+              className="card-surface p-4 flex items-center gap-3 hover:bg-accent/50 transition-colors rounded-lg"
+            >
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Target className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-foreground">Orçamento Familiar</p>
+                <p className="text-xs text-muted-foreground">Orçamento consolidado da família</p>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          </div>
+        </>
       )}
 
-      {/* Family sub-pages */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Link
-          to="/family/balances"
-          className="card-surface p-4 flex items-center gap-3 hover:bg-accent/50 transition-colors rounded-lg"
-        >
-          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Scale className="h-5 w-5 text-primary" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-foreground">Quem deve pra quem</p>
-            <p className="text-xs text-muted-foreground">Saldos de despesas divididas</p>
-          </div>
-          <ArrowRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-        <Link
-          to="/family/budget"
-          className="card-surface p-4 flex items-center gap-3 hover:bg-accent/50 transition-colors rounded-lg"
-        >
-          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Target className="h-5 w-5 text-primary" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-foreground">Orçamento Familiar</p>
-            <p className="text-xs text-muted-foreground">Orçamento consolidado da família</p>
-          </div>
-          <ArrowRight className="h-4 w-4 text-muted-foreground" />
-        </Link>
-      </div>
+      {activeTab === 'overview' && <FamilyOverview />}
+      {activeTab === 'balance' && <FamilyBalanceTab />}
     </div>
   );
 }
