@@ -15,11 +15,12 @@ interface EmojiAvatarProps {
   emoji?: string | null;
   color?: string;
   userId?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   className?: string;
 }
 
 const sizeClasses = {
+  xs: 'h-5 w-5 text-xs',
   sm: 'h-8 w-8 text-base',
   md: 'h-10 w-10 text-xl',
   lg: 'h-16 w-16 text-3xl',

@@ -23,6 +23,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { InsightsSection } from '@/components/InsightsSection';
 import { WhatsAppPendingBanner } from '@/components/WhatsAppPendingBanner';
+import { WhatsAppDashboardCard } from '@/components/WhatsAppDashboardCard';
 
 function getInvoicePeriod(closingDay: number) {
   const now = new Date();
@@ -493,6 +494,8 @@ export default function Dashboard() {
           <Plus className="h-6 w-6" />
         </button>
       )}
+      {/* WhatsApp quick action */}
+      <WhatsAppDashboardCard />
 
       <ExpenseForm open={formOpen} onOpenChange={setFormOpen} />
     </div>

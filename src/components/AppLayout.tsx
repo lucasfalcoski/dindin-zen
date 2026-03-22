@@ -7,8 +7,10 @@ import { GlobalSearch } from '@/components/GlobalSearch';
 import { QuickAddFAB } from '@/components/QuickAddFAB';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationAlerts } from '@/components/NotificationAlerts';
-import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users, Search, Tag, Gauge, Goal, TrendingUp, MoreHorizontal, X, User, HelpCircle } from 'lucide-react';
+import { LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut, DollarSign, Building2, CreditCard, Target, Users, Search, Tag, Gauge, Goal, TrendingUp, MoreHorizontal, X, User, HelpCircle, MessageCircle, ClipboardList } from 'lucide-react';
 import { EmojiAvatar } from '@/components/EmojiAvatar';
+import { ProfileDropdown } from '@/components/ProfileDropdown';
+import { useWhatsAppUser } from '@/hooks/useWhatsApp';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { HelpGuide } from '@/components/HelpGuide';
@@ -50,6 +52,7 @@ const DindinLogo = () => (
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { signOut, user } = useAuth();
   const { data: profile } = useProfile();
+  const { data: whatsappUser } = useWhatsAppUser();
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -87,8 +90,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     navigate('/login');
   };
 
-  const mobileMainLinks = links.slice(0, 4);
-  const mobileMoreLinks = links.slice(4);
+  const mobileMainLinks = links.slice(0, 3); // Dashboard, Despesas, Receitas
+  const mobileMoreLinks = links.slice(3);
 
   return (
     <div className="flex flex-col h-dvh bg-background transition-colors duration-300">
@@ -138,18 +141,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </button>
             <ThemeToggle />
             <ViewSelector />
-            <Link to="/profile" className="hidden xl:flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <EmojiAvatar emoji={profile?.avatar_emoji} color={profile?.avatar_color} userId={user?.id} size="sm" />
-              <span className="text-xs text-muted-foreground truncate max-w-[120px]">
-                {profile?.display_name || user?.email?.split('@')[0]}
-              </span>
-            </Link>
-            <button
-              onClick={handleSignOut}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
+            <ProfileDropdown />
           </div>
         </div>
       </header>
@@ -180,6 +172,19 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               {l.label}
             </NavLink>
           ))}
+          <NavLink
+            to="/profile"
+            end
+            className={({ isActive }) =>
+              cn(
+                'flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition-colors duration-150',
+                isActive ? 'text-primary' : 'text-muted-foreground'
+              )
+            }
+          >
+            <EmojiAvatar emoji={profile?.avatar_emoji} color={profile?.avatar_color} userId={user?.id} size="xs" />
+            Perfil
+          </NavLink>
           <button
             onClick={() => setMoreOpen(true)}
             className="flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium text-muted-foreground"
@@ -222,6 +227,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </button>
           </div>
           <div className="border-t border-border mt-4 pt-4 space-y-1">
+            <p className="px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Minha Conta</p>
             <NavLink
               to="/profile"
               onClick={() => setMoreOpen(false)}
@@ -234,6 +240,33 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             >
               <User className="h-4 w-4" />
               Meu Perfil
+            </NavLink>
+            <NavLink
+              to="/profile"
+              state={{ scrollTo: 'whatsapp' }}
+              onClick={() => setMoreOpen(false)}
+              className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              <MessageCircle className="h-4 w-4 text-[#25D366]" />
+              WhatsApp
+              {whatsappUser ? (
+                <span className="ml-auto text-[10px] text-[#25D366]">✅</span>
+              ) : (
+                <span className="ml-auto text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">Conectar</span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/whatsapp-history"
+              onClick={() => setMoreOpen(false)}
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm transition-colors',
+                  isActive ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                )
+              }
+            >
+              <ClipboardList className="h-4 w-4" />
+              Histórico WhatsApp
             </NavLink>
             <button
               onClick={() => { setHelpOpen(true); setMoreOpen(false); }}

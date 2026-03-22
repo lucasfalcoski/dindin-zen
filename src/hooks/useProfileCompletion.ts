@@ -2,6 +2,7 @@ import { useProfile } from '@/hooks/useProfiles';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useIncomes } from '@/hooks/useIncomes';
 import { useCreditCards } from '@/hooks/useCreditCards';
+import { useWhatsAppUser } from '@/hooks/useWhatsApp';
 
 export interface ProfileTask {
   id: string;
@@ -15,6 +16,7 @@ export function useProfileCompletion() {
   const { data: accounts } = useAccounts();
   const { data: incomes } = useIncomes({});
   const { data: cards } = useCreditCards();
+  const { data: whatsappUser } = useWhatsAppUser();
 
   const tasks: ProfileTask[] = [
     {
@@ -40,6 +42,12 @@ export function useProfileCompletion() {
       label: 'Adicionar um cartão de crédito',
       done: (cards?.length ?? 0) > 0,
       href: '/credit-cards',
+    },
+    {
+      id: 'whatsapp',
+      label: 'Conectar WhatsApp',
+      done: !!whatsappUser,
+      href: '/profile',
     },
   ];
 
