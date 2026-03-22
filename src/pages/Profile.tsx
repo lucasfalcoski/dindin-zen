@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, User } from 'lucide-react';
+import WhatsAppConnect from '@/components/WhatsAppConnect';
 
 const C = { ink:'#16150f', ink2:'#6b6a63', ink3:'#b0aea6', rule:'#e4e1da', bg:'#f2f0eb', green:'#1a7a45', red:'#b83232' };
 const AVATAR_COLORS = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#64748b','#1a7a45','#b83232'];
@@ -121,6 +122,16 @@ export default function ProfilePage() {
               <span style={{ fontSize:'13px', color:C.ink3 }}>{item.value}</span>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* WhatsApp Integration */}
+      <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', overflow:'hidden', marginBottom:'14px' }}>
+        <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.rule}` }}>
+          <span style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.5px', textTransform:'uppercase', color:C.ink2 }}>WhatsApp</span>
+        </div>
+        <div style={{ padding:'20px' }}>
+          <WhatsAppConnect />
         </div>
       </div>
 

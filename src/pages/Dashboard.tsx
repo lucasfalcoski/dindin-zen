@@ -8,7 +8,7 @@ import { useGroups } from '@/hooks/useGroups';
 import { useCreditCards } from '@/hooks/useCreditCards';
 import { useBudgets } from '@/hooks/useBudgets';
 import { useView } from '@/contexts/ViewContext';
-import { useFamilyProfiles } from '@/hooks/useProfiles';
+import { useFamilyProfiles, useProfile } from '@/hooks/useProfiles';
 import { useGoals } from '@/hooks/useGoals';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
@@ -62,11 +62,9 @@ export default function Dashboard() {
   const { data: budgets } = useBudgets(monthStart);
   const { data: profiles } = useFamilyProfiles(memberUserIds);
   const { data: goals } = useGoals();
+  const { data: profile } = useProfile();
 
-  const userName =
-    user?.user_metadata?.full_name?.split(' ')[0] ||
-    user?.user_metadata?.name?.split(' ')[0] ||
-    user?.email?.split('@')[0] || '';
+  const userName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || '';
 
   const monthExpenses = useMemo(() => {
     if (!allMonthExpenses) return [];
