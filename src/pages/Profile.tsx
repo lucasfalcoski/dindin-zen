@@ -191,7 +191,10 @@ export default function Profile() {
         </Link>
       </div>
 
-      {/* Seção 5 — WhatsApp */}
+      {/* Seção 5 — Compartilhamento com a família */}
+      {hasFamily && <FamilySharingSettings />}
+
+      {/* Seção 6 — WhatsApp */}
       <div ref={whatsappRef}>
         <WhatsAppConnect />
       </div>
