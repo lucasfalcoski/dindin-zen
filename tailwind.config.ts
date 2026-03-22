@@ -14,9 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"Inter"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
-        brand: ['"Kaisei Tokumin"', 'serif'],
-        mono: ['ui-monospace', 'SFMono-Regular', 'monospace'],
+        sans: ['"Cabinet Grotesk"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+        serif: ['"Instrument Serif"', 'Georgia', 'serif'],
+        mono: ['"Geist Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",

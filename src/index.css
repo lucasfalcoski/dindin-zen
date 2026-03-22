@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Kaisei+Tokumin:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,74 +6,83 @@
 
 @layer base {
   :root {
-    --background: 33 33% 93%;
-    --foreground: 135 18% 21%;
+    --background: 40 20% 94%;        /* #f2f0eb */
+    --foreground: 45 65% 7%;         /* #16150f */
 
-    --card: 37 50% 97%;
-    --card-foreground: 135 18% 21%;
+    --card: 0 0% 100%;
+    --card-foreground: 45 65% 7%;
 
-    --popover: 37 50% 97%;
-    --popover-foreground: 135 18% 21%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 45 65% 7%;
 
-    --primary: 135 25% 55%;
+    --primary: 150 64% 29%;          /* #1a7a45 verde */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 120 35% 74%;
-    --secondary-foreground: 135 18% 21%;
+    --secondary: 40 20% 96%;
+    --secondary-foreground: 45 65% 7%;
 
-    --muted: 33 20% 88%;
-    --muted-foreground: 135 10% 45%;
+    --muted: 40 15% 90%;
+    --muted-foreground: 42 5% 41%;   /* #6b6a63 */
 
-    --accent: 38 55% 62%;
-    --accent-foreground: 135 18% 21%;
+    --accent: 40 15% 90%;
+    --accent-foreground: 45 65% 7%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 60% 46%;        /* #b83232 */
     --destructive-foreground: 0 0% 100%;
 
-    --success: 135 25% 55%;
+    --success: 150 64% 29%;
     --success-foreground: 0 0% 100%;
 
-    --border: 33 20% 85%;
-    --input: 33 20% 85%;
-    --ring: 135 25% 55%;
+    --border: 40 18% 87%;            /* #e4e1da */
+    --input: 40 18% 87%;
+    --ring: 150 64% 29%;
 
-    --radius: 0.75rem;
+    --radius: 0.875rem;
 
-    --sidebar-background: 33 33% 93%;
-    --sidebar-foreground: 135 18% 21%;
-    --sidebar-primary: 135 18% 21%;
-    --sidebar-primary-foreground: 33 33% 93%;
-    --sidebar-accent: 33 20% 88%;
-    --sidebar-accent-foreground: 135 18% 21%;
-    --sidebar-border: 33 20% 85%;
-    --sidebar-ring: 135 25% 55%;
+    --shadow-card: 0 0 0 1px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+    --shadow-card-hover: 0 0 0 1px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.08);
 
-    --shadow-card: 0 0 0 1px rgba(0,0,0,0.06), 0 2px 8px rgba(44,62,45,0.06);
-    --shadow-card-hover: 0 0 0 1px rgba(0,0,0,0.08), 0 4px 16px rgba(44,62,45,0.10);
+    /* sidebar usa tinta escura (ink) */
+    --sidebar-background: 45 65% 7%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 150 64% 29%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 45 30% 14%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 45 20% 15%;
+    --sidebar-ring: 150 64% 29%;
   }
 
   .dark {
-    --background: 135 15% 8%;
-    --foreground: 33 20% 90%;
-    --card: 135 15% 11%;
-    --card-foreground: 33 20% 90%;
-    --popover: 135 15% 11%;
-    --popover-foreground: 33 20% 90%;
-    --primary: 135 25% 55%;
+    --background: 45 65% 5%;
+    --foreground: 40 20% 92%;
+    --card: 45 40% 8%;
+    --card-foreground: 40 20% 92%;
+    --popover: 45 40% 8%;
+    --popover-foreground: 40 20% 92%;
+    --primary: 150 55% 38%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 135 15% 18%;
-    --secondary-foreground: 33 20% 90%;
-    --muted: 135 15% 18%;
-    --muted-foreground: 33 15% 60%;
-    --accent: 38 40% 45%;
-    --accent-foreground: 33 20% 90%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 33 20% 90%;
-    --success: 135 25% 55%;
-    --success-foreground: 33 20% 90%;
-    --border: 135 12% 18%;
-    --input: 135 12% 18%;
-    --ring: 135 20% 50%;
+    --secondary: 45 20% 12%;
+    --secondary-foreground: 40 20% 92%;
+    --muted: 45 20% 12%;
+    --muted-foreground: 40 10% 55%;
+    --accent: 45 20% 12%;
+    --accent-foreground: 40 20% 92%;
+    --destructive: 0 55% 40%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 150 55% 38%;
+    --success-foreground: 0 0% 100%;
+    --border: 45 20% 16%;
+    --input: 45 20% 16%;
+    --ring: 150 55% 38%;
+    --sidebar-background: 45 65% 4%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 150 55% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 45 30% 10%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 45 20% 12%;
+    --sidebar-ring: 150 55% 38%;
   }
 }
 
@@ -81,48 +90,45 @@
 .theme-transition *,
 .theme-transition *::before,
 .theme-transition *::after {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-
+  * { @apply border-border; }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  h1, h2, h3 {
+    font-family: 'Cabinet Grotesk', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.03em;
   }
 }
 
 @layer utilities {
-  .font-brand {
-    font-family: 'Kaisei Tokumin', serif;
-  }
-
   .currency {
     @apply font-mono font-medium tracking-tighter;
     font-variant-numeric: tabular-nums;
   }
-
   .label-caps {
-    @apply text-muted-foreground font-medium uppercase tracking-wider text-[10px];
+    @apply text-muted-foreground font-semibold uppercase tracking-widest text-[10px];
   }
-
   .card-surface {
     @apply bg-card rounded-xl;
     box-shadow: var(--shadow-card);
-    overflow: hidden;
   }
-
   .card-surface-hover {
     @apply bg-card rounded-xl transition-shadow duration-150;
     box-shadow: var(--shadow-card);
-    overflow: hidden;
   }
-
   .card-surface-hover:hover {
     box-shadow: var(--shadow-card-hover);
+  }
+  /* Serif display — para valores monetários grandes */
+  .font-serif-display {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-style: italic;
   }
 
   /* Hide scrollbar but keep scroll functionality */
