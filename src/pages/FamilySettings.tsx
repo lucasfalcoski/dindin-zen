@@ -250,20 +250,33 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
               <h3 className="label-caps">Membros</h3>
             </div>
             <div className="divide-y divide-border/50">
-              {members?.map(m => (
+              {members?.map(m => {
+                const profile = m.user_id ? profileMap.get(m.user_id) : null;
+                const displayName = profile?.display_name || m.invited_email || 'Membro pendente';
+                const isPending = m.status === 'pending';
+                return (
                 <div key={m.id} className="flex items-center gap-3 p-4">
-                  <EmojiAvatar userId={m.user_id || m.id} size="sm" />
+                  {isPending ? (
+                    <EmojiAvatar emoji="👤" color="#94a3b8" size="sm" />
+                  ) : (
+                    <EmojiAvatar
+                      emoji={profile?.avatar_emoji}
+                      color={profile?.avatar_color || '#3b82f6'}
+                      userId={m.user_id || m.id}
+                      size="sm"
+                    />
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <p className="text-sm font-medium text-foreground truncate">
-                        {m.invited_email || 'Sem email'}
+                        {displayName}
                       </p>
                       {m.role === 'admin' && (
                         <Crown className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
                       )}
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      {m.status === 'pending' ? (
+                      {isPending ? (
                         <>
                           <Clock className="h-3 w-3" />
                           <span>Pendente</span>
