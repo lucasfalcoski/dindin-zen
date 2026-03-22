@@ -45,6 +45,7 @@ export default function WhatsAppConnect() {
   const sendCode = useSendWhatsAppCode();
   const verifyCode = useVerifyWhatsAppCode();
   const disconnect = useDisconnectWhatsApp();
+  const testConnection = useTestWhatsAppConnection();
   const { toast } = useToast();
 
   const [dialogOpen, setDialogOpen] = useState(false);
