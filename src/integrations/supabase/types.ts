@@ -22,6 +22,7 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          shared_with_family: boolean
           type: Database["public"]["Enums"]["account_type"]
           user_id: string
         }
@@ -32,6 +33,7 @@ export type Database = {
           created_at?: string
           id?: string
           name: string
+          shared_with_family?: boolean
           type?: Database["public"]["Enums"]["account_type"]
           user_id: string
         }
@@ -42,6 +44,7 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+          shared_with_family?: boolean
           type?: Database["public"]["Enums"]["account_type"]
           user_id?: string
         }
@@ -92,6 +95,7 @@ export type Database = {
           id: string
           limit: number
           name: string
+          shared_with_family: boolean
           user_id: string
         }
         Insert: {
@@ -103,6 +107,7 @@ export type Database = {
           id?: string
           limit?: number
           name: string
+          shared_with_family?: boolean
           user_id: string
         }
         Update: {
@@ -114,6 +119,7 @@ export type Database = {
           id?: string
           limit?: number
           name?: string
+          shared_with_family?: boolean
           user_id?: string
         }
         Relationships: [
@@ -655,6 +661,14 @@ export type Database = {
     }
     Functions: {
       accept_invite: { Args: { _token: string }; Returns: Json }
+      get_family_balance: {
+        Args: { _family_id: string; _month_end: string; _month_start: string }
+        Returns: Json
+      }
+      get_family_summary: {
+        Args: { _family_id: string; _month_end: string; _month_start: string }
+        Returns: Json
+      }
       get_user_family_ids: { Args: { _user_id: string }; Returns: string[] }
       is_family_admin: {
         Args: { _family_id: string; _user_id: string }
