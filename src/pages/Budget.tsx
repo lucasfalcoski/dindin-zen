@@ -7,9 +7,10 @@ import { useBudgets, useUpsertBudget, useCopyBudgets } from '@/hooks/useBudgets'
 import { formatBRL } from '@/lib/format';
 import { useToast } from '@/hooks/use-toast';
 import { ChevronLeft, ChevronRight, Copy } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+
+const C = { ink: '#16150f', ink2: '#6b6a63', ink3: '#b0aea6', rule: '#e4e1da', bg: '#f2f0eb', green: '#1a7a45', red: '#b83232', amber: '#92580a', blue: '#1d4ed8' };
 
 export default function BudgetPage() {
   const { toast } = useToast();
@@ -35,19 +36,13 @@ export default function BudgetPage() {
 
   const spentMap = useMemo(() => {
     const map: Record<string, number> = {};
-    expenses?.forEach(e => {
-      map[e.group_id] = (map[e.group_id] || 0) + Number(e.amount);
-    });
+    expenses?.forEach(e => { map[e.group_id] = (map[e.group_id] || 0) + Number(e.amount); });
     return map;
   }, [expenses]);
 
   const totals = useMemo(() => {
-    let budgetTotal = 0;
-    let spentTotal = 0;
-    groups?.forEach(g => {
-      budgetTotal += budgetMap[g.id] || 0;
-      spentTotal += spentMap[g.id] || 0;
-    });
+    let budgetTotal = 0, spentTotal = 0;
+    groups?.forEach(g => { budgetTotal += budgetMap[g.id] || 0; spentTotal += spentMap[g.id] || 0; });
     return { budgetTotal, spentTotal };
   }, [groups, budgetMap, spentMap]);
 
@@ -55,141 +50,117 @@ export default function BudgetPage() {
     const amount = parseFloat(value.replace(',', '.'));
     if (isNaN(amount) || amount < 0) return;
     try {
-      await upsertBudget.mutateAsync({ group_id: groupId, month: monthStr, amount });
-    } catch {
-      toast({ title: 'Erro ao salvar orçamento', variant: 'destructive' });
-    }
+      await upsertBudget.mutateAsync({ group_id: groupId, amount, month: monthStr });
+    } catch { toast({ title: 'Erro ao salvar', variant: 'destructive' }); }
   };
 
   const handleCopy = async () => {
     const prevMonthStr = format(subMonths(selectedMonth, 1), 'yyyy-MM-dd');
     try {
       await copyBudgets.mutateAsync({ fromMonth: prevMonthStr, toMonth: monthStr });
-      toast({ title: 'Orçamento copiado do mês anterior' });
-    } catch (err: any) {
-      toast({ title: err.message || 'Erro ao copiar', variant: 'destructive' });
-    }
+      toast({ title: 'Orçamentos copiados!' });
+    } catch { toast({ title: 'Erro ao copiar', variant: 'destructive' }); }
   };
 
   return (
-    <div className="space-y-4">
-      <div className="page-header">
+    <div>
+      {/* HEADER */}
+      <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:'28px', paddingBottom:'20px', borderBottom:`1px solid ${C.rule}` }}>
         <div>
-          <p className="page-eyebrow">limites</p>
-          <h1 className="page-title">Orçamento</h1>
+          <p style={{ fontSize:'11px', fontWeight:600, letterSpacing:'1.5px', textTransform:'uppercase', color:C.ink3, marginBottom:'6px' }}>limites</p>
+          <h1 style={{ fontFamily:"'Instrument Serif', Georgia, serif", fontSize:'34px', lineHeight:1, letterSpacing:'-0.5px', color:C.ink }}>Orçamento</h1>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleCopy}
-            disabled={copyBudgets.isPending}
-            className="flex items-center gap-1.5"
-          >
-            <Copy className="h-3.5 w-3.5" />
-            Copiar mês anterior
-          </Button>
-        </div>
-      </div>
-
-      {/* Month selector */}
-      <div className="flex items-center justify-center gap-4">
-        <button onClick={prevMonth} className="p-2 rounded-lg hover:bg-accent transition-colors">
-          <ChevronLeft className="h-5 w-5 text-muted-foreground" />
-        </button>
-        <span className="text-lg font-medium text-foreground capitalize min-w-[160px] text-center">
-          {format(selectedMonth, 'MMMM yyyy', { locale: ptBR })}
-        </span>
-        <button onClick={nextMonth} className="p-2 rounded-lg hover:bg-accent transition-colors">
-          <ChevronRight className="h-5 w-5 text-muted-foreground" />
-        </button>
-      </div>
-
-      {/* Budget list */}
-      <div className="card-surface divide-y divide-border/50">
-        {groups?.map(g => {
-          const budget = budgetMap[g.id] || 0;
-          const spent = spentMap[g.id] || 0;
-          const remaining = budget - spent;
-          const pct = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
-          const over = spent > budget && budget > 0;
-
-          return (
-            <div key={g.id} className="p-4 space-y-2">
-              <div className="flex items-center gap-3">
-                <div
-                  className="h-8 w-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
-                  style={{ backgroundColor: g.color + '20' }}
-                >
-                  {g.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">{g.name}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">R$</span>
-                  <Input
-                    className="w-24 h-8 text-sm text-right"
-                    defaultValue={budget > 0 ? budget.toFixed(2) : ''}
-                    placeholder="0,00"
-                    inputMode="decimal"
-                    onBlur={e => handleBudgetChange(g.id, e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-                    }}
-                  />
-                </div>
-              </div>
-
-              {budget > 0 && (
-                <>
-                  <Progress
-                    value={pct}
-                    className="h-2"
-                    style={{
-                      // @ts-ignore
-                      '--progress-color': over ? 'hsl(var(--destructive))' : pct >= 80 ? 'hsl(38, 92%, 50%)' : g.color,
-                    } as React.CSSProperties}
-                  />
-                  <div className="flex items-center justify-between text-xs flex-wrap gap-1">
-                    <span className="text-muted-foreground">
-                      {formatBRL(spent)} de {formatBRL(budget)}
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <span className={over ? 'text-destructive font-medium' : 'text-muted-foreground'}>
-                        {pct.toFixed(0)}%
-                      </span>
-                      <span className={over ? 'text-destructive font-medium' : 'text-emerald-600 dark:text-emerald-400'}>
-                        {over ? `−${formatBRL(Math.abs(remaining))} excedido` : `${formatBRL(remaining)} restante`}
-                      </span>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Totals footer */}
-      <div className="card-surface p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-muted-foreground">Orçamento total</p>
-            <p className="text-lg font-semibold text-foreground">{formatBRL(totals.budgetTotal)}</p>
+        <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+          {/* Seletor de mês */}
+          <div style={{ display:'flex', alignItems:'center', gap:'4px', background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'8px', padding:'4px 8px' }}>
+            <button onClick={prevMonth} style={{ border:'none', background:'none', cursor:'pointer', color:C.ink2, padding:'2px 4px', borderRadius:'4px' }}>
+              <ChevronLeft size={16} />
+            </button>
+            <span style={{ fontSize:'13px', fontWeight:600, color:C.ink, minWidth:'100px', textAlign:'center' }}>
+              {format(selectedMonth, 'MMM yyyy', { locale: ptBR })}
+            </span>
+            <button onClick={nextMonth} style={{ border:'none', background:'none', cursor:'pointer', color:C.ink2, padding:'2px 4px', borderRadius:'4px' }}>
+              <ChevronRight size={16} />
+            </button>
           </div>
-          <div className="text-right">
-            <p className="text-xs text-muted-foreground">Gasto total</p>
-            <p className={`text-lg font-semibold ${totals.spentTotal > totals.budgetTotal && totals.budgetTotal > 0 ? 'text-destructive' : 'text-foreground'}`}>
-              {formatBRL(totals.spentTotal)}
+          <button onClick={handleCopy} disabled={copyBudgets.isPending} style={{ padding:'6px 14px', borderRadius:'8px', fontSize:'12px', fontWeight:600, fontFamily:"'Cabinet Grotesk',sans-serif", border:`1px solid ${C.rule}`, background:'none', color:C.ink2, cursor:'pointer', display:'flex', alignItems:'center', gap:'6px' }}>
+            <Copy size={14} /> Copiar mês anterior
+          </button>
+        </div>
+      </div>
+
+      {/* STATS */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'20px' }}>
+        <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'20px' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'8px' }}>
+            <span style={{ width:'7px', height:'7px', borderRadius:'50%', background:C.blue, display:'inline-block' }} />
+            <span style={{ fontSize:'11px', fontWeight:600, letterSpacing:'1px', textTransform:'uppercase', color:C.ink3 }}>Total orçado</span>
+          </div>
+          <p style={{ fontFamily:"'Instrument Serif',serif", fontSize:'28px', letterSpacing:'-0.5px', lineHeight:1, color:C.blue }}>{formatBRL(totals.budgetTotal)}</p>
+        </div>
+        <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'20px' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'8px' }}>
+            <span style={{ width:'7px', height:'7px', borderRadius:'50%', background: totals.spentTotal > totals.budgetTotal ? C.red : C.green, display:'inline-block' }} />
+            <span style={{ fontSize:'11px', fontWeight:600, letterSpacing:'1px', textTransform:'uppercase', color:C.ink3 }}>Gasto até agora</span>
+          </div>
+          <p style={{ fontFamily:"'Instrument Serif',serif", fontSize:'28px', letterSpacing:'-0.5px', lineHeight:1, color: totals.spentTotal > totals.budgetTotal ? C.red : C.green }}>
+            {formatBRL(totals.spentTotal)}
+          </p>
+          {totals.budgetTotal > 0 && (
+            <p style={{ fontSize:'11px', color:C.ink3, marginTop:'8px', paddingTop:'8px', borderTop:`1px solid ${C.rule}`, fontWeight:500 }}>
+              <span style={{ color: totals.spentTotal > totals.budgetTotal ? C.red : C.green }}>
+                {((totals.spentTotal / totals.budgetTotal) * 100).toFixed(0)}%
+              </span> utilizado · {formatBRL(Math.max(0, totals.budgetTotal - totals.spentTotal))} livre
             </p>
-          </div>
+          )}
         </div>
-        {totals.budgetTotal > 0 && (
-          <Progress
-            value={Math.min((totals.spentTotal / totals.budgetTotal) * 100, 100)}
-            className="h-2 mt-3"
-          />
+      </div>
+
+      {/* CATEGORIAS */}
+      <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', overflow:'hidden' }}>
+        <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.rule}` }}>
+          <span style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.5px', textTransform:'uppercase', color:C.ink2 }}>Categorias</span>
+        </div>
+        {budgetsLoading ? (
+          <div style={{ padding:'20px' }}>
+            {[...Array(5)].map((_, i) => <div key={i} style={{ height:'48px', background:C.rule, borderRadius:'8px', marginBottom:'8px' }} />)}
+          </div>
+        ) : (
+          <div style={{ padding:'0 20px' }}>
+            {(groups || []).map(g => {
+              const budget = budgetMap[g.id] || 0;
+              const spent = spentMap[g.id] || 0;
+              const pct = budget > 0 ? (spent / budget) * 100 : 0;
+              const barColor = pct > 100 ? C.red : pct >= 80 ? C.amber : g.color;
+              return (
+                <div key={g.id} style={{ padding:'12px 0', borderBottom:`1px solid ${C.rule}` }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'8px' }}>
+                    <span style={{ fontSize:'13px', fontWeight:600, color:C.ink, flex:1 }}>{g.icon} {g.name}</span>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="10"
+                      defaultValue={budget || ''}
+                      placeholder="0"
+                      onBlur={e => handleBudgetChange(g.id, e.target.value)}
+                      style={{ width:'110px', height:'32px', fontSize:'13px', textAlign:'right' }}
+                    />
+                  </div>
+                  {budget > 0 && (
+                    <>
+                      <div style={{ height:'4px', background:C.bg, borderRadius:'100px', overflow:'hidden', marginBottom:'4px' }}>
+                        <div style={{ height:'100%', width:`${Math.min(pct,100)}%`, borderRadius:'100px', background:barColor, transition:'width .3s' }} />
+                      </div>
+                      <div style={{ display:'flex', justifyContent:'space-between', fontSize:'11px', color:C.ink3 }}>
+                        <span style={{ color: pct > 100 ? C.red : pct >= 80 ? C.amber : C.ink3 }}>{formatBRL(spent)}</span>
+                        <span style={{ fontWeight:600, color: pct > 100 ? C.red : pct >= 80 ? C.amber : C.green }}>{pct.toFixed(0)}%</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
