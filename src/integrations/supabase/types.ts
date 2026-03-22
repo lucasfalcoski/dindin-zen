@@ -574,6 +574,54 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_transactions: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          expense_id: string | null
+          id: string
+          income_id: string | null
+          parsed_amount: number | null
+          parsed_date: string
+          parsed_description: string | null
+          parsed_type: string | null
+          phone: string
+          raw_message: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          expense_id?: string | null
+          id?: string
+          income_id?: string | null
+          parsed_amount?: number | null
+          parsed_date?: string
+          parsed_description?: string | null
+          parsed_type?: string | null
+          phone: string
+          raw_message: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          expense_id?: string | null
+          id?: string
+          income_id?: string | null
+          parsed_amount?: number | null
+          parsed_date?: string
+          parsed_description?: string | null
+          parsed_type?: string | null
+          phone?: string
+          raw_message?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       whatsapp_users: {
         Row: {
           created_at: string
