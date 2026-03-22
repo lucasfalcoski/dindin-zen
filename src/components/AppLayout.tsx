@@ -227,6 +227,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </button>
           </div>
           <div className="border-t border-border mt-4 pt-4 space-y-1">
+            <p className="px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Minha Conta</p>
             <NavLink
               to="/profile"
               onClick={() => setMoreOpen(false)}
@@ -239,6 +240,33 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             >
               <User className="h-4 w-4" />
               Meu Perfil
+            </NavLink>
+            <NavLink
+              to="/profile"
+              state={{ scrollTo: 'whatsapp' }}
+              onClick={() => setMoreOpen(false)}
+              className="flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              <MessageCircle className="h-4 w-4 text-[#25D366]" />
+              WhatsApp
+              {whatsappUser ? (
+                <span className="ml-auto text-[10px] text-[#25D366]">✅</span>
+              ) : (
+                <span className="ml-auto text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">Conectar</span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/whatsapp-history"
+              onClick={() => setMoreOpen(false)}
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center gap-2 w-full px-3 py-2.5 rounded-xl text-sm transition-colors',
+                  isActive ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                )
+              }
+            >
+              <ClipboardList className="h-4 w-4" />
+              Histórico WhatsApp
             </NavLink>
             <button
               onClick={() => { setHelpOpen(true); setMoreOpen(false); }}
