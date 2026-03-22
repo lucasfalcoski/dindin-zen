@@ -208,7 +208,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* MAIN */}
-      <div className="din-main" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: C.pageBg }}>
+      <div className="din-main" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: C.pageBg, overflowX: 'hidden', overflowY: 'auto' }}>
 
         {/* TOPBAR */}
         <header style={{ position: 'sticky', top: 0, zIndex: 40, background: C.topbarBg, borderBottom: `1px solid ${C.topbarBorder}`, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', flexShrink: 0 }}>

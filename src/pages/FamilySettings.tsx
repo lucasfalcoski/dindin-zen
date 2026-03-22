@@ -177,7 +177,7 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
       </div>
 
       {/* MEMBROS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px', marginBottom: '20px' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
         {(members || []).map((m, i) => {
           const col = AVATAR_COLORS[i % AVATAR_COLORS.length];
           const isPending = m.status === 'pending';
@@ -214,7 +214,7 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
       </div>
 
       {/* SUB-PÁGINAS */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '20px' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
         <Link to="/family/balances" style={{ background: '#fff', border: `1px solid ${C.rule}`, borderRadius: '14px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}>
           <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(26,122,69,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Scale style={{ width: '18px', height: '18px', color: C.green }} />

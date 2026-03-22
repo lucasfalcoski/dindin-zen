@@ -100,7 +100,7 @@ export default function SettingsPage() {
 
       <div className="space-y-8">
         {/* Avatar */}
-        <div className="card-surface p-6 flex items-start gap-5">
+        <div className="card-surface p-6 flex flex-col sm:flex-row items-start gap-5">
           <div style={{ width: 56, height: 56, borderRadius: '50%', background: avatarColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
             {initials}
           </div>

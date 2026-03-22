@@ -108,15 +108,15 @@ export default function Expenses() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 w-full min-w-0">
 
       {/* ── PAGE HEADER ── */}
-      <div className="flex items-end justify-between pb-5 border-b border-border">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-5 border-b border-border gap-3">
         <div>
           <p className="label-caps mb-1.5 text-muted-foreground">saídas</p>
           <h1 className="page-title">Despesas</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {[
             { key: 'today', label: 'Hoje' },
             { key: 'week', label: 'Semana' },
@@ -199,12 +199,12 @@ export default function Expenses() {
       </div>
 
       {/* ── BODY: 2 colunas ── */}
-      <div className="grid md:grid-cols-[1.5fr_1fr] gap-3.5">
+      <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-3.5">
 
         {/* Lista de despesas */}
         <div className="card-surface overflow-hidden">
           {/* Filtros de grupo */}
-          <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border flex-wrap">
+          <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border overflow-x-auto">
             <span className="sec-title mr-1">Todas as despesas</span>
             <button
               onClick={() => setGroupFilter('')}

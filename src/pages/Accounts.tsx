@@ -34,7 +34,7 @@ export default function AccountsPage() {
       </div>
 
       {/* SALDO TOTAL */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'14px', marginBottom:'20px' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
         <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'20px' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'8px' }}>
             <span style={{ width:'7px', height:'7px', borderRadius:'50%', background: totalBalance >= 0 ? C.green : C.red, display:'inline-block' }} />
@@ -58,11 +58,11 @@ export default function AccountsPage() {
 
       {/* LISTA DE CONTAS */}
       {isLoading ? (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'14px' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[...Array(3)].map((_, i) => <div key={i} style={{ height:'100px', background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px' }} />)}
         </div>
       ) : accounts && accounts.length > 0 ? (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'14px', marginBottom:'20px' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
           {accounts.map(a => {
             const typeInfo = ACCOUNT_TYPES.find(t => t.value === a.type);
             const isSelected = selectedAccount?.id === a.id;
