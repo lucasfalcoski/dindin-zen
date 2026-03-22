@@ -10,16 +10,25 @@ interface SummaryCardProps {
 }
 
 export function SummaryCard({ label, value, icon, valueClassName, formatFn }: SummaryCardProps) {
-  const formatted = formatFn ? formatFn(value) : formatBRL(value);
-  const isLong = formatted.length > 10;
   return (
-    <div className="card-surface p-4 md:p-5 animate-fade-in overflow-hidden">
+    <div className="card-surface p-5 animate-fade-in">
+      {/* Label + ícone — igual .card-label do protótipo */}
       <div className="flex items-center justify-between mb-2">
-        <span className="label-caps truncate">{label}</span>
-        {icon}
+        <span className="label-caps">{label}</span>
+        {icon && <span className="opacity-50">{icon}</span>}
       </div>
-      <p className={cn('currency text-foreground truncate tabular-nums', isLong ? 'text-lg md:text-2xl' : 'text-xl md:text-2xl', valueClassName)}>
-        {formatted}
+
+      {/* Valor — Instrument Serif 28px, igual .card-value do protótipo */}
+      <p
+        className={cn('text-foreground leading-none', valueClassName)}
+        style={{
+          fontFamily: "'Instrument Serif', Georgia, serif",
+          fontSize: '28px',
+          letterSpacing: '-0.5px',
+          lineHeight: 1,
+        }}
+      >
+        {formatFn ? formatFn(value) : formatBRL(value)}
       </p>
     </div>
   );
