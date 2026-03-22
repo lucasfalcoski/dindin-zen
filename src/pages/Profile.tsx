@@ -30,6 +30,8 @@ export default function Profile() {
   const { data: incomes } = useIncomes({});
   const { data: accounts } = useAccounts();
   const { data: creditCards } = useCreditCards();
+  const { data: families } = useMyFamilies();
+  const hasFamily = families && families.length > 0;
 
   const whatsappRef = useRef<HTMLDivElement>(null);
   const preferencesRef = useRef<HTMLDivElement>(null);
