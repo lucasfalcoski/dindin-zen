@@ -37,6 +37,7 @@ export function IncomeRow({ income, onEdit }: IncomeRowProps) {
           <span className="text-[11px] text-muted-foreground">·</span>
           <span className="text-[11px] text-muted-foreground">{cat?.label}</span>
           {income.recurrent && <RefreshCw className="h-3 w-3 text-muted-foreground" />}
+          {isWhatsApp && <MessageCircle className="inline h-3 w-3 text-[#25D366]" />}
         </div>
       </div>
       <span className="currency text-sm font-semibold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">

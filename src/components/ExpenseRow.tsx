@@ -67,6 +67,7 @@ export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
           {formatDate(expense.date)}
           {group && <span> · {group.name}</span>}
           {expense.recurrent && <span> · 🔄</span>}
+          {isWhatsApp && <MessageCircle className="inline h-3 w-3 ml-1 text-[#25D366]" />}
         </p>
       </div>
       <div className="flex items-center gap-2">

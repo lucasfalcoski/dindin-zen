@@ -68,6 +68,7 @@ const App = () => (
             <Route path="/goals" element={<ProtectedPage><Goals /></ProtectedPage>} />
             <Route path="/forecast" element={<ProtectedPage><Forecast /></ProtectedPage>} />
             <Route path="/profile" element={<ProtectedPage><Profile /></ProtectedPage>} />
+            <Route path="/whatsapp-history" element={<ProtectedPage><WhatsAppHistory /></ProtectedPage>} />
             <Route path="/family" element={<ProtectedPage><FamilySettings /></ProtectedPage>} />
             <Route path="/family/balances" element={<ProtectedPage><FamilyBalances /></ProtectedPage>} />
             <Route path="/family/budget" element={<ProtectedPage><FamilyBudgetPage /></ProtectedPage>} />
