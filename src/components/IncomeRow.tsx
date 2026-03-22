@@ -1,6 +1,7 @@
 import { Income, INCOME_CATEGORIES, useDeleteIncome } from '@/hooks/useIncomes';
 import { formatBRL, formatDateShort } from '@/lib/format';
-import { Trash2, Pencil, RefreshCw } from 'lucide-react';
+import { Trash2, Pencil, RefreshCw, MessageCircle } from 'lucide-react';
+import { useWhatsAppConfirmedIds } from '@/hooks/useWhatsAppTransactions';
 import { useToast } from '@/hooks/use-toast';
 
 interface IncomeRowProps {
