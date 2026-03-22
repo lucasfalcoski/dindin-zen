@@ -1,101 +1,120 @@
 import { useState, useEffect } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { ViewSelector } from '@/components/ViewSelector';
 import { GlobalSearch } from '@/components/GlobalSearch';
 import { QuickAddFAB } from '@/components/QuickAddFAB';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationAlerts } from '@/components/NotificationAlerts';
 import {
-  LayoutDashboard, Receipt, FolderOpen, BarChart3, LogOut,
-  DollarSign, Building2, CreditCard, Target, Users, Search,
-  Tag, Gauge, Goal, TrendingUp, X, ChevronRight,
+  LayoutDashboard, Receipt, DollarSign, Building2, CreditCard,
+  FolderOpen, Tag, Target, Gauge, Goal, TrendingUp, Users, BarChart3,
+  LogOut, Settings, Plus, Search,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
-const links = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/expenses', label: 'Despesas', icon: Receipt },
-  { to: '/income', label: 'Receitas', icon: DollarSign },
-  { to: '/accounts', label: 'Contas', icon: Building2 },
-  { to: '/credit-cards', label: 'Cartões', icon: CreditCard },
-  { to: '/groups', label: 'Grupos', icon: FolderOpen },
-  { to: '/tags', label: 'Tags', icon: Tag },
-  { to: '/budget', label: 'Orçamento', icon: Target },
-  { to: '/score', label: 'Score', icon: Gauge },
-  { to: '/goals', label: 'Metas', icon: Goal },
-  { to: '/forecast', label: 'Projeção', icon: TrendingUp },
-  { to: '/family', label: 'Família', icon: Users },
-  { to: '/reports', label: 'Relatórios', icon: BarChart3 },
+// ── GRUPOS DE LINKS ──
+const NAV_GROUPS = [
+  {
+    links: [
+      { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+    ],
+  },
+  {
+    label: 'Transações',
+    links: [
+      { to: '/expenses', label: 'Despesas', icon: Receipt },
+      { to: '/income', label: 'Receitas', icon: DollarSign },
+    ],
+  },
+  {
+    label: 'Contas',
+    links: [
+      { to: '/accounts', label: 'Contas', icon: Building2 },
+      { to: '/credit-cards', label: 'Cartões', icon: CreditCard },
+    ],
+  },
+  {
+    label: 'Organização',
+    links: [
+      { to: '/groups', label: 'Grupos', icon: FolderOpen },
+      { to: '/tags', label: 'Tags', icon: Tag },
+      { to: '/budget', label: 'Orçamento', icon: Target },
+    ],
+  },
+  {
+    label: 'Análise',
+    links: [
+      { to: '/score', label: 'Score', icon: Gauge },
+      { to: '/goals', label: 'Metas', icon: Goal },
+      { to: '/forecast', label: 'Projeção', icon: TrendingUp },
+      { to: '/reports', label: 'Relatórios', icon: BarChart3 },
+    ],
+  },
+  {
+    label: 'Social',
+    links: [
+      { to: '/family', label: 'Família', icon: Users },
+    ],
+  },
 ];
 
-const routeTitles: Record<string, string> = {
-  '/': 'Dashboard',
-  '/expenses': 'Despesas',
-  '/income': 'Receitas',
-  '/accounts': 'Contas',
-  '/credit-cards': 'Cartões',
-  '/groups': 'Grupos',
-  '/tags': 'Tags',
-  '/budget': 'Orçamento',
-  '/score': 'Score',
-  '/goals': 'Metas',
-  '/forecast': 'Projeção',
-  '/family': 'Família',
-  '/reports': 'Relatórios',
+// Flat list para mobile
+const ALL_LINKS = NAV_GROUPS.flatMap(g => g.links);
+
+// Breadcrumb lookup
+const LABEL_MAP: Record<string, string> = Object.fromEntries(ALL_LINKS.map(l => [l.to, l.label]));
+
+const C = {
+  sidebarBg: '#16150f',
+  sidebarActive: 'rgba(255,255,255,0.12)',
+  sidebarIcon: 'rgba(255,255,255,0.45)',
+  sidebarIconActive: '#ffffff',
+  sidebarIndicator: '#1a7a45',
+  topbarBg: '#faf9f7',
+  topbarBorder: '#e4e1da',
+  ink: '#16150f',
+  ink2: '#6b6a63',
+  ink3: '#b0aea6',
+  pageBg: '#f2f0eb',
+  amber: '#92580a',
+  amberBg: '#fdefd4',
 };
 
-// Grupos de links para separadores visuais no rail
-const railGroups = [
-  links.slice(0, 5),   // Dashboard → Cartões
-  links.slice(5, 11),  // Grupos → Projeção
-  links.slice(11),     // Família → Relatórios
-];
-
-// Links do drawer mobile "Mais"
-const moreLinks = [
-  { to: '/income', label: 'Receitas', icon: DollarSign },
-  { to: '/accounts', label: 'Contas', icon: Building2 },
-  { to: '/credit-cards', label: 'Cartões', icon: CreditCard },
-  { to: '/groups', label: 'Grupos', icon: FolderOpen },
-  { to: '/tags', label: 'Tags', icon: Tag },
-  { to: '/budget', label: 'Orçamento', icon: Target },
-  { to: '/score', label: 'Score', icon: Gauge },
-  { to: '/goals', label: 'Metas', icon: Goal },
-  { to: '/forecast', label: 'Projeção', icon: TrendingUp },
-  { to: '/reports', label: 'Relatórios', icon: BarChart3 },
-];
-
-// Ícone logo Din-Din Zen
-function DinDinLogo({ size = 20 }: { size?: number }) {
+// Logo badge
+function LogoBadge() {
   return (
-    <svg viewBox="0 0 32 32" width={size} height={size} fill="none">
-      <text
-        x="16" y="21"
-        textAnchor="middle"
-        style={{ fontFamily: 'sans-serif', fontSize: '15px', fontWeight: 900, fill: '#1a7a45' }}
-      >
-        $
-      </text>
-      <rect x="7" y="25" width="18" height="2" rx="1" fill="#1a7a45" opacity="0.5" />
-      <rect x="10" y="28" width="12" height="1.5" rx="0.75" fill="#1a7a45" opacity="0.25" />
-    </svg>
+    <div style={{
+      width: '36px', height: '36px', borderRadius: '10px',
+      background: '#1a7a45', display: 'flex', alignItems: 'center',
+      justifyContent: 'center', flexShrink: 0,
+    }}>
+      <span style={{ fontSize: '18px', fontWeight: 800, color: '#fff', fontFamily: "'Cabinet Grotesk', sans-serif", lineHeight: 1 }}>$</span>
+    </div>
   );
 }
 
-function DinDinLogoWhite({ size = 20 }: { size?: number }) {
+// Tooltip wrapper para sidebar
+function SidebarTooltip({ label, children }: { label: string; children: React.ReactNode }) {
+  const [visible, setVisible] = useState(false);
   return (
-    <svg viewBox="0 0 32 32" width={size} height={size} fill="none">
-      <text
-        x="16" y="21"
-        textAnchor="middle"
-        style={{ fontFamily: 'sans-serif', fontSize: '15px', fontWeight: 900, fill: 'white' }}
-      >
-        $
-      </text>
-      <rect x="7" y="25" width="18" height="2" rx="1" fill="white" opacity="0.4" />
-      <rect x="10" y="28" width="12" height="1.5" rx="0.75" fill="white" opacity="0.2" />
-    </svg>
+    <div
+      style={{ position: 'relative' }}
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}
+    >
+      {children}
+      {visible && (
+        <div style={{
+          position: 'absolute', left: '56px', top: '50%', transform: 'translateY(-50%)',
+          background: C.ink, color: '#fff', fontSize: '12px', fontWeight: 600,
+          padding: '4px 10px', borderRadius: '6px', whiteSpace: 'nowrap',
+          zIndex: 100, pointerEvents: 'none',
+          fontFamily: "'Cabinet Grotesk', sans-serif",
+          boxShadow: '0 4px 12px rgba(0,0,0,.3)',
+        }}>
+          {label}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -104,383 +123,253 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
 
-  const pageTitle = routeTitles[location.pathname] ?? 'Din-Din Zen';
-
-  // Fechar drawer ao navegar
-  useEffect(() => {
-    setMoreOpen(false);
-  }, [location.pathname]);
-
-  // Atalhos de teclado
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setSearchOpen(true);
-      }
-      if ((e.key === 'n' || e.key === 'N') && !e.metaKey && !e.ctrlKey && !e.altKey) {
-        navigate('/expenses?new=1');
-      }
-      if (e.key === 'Escape') setMoreOpen(false);
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); setSearchOpen(true); }
+      if ((e.key === 'n' || e.key === 'N') && !e.metaKey && !e.ctrlKey && !e.altKey) navigate('/expenses?new=1');
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [navigate]);
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/login');
-  };
+  const handleSignOut = async () => { await signOut(); navigate('/login'); };
+
+  // Breadcrumb label
+  const currentLabel = LABEL_MAP[location.pathname] ?? Object.entries(LABEL_MAP).find(([k]) => location.pathname.startsWith(k) && k !== '/')?.[1] ?? 'Página';
+
+  // Mobile bottom 5 links
+  const mobileLinks = [
+    ALL_LINKS[0], // Dashboard
+    ALL_LINKS[1], // Despesas
+    ALL_LINKS[2], // Receitas
+    ALL_LINKS[11], // Família
+    ALL_LINKS[10], // Relatórios
+  ].filter(Boolean);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div style={{ display: 'flex', minHeight: '100vh', background: C.pageBg }}>
+      <NotificationAlerts />
 
-      {/* ══════════════════════════════════════════
-          SIDEBAR RAIL — desktop only
-          Fundo escuro (#16150f), 64px largura fixa
-      ══════════════════════════════════════════ */}
-      <aside
-        className="hidden md:flex w-16 min-w-[64px] flex-col items-center py-4 gap-0.5 flex-shrink-0 z-50"
-        style={{ background: '#16150f' }}
+      {/* ── SIDEBAR RAIL (desktop only) ── */}
+      <aside style={{
+        display: 'none',
+        width: '64px',
+        flexShrink: 0,
+        background: C.sidebarBg,
+        flexDirection: 'column',
+        alignItems: 'center',
+        paddingTop: '14px',
+        paddingBottom: '14px',
+        position: 'fixed',
+        top: 0, left: 0, bottom: 0,
+        zIndex: 50,
+        overflowY: 'auto',
+        overflowX: 'visible',
+      }}
+        className="md-sidebar"
+        id="app-sidebar"
       >
         {/* Logo */}
-        <div
-          className="w-9 h-9 rounded-[11px] flex items-center justify-center mb-5 cursor-pointer flex-shrink-0 transition-opacity hover:opacity-80"
-          style={{ background: '#1a7a45' }}
-          onClick={() => navigate('/')}
-          title="Din-Din Zen"
-        >
-          <DinDinLogoWhite size={20} />
+        <NavLink to="/" style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+          <LogoBadge />
+        </NavLink>
+
+        {/* Nav groups */}
+        <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {NAV_GROUPS.map((group, gi) => (
+            <div key={gi}>
+              {/* Separador entre grupos */}
+              {gi > 0 && (
+                <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', margin: '6px 12px' }} />
+              )}
+              {group.links.map(link => (
+                <SidebarTooltip key={link.to} label={link.label}>
+                  <NavLink
+                    to={link.to}
+                    end={link.to === '/'}
+                    style={({ isActive }) => ({
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      width: '100%', height: '44px', position: 'relative',
+                      background: isActive ? C.sidebarActive : 'none',
+                      textDecoration: 'none', transition: 'background .15s',
+                    })}
+                  >
+                    {({ isActive }) => (
+                      <>
+                        {/* Indicador ativo */}
+                        {isActive && (
+                          <div style={{
+                            position: 'absolute', left: 0, top: '8px', bottom: '8px',
+                            width: '2px', borderRadius: '0 2px 2px 0',
+                            background: C.sidebarIndicator,
+                          }} />
+                        )}
+                        <link.icon
+                          size={18}
+                          style={{ color: isActive ? C.sidebarIconActive : C.sidebarIcon, transition: 'color .15s' }}
+                        />
+                      </>
+                    )}
+                  </NavLink>
+                </SidebarTooltip>
+              ))}
+            </div>
+          ))}
         </div>
 
-        {/* Nav por grupos com separadores */}
-        {railGroups.map((group, gi) => (
-          <div key={gi} className="flex flex-col items-center gap-0.5 w-full">
-            {gi > 0 && (
-              <div
-                className="w-6 h-px my-1.5 flex-shrink-0"
-                style={{ background: 'rgba(255,255,255,0.10)' }}
-              />
-            )}
-            {group.map((l) => (
-              <NavLink
-                key={l.to}
-                to={l.to}
-                end={l.to === '/'}
-                title={l.label}
-                className={({ isActive }) =>
-                  cn(
-                    'relative w-10 h-10 rounded-[10px] flex items-center justify-center transition-all duration-150 flex-shrink-0',
-                    isActive
-                      ? 'text-white'
-                      : 'text-white/35 hover:text-white/70'
-                  )
-                }
-                style={({ isActive }) => ({
-                  background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
-                })}
-              >
-                {({ isActive }) => (
-                  <>
-                    {isActive && (
-                      <span
-                        className="absolute left-0 rounded-r-sm"
-                        style={{
-                          top: '20%', bottom: '20%',
-                          width: '2px',
-                          background: '#1a7a45',
-                        }}
-                      />
-                    )}
-                    <l.icon className="h-4 w-4" />
-                  </>
-                )}
-              </NavLink>
-            ))}
-          </div>
-        ))}
-
-        {/* Bottom: theme + sair */}
-        <div className="mt-auto flex flex-col items-center gap-2">
-          <button
-            onClick={handleSignOut}
-            title="Sair"
-            className="w-10 h-10 rounded-[10px] flex items-center justify-center transition-all duration-150 text-white/35 hover:text-white/70"
-            style={{ background: 'transparent' }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-          >
-            <LogOut className="h-4 w-4" />
-          </button>
+        {/* Sair */}
+        <div style={{ width: '100%', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.07)', marginTop: '6px' }}>
+          <SidebarTooltip label="Sair">
+            <button
+              onClick={handleSignOut}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: '100%', height: '44px', background: 'none', border: 'none',
+                cursor: 'pointer', transition: 'background .15s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = C.sidebarActive)}
+              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+            >
+              <LogOut size={18} style={{ color: C.sidebarIcon }} />
+            </button>
+          </SidebarTooltip>
         </div>
       </aside>
 
-      {/* ══════════════════════════════════════════
-          SHELL — topbar + conteúdo + mobile nav
-      ══════════════════════════════════════════ */}
-      <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+      {/* ── CONTEÚDO PRINCIPAL (com margem p/ sidebar) ── */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }} className="md-main-content">
 
-        {/* ── TOP BAR DESKTOP ── */}
-        <header
-          className="hidden md:flex h-[52px] items-center px-7 gap-4 flex-shrink-0 border-b"
-          style={{ background: '#faf9f7', borderColor: '#e4e1da' }}
-        >
+        {/* ── TOPBAR ── */}
+        <header style={{
+          background: C.topbarBg,
+          borderBottom: `1px solid ${C.topbarBorder}`,
+          height: '52px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 20px',
+          position: 'sticky',
+          top: 0,
+          zIndex: 40,
+        }}>
           {/* Breadcrumb */}
-          <div className="flex items-center gap-1.5 text-sm font-medium" style={{ color: '#6b6a63' }}>
-            <span>Din-Din Zen</span>
-            <span style={{ color: '#ccc9c0' }}>/</span>
-            <strong style={{ color: '#16150f', fontWeight: 700 }}>{pageTitle}</strong>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {/* Logo mobile */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} className="mobile-logo">
+              <LogoBadge />
+              <span style={{ fontSize: '14px', fontWeight: 700, color: C.ink, fontFamily: "'Cabinet Grotesk', sans-serif" }}>Din-Din Zen</span>
+              <span style={{ color: C.topbarBorder, fontSize: '16px' }}>/</span>
+            </div>
+            <span style={{ fontSize: '14px', fontWeight: 700, color: C.ink, fontFamily: "'Cabinet Grotesk', sans-serif" }}>{currentLabel}</span>
           </div>
 
-          {/* Actions */}
-          <div className="ml-auto flex items-center gap-2">
+          {/* Ações topbar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {/* Busca */}
             <button
               onClick={() => setSearchOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors border"
               style={{
-                color: '#6b6a63',
-                borderColor: '#ccc9c0',
-                background: 'none',
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.color = '#16150f';
-                (e.currentTarget as HTMLElement).style.borderColor = '#6b6a63';
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.color = '#6b6a63';
-                (e.currentTarget as HTMLElement).style.borderColor = '#ccc9c0';
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '5px 12px', borderRadius: '8px', fontSize: '12px',
+                color: C.ink2, background: 'none',
+                border: `1px solid ${C.topbarBorder}`,
+                cursor: 'pointer', fontFamily: "'Cabinet Grotesk', sans-serif", fontWeight: 500,
               }}
             >
-              <Search className="h-3.5 w-3.5" />
+              <Search size={13} />
               <span>Buscar</span>
-              <kbd
-                className="hidden lg:inline-flex h-4 items-center px-1.5 rounded text-[10px]"
-                style={{ border: '1px solid #ccc9c0', background: '#f2f0eb', color: '#b0aea6' }}
-              >
-                ⌘K
-              </kbd>
+              <kbd style={{ fontSize: '10px', color: C.ink3, background: C.pageBg, padding: '1px 5px', borderRadius: '4px', border: `1px solid ${C.topbarBorder}` }}>⌘K</kbd>
             </button>
-            <ThemeToggle />
+
             <ViewSelector />
-            <span className="text-xs truncate max-w-[160px]" style={{ color: '#b0aea6' }}>
+
+            <span style={{ fontSize: '12px', color: C.ink3, fontFamily: "'Cabinet Grotesk', sans-serif" }}>
               {user?.email}
             </span>
           </div>
         </header>
 
-        {/* ── TOP BAR MOBILE ── */}
-        <div
-          className="md:hidden sticky top-0 z-40 flex items-center justify-between px-4 flex-shrink-0"
-          style={{ height: '48px', background: '#f2f0eb', borderBottom: '1px solid #e4e1da' }}
-        >
-          <div className="flex items-center gap-2">
-            <div
-              className="w-7 h-7 rounded-[8px] flex items-center justify-center flex-shrink-0"
-              style={{ background: '#16150f' }}
-            >
-              <DinDinLogo size={16} />
-            </div>
-            <span className="text-sm font-extrabold tracking-tight" style={{ color: '#16150f' }}>
-              Din-Din <span style={{ color: '#1a7a45' }}>Zen</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <ThemeToggle />
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="p-2 rounded-lg transition-colors"
-              style={{ color: '#6b6a63' }}
-            >
-              <Search className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* ── MAIN CONTENT ── */}
-        <main className="flex-1 overflow-y-auto px-4 py-5 md:px-9 md:py-8 pb-24 md:pb-8">
+        {/* ── PAGE CONTENT ── */}
+        <main style={{ flex: 1, padding: '24px', paddingBottom: '88px', maxWidth: '100%', overflowX: 'hidden' }} className="md-page-padding">
           {children}
         </main>
-
-        {/* ── BOTTOM NAV MOBILE ── */}
-        <nav
-          className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t"
-          style={{ background: '#ffffff', borderColor: '#e4e1da', height: '64px' }}
-        >
-          <div className="flex items-center justify-around h-full px-2">
-
-            {/* Dashboard */}
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                cn('flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-semibold transition-colors',
-                  isActive ? 'text-primary' : 'text-muted-foreground')
-              }
-            >
-              <LayoutDashboard className="h-5 w-5" />
-              <span>Início</span>
-            </NavLink>
-
-            {/* Despesas */}
-            <NavLink
-              to="/expenses"
-              className={({ isActive }) =>
-                cn('flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-semibold transition-colors',
-                  isActive ? 'text-primary' : 'text-muted-foreground')
-              }
-            >
-              <Receipt className="h-5 w-5" />
-              <span>Despesas</span>
-            </NavLink>
-
-            {/* FAB central */}
-            <button
-              onClick={() => navigate('/expenses?new=1')}
-              className="flex flex-col items-center gap-1 flex-shrink-0"
-              style={{ marginTop: '-20px' }}
-            >
-              <div
-                className="w-14 h-14 rounded-[18px] flex items-center justify-center shadow-lg transition-transform active:scale-95"
-                style={{ background: '#16150f' }}
-              >
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="none">
-                  <path d="M12 5v14M5 12h14" stroke="#1a7a45" strokeWidth="2.5" strokeLinecap="round" />
-                </svg>
-              </div>
-              <span className="text-[10px] font-semibold" style={{ color: '#6b6a63' }}>Lançar</span>
-            </button>
-
-            {/* Família */}
-            <NavLink
-              to="/family"
-              className={({ isActive }) =>
-                cn('flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-semibold transition-colors',
-                  isActive ? 'text-primary' : 'text-muted-foreground')
-              }
-            >
-              <Users className="h-5 w-5" />
-              <span>Família</span>
-            </NavLink>
-
-            {/* Mais */}
-            <button
-              onClick={() => setMoreOpen(true)}
-              className="flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-semibold text-muted-foreground"
-            >
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
-                <circle cx="5" cy="12" r="1.5" fill="currentColor" />
-                <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-                <circle cx="19" cy="12" r="1.5" fill="currentColor" />
-              </svg>
-              <span>Mais</span>
-            </button>
-
-          </div>
-        </nav>
-
-        {/* ── DRAWER MAIS (mobile) ── */}
-        {moreOpen && (
-          <>
-            {/* Backdrop */}
-            <div
-              className="md:hidden fixed inset-0 z-[60]"
-              style={{ background: 'rgba(22,21,15,0.45)' }}
-              onClick={() => setMoreOpen(false)}
-            />
-            {/* Sheet */}
-            <div
-              className="md:hidden fixed bottom-0 left-0 right-0 z-[70] rounded-t-2xl overflow-hidden"
-              style={{ background: '#faf9f7', maxHeight: '80vh' }}
-            >
-              {/* Handle */}
-              <div className="flex justify-center pt-3 pb-1">
-                <div className="w-10 h-1 rounded-full" style={{ background: '#ccc9c0' }} />
-              </div>
-
-              {/* Header */}
-              <div
-                className="flex items-center justify-between px-5 py-3 border-b"
-                style={{ borderColor: '#e4e1da' }}
-              >
-                <span className="text-sm font-bold" style={{ color: '#16150f' }}>Menu</span>
-                <button
-                  onClick={() => setMoreOpen(false)}
-                  className="p-1.5 rounded-lg"
-                  style={{ color: '#6b6a63' }}
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-
-              {/* Links */}
-              <div className="overflow-y-auto pb-8" style={{ maxHeight: 'calc(80vh - 80px)' }}>
-                <div className="px-4 py-2">
-                  <p
-                    className="text-[10px] font-bold uppercase tracking-widest px-2 py-2"
-                    style={{ color: '#b0aea6' }}
-                  >
-                    Navegação
-                  </p>
-                  {moreLinks.map((l) => (
-                    <NavLink
-                      key={l.to}
-                      to={l.to}
-                      className={({ isActive }) =>
-                        cn(
-                          'flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-colors',
-                          isActive
-                            ? 'bg-primary/10 text-primary'
-                            : 'text-foreground hover:bg-accent'
-                        )
-                      }
-                    >
-                      <l.icon className="h-4 w-4 flex-shrink-0" />
-                      {l.label}
-                      <ChevronRight className="h-3.5 w-3.5 ml-auto opacity-30" />
-                    </NavLink>
-                  ))}
-                </div>
-
-                {/* Minha conta */}
-                <div className="px-4 py-2 border-t" style={{ borderColor: '#e4e1da' }}>
-                  <p
-                    className="text-[10px] font-bold uppercase tracking-widest px-2 py-2"
-                    style={{ color: '#b0aea6' }}
-                  >
-                    Minha conta
-                  </p>
-                  <button
-                    onClick={() => { navigate('/profile'); setMoreOpen(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-foreground hover:bg-accent transition-colors"
-                  >
-                    <span className="text-base">👤</span>
-                    Perfil
-                    <ChevronRight className="h-3.5 w-3.5 ml-auto opacity-30" />
-                  </button>
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-colors"
-                    style={{ color: '#b83232' }}
-                  >
-                    <LogOut className="h-4 w-4 flex-shrink-0" />
-                    Sair
-                  </button>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
       </div>
 
-      {/* ── GLOBAIS ── */}
+      {/* ── MOBILE BOTTOM NAV ── */}
+      <nav style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0,
+        background: C.topbarBg, borderTop: `1px solid ${C.topbarBorder}`,
+        height: '64px', display: 'flex', alignItems: 'center',
+        justifyContent: 'space-around', zIndex: 50, paddingBottom: '4px',
+      }} className="mobile-bottom-nav">
+        {mobileLinks.map((link, i) => {
+          const isFAB = i === 2;
+          if (isFAB) return (
+            <button
+              key="fab"
+              onClick={() => navigate('/expenses?new=1')}
+              style={{
+                width: '48px', height: '48px', borderRadius: '50%',
+                background: '#1a7a45', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 4px 16px rgba(26,122,69,.4)',
+                marginTop: '-16px',
+              }}
+            >
+              <Plus size={22} style={{ color: '#fff' }} />
+            </button>
+          );
+          return (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end={link.to === '/'}
+              style={({ isActive }) => ({
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                gap: '2px', padding: '4px 8px', textDecoration: 'none',
+                color: isActive ? '#1a7a45' : C.ink3,
+                fontSize: '9px', fontWeight: 600,
+                fontFamily: "'Cabinet Grotesk', sans-serif",
+                letterSpacing: '0.3px', textTransform: 'uppercase',
+                flex: 1,
+              })}
+            >
+              {({ isActive }) => (
+                <>
+                  <link.icon size={20} style={{ color: isActive ? '#1a7a45' : C.ink3 }} />
+                  {link.label}
+                </>
+              )}
+            </NavLink>
+          );
+        })}
+      </nav>
+
+      {/* FAB desktop (quick add) */}
       <QuickAddFAB />
-      <NotificationAlerts />
+
+      {/* Global search */}
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+
+      {/* CSS para mostrar sidebar só no desktop */}
+      <style>{`
+        @media (min-width: 768px) {
+          #app-sidebar { display: flex !important; }
+          .md-main-content { margin-left: 64px; }
+          .md-page-padding { padding: 28px 32px !important; padding-bottom: 28px !important; max-width: 1200px !important; margin: 0 auto !important; width: 100% !important; }
+          .mobile-bottom-nav { display: none !important; }
+          .mobile-logo { display: none !important; }
+        }
+        @media (max-width: 767px) {
+          #app-sidebar { display: none !important; }
+          .md-main-content { margin-left: 0 !important; }
+          .md-page-padding { padding: 16px !important; padding-bottom: 80px !important; }
+        }
+        #app-sidebar::-webkit-scrollbar { width: 0; }
+      `}</style>
     </div>
   );
 }
