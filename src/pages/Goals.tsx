@@ -311,7 +311,7 @@ export default function Goals() {
 
       {/* ── GRID DE METAS ── */}
       {isLoading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
           {[...Array(3)].map((_, i) => (
             <div key={i} style={{ height: '160px', background: '#fff', border: `1px solid ${C.rule}`, borderRadius: '14px', animation: 'pulse 1.5s infinite' }} />
           ))}
