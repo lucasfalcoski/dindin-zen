@@ -310,7 +310,8 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
