@@ -177,7 +177,7 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
       </div>
 
       {/* MEMBROS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px', marginBottom: '20px' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
         {(members || []).map((m, i) => {
           const col = AVATAR_COLORS[i % AVATAR_COLORS.length];
           const isPending = m.status === 'pending';
