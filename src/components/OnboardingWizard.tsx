@@ -100,7 +100,7 @@ export function OnboardingWizard() {
       await createIncome.mutateAsync({
         description: 'Salário',
         amount,
-        date: format(new Date(), 'yyyy-MM-dd'),
+        date: todayString(),
         category: 'salario',
         recurrent: true,
       });
