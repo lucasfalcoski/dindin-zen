@@ -233,6 +233,20 @@ export default function Profile() {
             ))}
           </div>
         </div>
+        <div>
+          <p className="text-sm text-foreground mb-2">Fuso horário</p>
+          <select
+            value={profile?.timezone || 'America/Sao_Paulo'}
+            onChange={(e) => updateProfile.mutate({ timezone: e.target.value }, {
+              onSuccess: () => toast({ title: 'Fuso horário atualizado!' }),
+            })}
+            className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
+          >
+            {TIMEZONES.map(tz => (
+              <option key={tz.value} value={tz.value}>{tz.label}</option>
+            ))}
+          </select>
+        </div>
         <div className="border-t border-border pt-4">
           <Button variant="outline" className="w-full gap-2 text-muted-foreground" onClick={handleSignOut}>
             <LogOut className="h-4 w-4" /> Sair
