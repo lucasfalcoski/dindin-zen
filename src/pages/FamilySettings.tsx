@@ -121,6 +121,11 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
   const inviteMember = useInviteMember();
   const removeMember = useRemoveMember();
 
+  // Fetch profiles for active members
+  const memberUserIds = (members || []).filter(m => m.user_id).map(m => m.user_id!);
+  const { data: profiles } = useFamilyProfiles(memberUserIds);
+  const profileMap = new Map((profiles || []).map(p => [p.id, p]));
+
   const [activeTab, setActiveTab] = useState<TabId>('members');
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(family.name);
