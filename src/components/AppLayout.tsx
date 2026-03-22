@@ -90,8 +90,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     navigate('/login');
   };
 
-  const mobileMainLinks = links.slice(0, 4);
-  const mobileMoreLinks = links.slice(4);
+  const mobileMainLinks = links.slice(0, 3); // Dashboard, Despesas, Receitas
+  const mobileMoreLinks = links.slice(3);
 
   return (
     <div className="flex flex-col h-dvh bg-background transition-colors duration-300">
