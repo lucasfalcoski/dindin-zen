@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { WhatsAppConnect } from '@/components/WhatsAppConnect';
+import WhatsAppConnect from '@/components/WhatsAppConnect';
 
 const C = {
   ink: '#16150f', ink2: '#6b6a63', ink3: '#b0aea6',
