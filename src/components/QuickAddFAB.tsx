@@ -93,6 +93,7 @@ export function QuickAddFAB() {
   const { data: groups } = useGroups();
   const createExpense = useCreateExpense();
   const { user } = useAuth();
+  const { todayString } = useUserTimezone();
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
