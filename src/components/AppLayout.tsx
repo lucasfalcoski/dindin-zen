@@ -138,6 +138,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const displayName = profile?.display_name || user?.email?.split('@')[0] || 'Usuário';
   const avatarColor = profile?.avatar_color || C.green;
