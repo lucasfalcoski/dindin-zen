@@ -127,7 +127,7 @@ export default function Login() {
             <span className="font-extrabold text-lg tracking-tight">Din-Din <span className="text-primary">Zen</span></span>
           </div>
 
-          <h2 className="text-3xl font-extrabold tracking-tight text-foreground mb-1">Bom dia.</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight text-foreground mb-1">{(() => { const h = new Date().getHours(); return h >= 5 && h < 12 ? 'Bom dia.' : h < 18 ? 'Boa tarde.' : 'Boa noite.'; })()}</h2>
           <p className="text-sm text-muted-foreground mb-8">Entre na sua conta para continuar de onde parou.</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
