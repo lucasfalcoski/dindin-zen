@@ -23,6 +23,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { InsightsSection } from '@/components/InsightsSection';
 import { WhatsAppPendingBanner } from '@/components/WhatsAppPendingBanner';
+import { WhatsAppDashboardCard } from '@/components/WhatsAppDashboardCard';
 
 function getInvoicePeriod(closingDay: number) {
   const now = new Date();
