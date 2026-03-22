@@ -65,7 +65,7 @@ export function useFamilyBalance(familyId: string | null, monthStart: string, mo
         _month_end: monthEnd,
       });
       if (error) throw error;
-      return data as FamilyBalanceData;
+      return data as unknown as FamilyBalanceData;
     },
     enabled: !!familyId,
   });
