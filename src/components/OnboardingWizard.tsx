@@ -43,6 +43,7 @@ export function OnboardingWizard() {
   const [cardName, setCardName] = useState('');
   const [cardLimit, setCardLimit] = useState('');
   const createCard = useCreateCreditCard();
+  const { todayString, nowInUserTz } = useUserTimezone();
 
   // Step 4
   const [familyName, setFamilyName] = useState('');
