@@ -230,7 +230,7 @@ export default function Dashboard() {
       </div>
 
       {/* BODY 2 COLUNAS */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '14px' }}>
+      <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-3">
         {/* ESQUERDA */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {card(<>
