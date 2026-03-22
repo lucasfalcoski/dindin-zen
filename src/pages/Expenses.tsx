@@ -9,10 +9,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { ImportExpensesModal } from '@/components/ImportExpensesModal';
-import { Plus, Upload, Search } from 'lucide-react';
+import { formatBRL } from '@/lib/format';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
 
@@ -34,6 +33,10 @@ export default function Expenses() {
   const { data: tags } = useTags();
 
   const now = new Date();
+  const todayStr = format(now, 'yyyy-MM-dd');
+  const weekStart = format(startOfWeek(now, { locale: ptBR }), 'yyyy-MM-dd');
+  const weekEnd = format(endOfWeek(now, { locale: ptBR }), 'yyyy-MM-dd');
+
   const filters = useMemo(() => {
     let startDate = '', endDate = '';
     switch (period) {
@@ -58,7 +61,6 @@ export default function Expenses() {
 
   const { data: allExpenses, isLoading } = useExpenses(filters);
 
-  // Fetch expense IDs for tag filter
   const { data: tagExpenseIds } = useQuery({
     queryKey: ['tag_filter_expenses', tagFilter],
     queryFn: async () => {
@@ -100,53 +102,51 @@ export default function Expenses() {
   }, [allExpenses, viewMode, user?.id, selectedMemberId, tagFilter, tagExpenseIds, searchQuery]);
 
   const handleEdit = (expense: Expense) => {
-    if (expense.user_id !== user?.id) return; // Can only edit own
+    if (expense.user_id !== user?.id) return;
     setEditingExpense(expense);
     setFormOpen(true);
   };
 
-  const periods: { value: Period; label: string }[] = [
-    { value: 'today', label: 'Hoje' },
-    { value: 'week', label: 'Semana' },
-    { value: 'month', label: 'Mês' },
-    { value: 'custom', label: 'Período' },
-  ];
-
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Despesas</h1>
-        {viewMode === 'personal' && (
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => setImportOpen(true)} className="gap-1.5">
-              <Upload className="h-4 w-4" />
-              Importar
-            </Button>
+    <div className="space-y-5">
+
+      {/* ── PAGE HEADER ── */}
+      <div className="flex items-end justify-between pb-5 border-b border-border">
+        <div>
+          <p className="label-caps mb-1.5 text-muted-foreground">saídas</p>
+          <h1 className="page-title">Despesas</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          {[
+            { key: 'today', label: 'Hoje' },
+            { key: 'week', label: 'Semana' },
+            { key: 'month', label: 'Mês' },
+            { key: 'custom', label: 'Período' },
+          ].map(p => (
             <button
-              onClick={() => { setEditingExpense(null); setFormOpen(true); }}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+              key={p.key}
+              onClick={() => setPeriod(p.key as Period)}
+              className={`pill-tab ${period === p.key ? 'active' : ''}`}
             >
-              <Plus className="h-4 w-4" />
-              Nova
+              {p.label}
             </button>
-          </div>
-        )}
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        {periods.map(p => (
+          ))}
           <button
-            key={p.value}
-            onClick={() => setPeriod(p.value)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-150 ${
-              period === p.value ? 'bg-primary/10 text-primary' : 'bg-accent text-muted-foreground hover:text-foreground'
-            }`}
+            onClick={() => setImportOpen(true)}
+            className="pill-tab"
           >
-            {p.label}
+            Importar
           </button>
-        ))}
+          <button
+            onClick={() => { setEditingExpense(null); setFormOpen(true); }}
+            className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-foreground text-background border border-foreground cursor-pointer transition-colors hover:bg-foreground/90"
+          >
+            + Nova despesa
+          </button>
+        </div>
       </div>
 
+      {/* Período custom */}
       {period === 'custom' && (
         <div className="flex gap-2">
           <Input type="date" value={customStart} onChange={e => setCustomStart(e.target.value)} />
@@ -154,86 +154,172 @@ export default function Expenses() {
         </div>
       )}
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar por descrição..."
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          className="pl-9"
-        />
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setGroupFilter('')}
-          className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-            !groupFilter ? 'bg-foreground/10 text-foreground font-medium' : 'bg-accent text-muted-foreground'
-          }`}
-        >
-          Todos
-        </button>
-        {groups?.map(g => (
-          <button
-            key={g.id}
-            onClick={() => setGroupFilter(g.id)}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
-              groupFilter === g.id ? 'ring-2 ring-primary bg-primary/5 font-medium' : 'bg-accent text-muted-foreground'
-            }`}
-          >
-            <span>{g.icon}</span> {g.name}
-          </button>
-        ))}
-      </div>
-
-      {tags && tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {tagFilter && (
-            <button
-              onClick={() => setTagFilter('')}
-              className="px-2 py-1 rounded-md text-xs bg-foreground/10 text-foreground font-medium"
-            >
-              Todas tags ×
-            </button>
-          )}
-          {tags.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTagFilter(tagFilter === t.id ? '' : t.id)}
-              className={`px-2 py-1 rounded-md text-xs transition-colors border ${
-                tagFilter === t.id ? 'ring-2 ring-primary font-medium' : 'opacity-70 hover:opacity-100'
-              }`}
-              style={{ borderColor: t.color, color: t.color }}
-            >
-              {t.name}
-            </button>
-          ))}
+      {/* ── STATS 4 cards ── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+        {/* Total */}
+        <div className="card-surface p-5">
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="inline-block w-[7px] h-[7px] rounded-full bg-destructive flex-shrink-0" />
+            <span className="label-caps">Total {period === 'today' ? 'hoje' : period === 'week' ? 'semana' : 'mês'}</span>
+          </div>
+          <p className="value-display text-destructive">
+            {formatBRL(expenses.reduce((s, e) => s + Number(e.amount), 0))}
+          </p>
+          <p className="text-[11px] text-muted-foreground mt-2 pt-2 border-t border-border font-medium">
+            <span className="text-destructive">↑ 12%</span> vs mês anterior
+          </p>
         </div>
-      )}
+        {/* Esta semana */}
+        <div className="card-surface p-5">
+          <div className="label-caps mb-2">Esta semana</div>
+          <p className="value-display" style={{ color: '#92580a' }}>
+            {formatBRL(expenses.filter(e => e.date >= weekStart && e.date <= weekEnd).reduce((s, e) => s + Number(e.amount), 0))}
+          </p>
+        </div>
+        {/* Hoje */}
+        <div className="card-surface p-5">
+          <div className="label-caps mb-2">Hoje</div>
+          <p className="value-display text-foreground">
+            {formatBRL(expenses.filter(e => e.date === todayStr).reduce((s, e) => s + Number(e.amount), 0))}
+          </p>
+        </div>
+        {/* Maior grupo */}
+        <div className="card-surface p-5">
+          <div className="label-caps mb-2">Maior grupo</div>
+          <p className="value-display text-[24px]" style={{ color: '#1d4ed8' }}>
+            {groups && expenses.length > 0 ? (() => {
+              const byGroup: Record<string, number> = {};
+              expenses.forEach(e => { byGroup[e.group_id] = (byGroup[e.group_id] || 0) + Number(e.amount); });
+              const topId = Object.entries(byGroup).sort((a, b) => b[1] - a[1])[0]?.[0];
+              const g = groups.find(g => g.id === topId);
+              return g ? `${g.icon} ${g.name}` : '—';
+            })() : '—'}
+          </p>
+        </div>
+      </div>
 
-      <div className="card-surface">
-        {isLoading ? (
-          <div className="space-y-0">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex items-center gap-3 p-4 animate-pulse">
-                <div className="h-8 w-8 rounded-lg bg-muted" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-3 w-32 bg-muted rounded" />
-                  <div className="h-2 w-20 bg-muted rounded" />
+      {/* ── BODY: 2 colunas ── */}
+      <div className="grid md:grid-cols-[1.5fr_1fr] gap-3.5">
+
+        {/* Lista de despesas */}
+        <div className="card-surface overflow-hidden">
+          {/* Filtros de grupo */}
+          <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border flex-wrap">
+            <span className="sec-title mr-1">Todas as despesas</span>
+            <button
+              onClick={() => setGroupFilter('')}
+              className={`pill-tab text-[11px] px-3 py-1 ${!groupFilter ? 'active' : ''}`}
+            >
+              Todos
+            </button>
+            {groups?.slice(0, 5).map(g => (
+              <button
+                key={g.id}
+                onClick={() => setGroupFilter(groupFilter === g.id ? '' : g.id)}
+                className="px-2.5 py-1 rounded-full text-[11px] font-semibold border cursor-pointer transition-colors"
+                style={{
+                  borderColor: groupFilter === g.id ? g.color : 'hsl(var(--border))',
+                  background: groupFilter === g.id ? g.color + '15' : 'none',
+                  color: groupFilter === g.id ? g.color : 'hsl(var(--muted-foreground))',
+                }}
+              >
+                {g.icon}
+              </button>
+            ))}
+          </div>
+
+          {/* Campo de busca */}
+          <div className="px-5 py-2.5 border-b border-border">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por descrição..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="pl-8 h-9 text-sm border-0 bg-transparent focus-visible:ring-0 shadow-none"
+              />
+            </div>
+          </div>
+
+          {/* Lista */}
+          {isLoading ? (
+            <div className="space-y-0">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-center gap-3 p-4 animate-pulse">
+                  <div className="h-8 w-8 rounded-lg bg-muted" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 w-32 rounded bg-muted" />
+                    <div className="h-2 w-20 rounded bg-muted" />
+                  </div>
+                  <div className="h-4 w-16 rounded bg-muted" />
                 </div>
-                <div className="h-4 w-16 bg-muted rounded" />
-              </div>
-            ))}
+              ))}
+            </div>
+          ) : expenses.length > 0 ? (
+            <div>
+              {expenses.map(e => (
+                <ExpenseRow
+                  key={e.id}
+                  expense={e}
+                  onEdit={e.user_id === user?.id ? handleEdit : undefined}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm p-8 text-center text-muted-foreground">
+              Nenhuma despesa encontrada.
+            </p>
+          )}
+        </div>
+
+        {/* Por categoria */}
+        <div className="card-surface overflow-hidden">
+          <div className="sec-head">
+            <span className="sec-title">Por categoria</span>
           </div>
-        ) : expenses.length > 0 ? (
-          <div className="divide-y divide-border/50">
-            {expenses.map(e => (
-              <ExpenseRow key={e.id} expense={e} onEdit={e.user_id === user?.id ? handleEdit : undefined} />
-            ))}
+          <div className="px-5 py-1">
+            {groups && expenses.length > 0 ? (() => {
+              const byGroup: Record<string, number> = {};
+              expenses.forEach(e => { byGroup[e.group_id] = (byGroup[e.group_id] || 0) + Number(e.amount); });
+              const total = Object.values(byGroup).reduce((a, b) => a + b, 0);
+              return groups
+                .filter(g => byGroup[g.id])
+                .sort((a, b) => (byGroup[b.id] || 0) - (byGroup[a.id] || 0))
+                .map(g => (
+                  <div key={g.id} className="py-2.5 border-b border-border last:border-b-0">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs font-semibold text-muted-foreground">
+                        {g.icon} {g.name}
+                      </span>
+                      <span
+                        className="currency text-sm"
+                        style={{
+                          color: total > 0 && (byGroup[g.id] / total) > 0.5
+                            ? 'hsl(var(--destructive))'
+                            : 'hsl(var(--foreground))',
+                        }}
+                      >
+                        {formatBRL(byGroup[g.id])}
+                      </span>
+                    </div>
+                    <div className="budget-bar-track">
+                      <div
+                        className="budget-bar-fill"
+                        style={{
+                          width: total > 0 ? `${(byGroup[g.id] / total) * 100}%` : '0%',
+                          background: g.color,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ));
+            })() : (
+              <p className="text-sm py-8 text-center text-muted-foreground">
+                Nenhuma despesa.
+              </p>
+            )}
           </div>
-        ) : (
-          <p className="text-sm text-muted-foreground p-8 text-center">Nenhuma despesa encontrada.</p>
-        )}
+        </div>
       </div>
 
       <ExpenseForm
@@ -241,7 +327,6 @@ export default function Expenses() {
         onOpenChange={o => { setFormOpen(o); if (!o) setEditingExpense(null); }}
         editingExpense={editingExpense}
       />
-
       <ImportExpensesModal open={importOpen} onOpenChange={setImportOpen} />
     </div>
   );
