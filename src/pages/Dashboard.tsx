@@ -178,9 +178,11 @@ export default function Dashboard() {
       .sort((a, b) => b.pct - a.pct);
   }, [budgets, groups, monthExpenses, viewMode]);
 
-  const userName = user?.user_metadata?.full_name?.split(' ')[0]
-    || user?.email?.split('@')[0]
-    || '';
+  const userName =
+    user?.user_metadata?.full_name?.split(' ')[0] ||
+    user?.user_metadata?.name?.split(' ')[0] ||
+    user?.email?.split('@')[0] ||
+    '';
 
   if (isLoading) {
     return (
