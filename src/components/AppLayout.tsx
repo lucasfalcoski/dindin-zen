@@ -10,7 +10,7 @@ import { TopbarInsights } from '@/components/TopbarInsights';
 import {
   LayoutDashboard, Receipt, DollarSign, Building2, CreditCard,
   FolderOpen, Tag, Target, Gauge, TrendingUp, Users, BarChart3,
-  LogOut, Plus, Search, User, Settings, ChevronDown, Goal,
+  LogOut, Plus, Search, User, Settings, ChevronDown, Goal, LayoutGrid,
 } from 'lucide-react';
 
 const C = {
@@ -138,6 +138,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const displayName = profile?.display_name || user?.email?.split('@')[0] || 'Usuário';
   const avatarColor = profile?.avatar_color || C.green;
@@ -159,12 +160,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     ?? ALL_LINKS.find(l => l.to !== '/' && location.pathname.startsWith(l.to))?.label
     ?? 'Página';
 
-  const mobileSlots: (typeof ALL_LINKS[0] | null)[] = [
+  const mobileSlots: (typeof ALL_LINKS[0] | null | 'more')[] = [
     { to: '/',         label: 'Início',   icon: LayoutDashboard },
     { to: '/expenses', label: 'Despesas', icon: Receipt },
     null,
     { to: '/income',   label: 'Receitas', icon: DollarSign },
-    { to: '/family',   label: 'Família',  icon: Users },
+    'more',
   ];
 
   return (
@@ -243,16 +244,64 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* BOTTOM NAV MOBILE */}
       <nav className="din-bottom-nav" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: C.topbarBg, borderTop: `1px solid ${C.topbarBorder}`, height: 64, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
-        {mobileSlots.map((slot, i) => !slot
-          ? <button key="fab" onClick={() => navigate('/expenses?new=1')} style={{ width: 48, height: 48, borderRadius: '50%', background: C.green, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(26,122,69,.4)', marginTop: -16, flexShrink: 0 }}>
+        {mobileSlots.map((slot, i) => {
+          if (slot === null) return (
+            <button key="fab" onClick={() => navigate('/expenses?new=1')} style={{ width: 48, height: 48, borderRadius: '50%', background: C.green, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(26,122,69,.4)', marginTop: -16, flexShrink: 0 }}>
               <Plus size={22} style={{ color: '#fff' }} />
             </button>
-          : <NavLink key={slot.to} to={slot.to} end={slot.to === '/'}
+          );
+          if (slot === 'more') return (
+            <button key="more" onClick={() => setMoreOpen(true)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '4px 8px', background: 'none', border: 'none', cursor: 'pointer', flex: 1, color: moreOpen ? C.green : C.ink3, fontSize: 9, fontWeight: 600, fontFamily: "'Cabinet Grotesk', sans-serif", textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+              <LayoutGrid size={20} style={{ color: moreOpen ? C.green : C.ink3 }} />
+              Mais
+            </button>
+          );
+          return (
+            <NavLink key={slot.to} to={slot.to} end={slot.to === '/'}
               style={({ isActive }) => ({ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '4px 8px', textDecoration: 'none', flex: 1, color: isActive ? C.green : C.ink3, fontSize: 9, fontWeight: 600, fontFamily: "'Cabinet Grotesk', sans-serif", textTransform: 'uppercase', letterSpacing: '0.3px' })}>
               {({ isActive }) => <><slot.icon size={20} style={{ color: isActive ? C.green : C.ink3 }} />{slot.label}</>}
             </NavLink>
-        )}
+          );
+        })}
       </nav>
+
+      {/* DRAWER MAIS — mobile */}
+      {moreOpen && (
+        <>
+          <div onClick={() => setMoreOpen(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(22,21,15,0.5)', zIndex: 60, backdropFilter: 'blur(2px)' }} />
+          <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 61, background: C.topbarBg, borderRadius: '16px 16px 0 0', padding: '12px 16px 24px', animation: 'slideUpMore .25s ease-out' }}>
+            <div style={{ width: 40, height: 4, borderRadius: 2, background: C.ink3, margin: '0 auto 12px', opacity: 0.4 }} />
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, fontFamily: "'Cabinet Grotesk', sans-serif", marginBottom: 12 }}>Menu</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
+              {[
+                { to: '/accounts',     label: 'Contas',     icon: Building2 },
+                { to: '/credit-cards', label: 'Cartões',    icon: CreditCard },
+                { to: '/groups',       label: 'Grupos',     icon: FolderOpen },
+                { to: '/tags',         label: 'Tags',       icon: Tag },
+                { to: '/budget',       label: 'Orçamento',  icon: Target },
+                { to: '/score',        label: 'Score',      icon: Gauge },
+                { to: '/goals',        label: 'Metas',      icon: Goal },
+                { to: '/forecast',     label: 'Projeção',   icon: TrendingUp },
+                { to: '/reports',      label: 'Relatórios', icon: BarChart3 },
+                { to: '/family',       label: 'Família',    icon: Users },
+                { to: '/settings',     label: 'Config.',    icon: Settings },
+              ].map(item => {
+                const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to));
+                return (
+                  <Link key={item.to} to={item.to} onClick={() => setMoreOpen(false)}
+                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '14px 8px', textDecoration: 'none', color: isActive ? C.green : C.ink2, fontSize: 10, fontWeight: 600, fontFamily: "'Cabinet Grotesk', sans-serif", transition: 'color .15s' }}>
+                    <item.icon size={20} />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+          <style>{`@keyframes slideUpMore { from { transform: translateY(100%); } to { transform: translateY(0); } }`}</style>
+        </>
+      )}
 
       <QuickAddFAB />
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
