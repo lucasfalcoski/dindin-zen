@@ -77,7 +77,7 @@ export default function Dashboard() {
     [familyMembers]
   );
   const { data: profiles } = useFamilyProfiles(memberUserIds);
-  const { data: tagsStats } = useTagsWithStats(monthStart, monthEnd);
+  const { data: tagsStats } = useTagsWithStats();
 
   const getName = (userId: string) => {
     if (userId === user?.id) return 'Você';
