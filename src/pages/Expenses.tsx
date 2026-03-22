@@ -199,7 +199,7 @@ export default function Expenses() {
       </div>
 
       {/* ── BODY: 2 colunas ── */}
-      <div className="grid md:grid-cols-[1.5fr_1fr] gap-3.5">
+      <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-3.5">
 
         {/* Lista de despesas */}
         <div className="card-surface overflow-hidden">
