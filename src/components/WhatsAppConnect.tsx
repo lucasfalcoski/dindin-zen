@@ -28,6 +28,7 @@ import {
   useSendWhatsAppCode,
   useVerifyWhatsAppCode,
   useDisconnectWhatsApp,
+  useTestWhatsAppConnection,
   formatPhone,
 } from '@/hooks/useWhatsApp';
 import { cn } from '@/lib/utils';
@@ -44,6 +45,7 @@ export default function WhatsAppConnect() {
   const sendCode = useSendWhatsAppCode();
   const verifyCode = useVerifyWhatsAppCode();
   const disconnect = useDisconnectWhatsApp();
+  const testConnection = useTestWhatsAppConnection();
   const { toast } = useToast();
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -134,7 +136,12 @@ export default function WhatsAppConnect() {
   };
 
   const handleTestMessage = async () => {
-    toast({ title: 'Mensagem de teste enviada! 📱', description: 'Verifique seu WhatsApp.' });
+    try {
+      await testConnection.mutateAsync();
+      toast({ title: 'Mensagem de teste enviada!', description: 'Verifique seu WhatsApp.' });
+    } catch (e: any) {
+      toast({ title: 'Erro', description: e.message, variant: 'destructive' });
+    }
   };
 
   if (isLoading) {
