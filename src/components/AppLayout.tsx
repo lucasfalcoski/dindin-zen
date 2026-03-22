@@ -52,6 +52,7 @@ const DindinLogo = () => (
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { signOut, user } = useAuth();
   const { data: profile } = useProfile();
+  const { data: whatsappUser } = useWhatsAppUser();
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
