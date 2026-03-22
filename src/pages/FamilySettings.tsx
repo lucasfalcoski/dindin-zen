@@ -27,11 +27,15 @@ type TabId = 'members' | 'overview' | 'balance';
 export default function FamilySettings() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { data: families, isLoading } = useMyFamilies();
   const createFamily = useCreateFamily();
 
-  const [createOpen, setCreateOpen] = useState(false);
-  const [familyName, setFamilyName] = useState('');
+  // Force refetch family data on mount
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['families'] });
+    queryClient.invalidateQueries({ queryKey: ['family_members'] });
+  }, [queryClient]);
 
   const myFamily = families?.[0];
 
