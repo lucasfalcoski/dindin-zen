@@ -314,7 +314,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
           </div>
 
           {selectedPayment === 'credito' ? (
-            creditCards && creditCards.length > 0 && (
+            (creditCards && creditCards.length > 0 || familyCards && familyCards.length > 0) && (
               <div className="space-y-2">
                 <Label>Cartão de crédito</Label>
                 <select
@@ -322,14 +322,27 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 >
                   <option value="">Selecione...</option>
-                  {creditCards.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
+                  {creditCards && creditCards.length > 0 && (
+                    <optgroup label="Meus cartões">
+                      {creditCards.map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </optgroup>
+                  )}
+                  {familyCards && familyCards.length > 0 && (
+                    <optgroup label="Cartões da família">
+                      {familyCards.map(c => (
+                        <option key={c.id} value={c.id}>
+                          {c.owner_emoji || '👤'} {c.owner_name} — {c.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
                 </select>
               </div>
             )
           ) : (
-            accounts && accounts.length > 0 && (
+            (accounts && accounts.length > 0 || familyAccounts && familyAccounts.length > 0) && (
               <div className="space-y-2">
                 <Label>Conta</Label>
                 <select
@@ -337,9 +350,22 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 >
                   <option value="">Selecione...</option>
-                  {accounts.map(a => (
-                    <option key={a.id} value={a.id}>{a.name}</option>
-                  ))}
+                  {accounts && accounts.length > 0 && (
+                    <optgroup label="Minhas contas">
+                      {accounts.map(a => (
+                        <option key={a.id} value={a.id}>{a.name}</option>
+                      ))}
+                    </optgroup>
+                  )}
+                  {familyAccounts && familyAccounts.length > 0 && (
+                    <optgroup label="Contas da família">
+                      {familyAccounts.map(a => (
+                        <option key={a.id} value={a.id}>
+                          {a.owner_emoji || '👤'} {a.owner_name} — {a.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
                 </select>
               </div>
             )
