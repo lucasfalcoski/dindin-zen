@@ -180,9 +180,9 @@ export function QuickAddFAB() {
         onClick={() => setOpen(true)}
         className={cn(
           'fixed z-[55] h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg',
-          'flex items-center justify-center transition-all duration-200',
+          'hidden md:flex items-center justify-center transition-all duration-200',
           'hover:scale-105 hover:shadow-xl active:scale-95',
-          'right-5 bottom-20 md:bottom-8'
+          'right-5 bottom-8'
         )}
       >
         <Plus className="h-6 w-6" />
