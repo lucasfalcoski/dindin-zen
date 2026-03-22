@@ -37,6 +37,9 @@ export default function FamilySettings() {
     queryClient.invalidateQueries({ queryKey: ['family_members'] });
   }, [queryClient]);
 
+  const [createOpen, setCreateOpen] = useState(false);
+  const [familyName, setFamilyName] = useState('');
+
   const myFamily = families?.[0];
 
   const handleCreate = async () => {
