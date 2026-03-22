@@ -35,7 +35,7 @@ export function useFamilySummary(familyId: string | null, monthStart: string, mo
         _month_end: monthEnd,
       });
       if (error) throw error;
-      return data as FamilySummary;
+      return data as unknown as FamilySummary;
     },
     enabled: !!familyId,
   });
