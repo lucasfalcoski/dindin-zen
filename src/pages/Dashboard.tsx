@@ -22,6 +22,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { InsightsSection } from '@/components/InsightsSection';
+import { WhatsAppPendingBanner } from '@/components/WhatsAppPendingBanner';
 
 function getInvoicePeriod(closingDay: number) {
   const now = new Date();
@@ -276,6 +277,7 @@ export default function Dashboard() {
       </div>
 
       <ProfileCompletionBanner />
+      <WhatsAppPendingBanner />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
         <SummaryCard label={`Despesas${viewLabel ? ` ${viewLabel}` : ' do mês'}`} value={stats.total} icon={<Wallet className="h-4 w-4 text-muted-foreground" />} />

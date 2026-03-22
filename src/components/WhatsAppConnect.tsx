@@ -21,6 +21,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 import { MessageCircle, Check, Loader2, X } from 'lucide-react';
 import {
   useWhatsAppUser,
@@ -178,6 +179,9 @@ export default function WhatsAppConnect() {
             </AlertDialogContent>
           </AlertDialog>
         </div>
+        <Link to="/whatsapp-history" className="text-xs text-primary hover:underline">
+          Ver histórico de mensagens →
+        </Link>
       </div>
     );
   }

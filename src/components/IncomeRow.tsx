@@ -1,6 +1,7 @@
 import { Income, INCOME_CATEGORIES, useDeleteIncome } from '@/hooks/useIncomes';
 import { formatBRL, formatDateShort } from '@/lib/format';
-import { Trash2, Pencil, RefreshCw } from 'lucide-react';
+import { Trash2, Pencil, RefreshCw, MessageCircle } from 'lucide-react';
+import { useWhatsAppConfirmedIds } from '@/hooks/useWhatsAppTransactions';
 import { useToast } from '@/hooks/use-toast';
 
 interface IncomeRowProps {
@@ -12,6 +13,8 @@ export function IncomeRow({ income, onEdit }: IncomeRowProps) {
   const deleteIncome = useDeleteIncome();
   const { toast } = useToast();
   const cat = INCOME_CATEGORIES.find(c => c.value === income.category);
+  const { data: waIds } = useWhatsAppConfirmedIds();
+  const isWhatsApp = waIds?.incomeIds.has(income.id);
 
   const handleDelete = async () => {
     try {
@@ -34,6 +37,7 @@ export function IncomeRow({ income, onEdit }: IncomeRowProps) {
           <span className="text-[11px] text-muted-foreground">·</span>
           <span className="text-[11px] text-muted-foreground">{cat?.label}</span>
           {income.recurrent && <RefreshCw className="h-3 w-3 text-muted-foreground" />}
+          {isWhatsApp && <MessageCircle className="inline h-3 w-3 text-[#25D366]" />}
         </div>
       </div>
       <span className="currency text-sm font-semibold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
