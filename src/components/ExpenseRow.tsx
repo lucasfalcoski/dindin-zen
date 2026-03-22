@@ -67,6 +67,7 @@ export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
           {formatDate(expense.date)}
           {group && <span> · {group.name}</span>}
           {expense.recurrent && <span> · 🔄</span>}
+          {(expense as any).visibility === 'family' && <span className="ml-1">👨‍👩‍👧</span>}
           {isWhatsApp && <MessageCircle className="inline h-3 w-3 ml-1 text-[#25D366]" />}
         </p>
       </div>
