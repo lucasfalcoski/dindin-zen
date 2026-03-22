@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { Check, Loader2, Mail } from 'lucide-react';
 
 export default function Register() {
   const { signUp, user } = useAuth();
@@ -13,6 +15,8 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
+  const [resending, setResending] = useState(false);
 
   if (user) return <Navigate to="/" replace />;
 
@@ -32,9 +36,43 @@ export default function Register() {
     if (error) {
       toast({ title: 'Erro ao criar conta', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Conta criada!', description: 'Você já pode começar a usar.' });
+      setRegistered(true);
     }
   };
+
+  const handleResend = async () => {
+    setResending(true);
+    const { error } = await supabase.auth.resend({ type: 'signup', email });
+    setResending(false);
+    if (error) {
+      toast({ title: 'Erro', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'E-mail reenviado!', description: 'Verifique sua caixa de entrada.' });
+    }
+  };
+
+  if (registered) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <div className="card-surface w-full max-w-sm p-8 animate-fade-in text-center space-y-4">
+          <div className="mx-auto h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center">
+            <Mail className="h-8 w-8 text-primary" />
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Verifique seu e-mail</h1>
+          <p className="text-sm text-muted-foreground">
+            Enviamos um link de confirmação para <strong className="text-foreground">{email}</strong>. Clique no link para ativar sua conta.
+          </p>
+          <Button variant="outline" className="w-full" onClick={handleResend} disabled={resending}>
+            {resending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+            Reenviar e-mail
+          </Button>
+          <Link to="/login" className="text-sm text-primary hover:underline block">
+            Voltar ao login
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
