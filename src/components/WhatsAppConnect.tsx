@@ -136,7 +136,12 @@ export default function WhatsAppConnect() {
   };
 
   const handleTestMessage = async () => {
-    toast({ title: 'Mensagem de teste enviada! 📱', description: 'Verifique seu WhatsApp.' });
+    try {
+      await testConnection.mutateAsync();
+      toast({ title: 'Mensagem de teste enviada!', description: 'Verifique seu WhatsApp.' });
+    } catch (e: any) {
+      toast({ title: 'Erro', description: e.message, variant: 'destructive' });
+    }
   };
 
   if (isLoading) {
