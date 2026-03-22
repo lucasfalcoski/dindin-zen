@@ -13,6 +13,8 @@ export function IncomeRow({ income, onEdit }: IncomeRowProps) {
   const deleteIncome = useDeleteIncome();
   const { toast } = useToast();
   const cat = INCOME_CATEGORIES.find(c => c.value === income.category);
+  const { data: waIds } = useWhatsAppConfirmedIds();
+  const isWhatsApp = waIds?.incomeIds.has(income.id);
 
   const handleDelete = async () => {
     try {
