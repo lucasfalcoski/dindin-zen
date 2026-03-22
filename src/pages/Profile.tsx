@@ -1,80 +1,43 @@
-import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useProfile } from '@/hooks/useProfiles';
 import { useAuth } from '@/contexts/AuthContext';
-import { useProfile, useUpdateProfile } from '@/hooks/useProfiles';
-import { useIncomes } from '@/hooks/useIncomes';
-import { useAccounts } from '@/hooks/useAccounts';
-import { useCreditCards } from '@/hooks/useCreditCards';
-import { useMyFamilies } from '@/hooks/useFamily';
-import { formatBRL } from '@/lib/format';
-import { useNavigate } from 'react-router-dom';
+import { useUpdateProfile } from '@/hooks/useProfiles';
+import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { LogOut, ChevronRight, Plus, Pencil, Check, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { EmojiAvatar, EmojiPicker } from '@/components/EmojiAvatar';
-import WhatsAppConnect from '@/components/WhatsAppConnect';
-import { FamilySharingSettings } from '@/components/FamilySharingSettings';
+import { Label } from '@/components/ui/label';
+import { useNavigate } from 'react-router-dom';
+import { LogOut, User } from 'lucide-react';
 
-const AVATAR_COLORS = ['#6BAE7A', '#D4AF6A', '#2C3E2D', '#3b82f6', '#ef4444', '#8b5cf6'];
+const C = { ink:'#16150f', ink2:'#6b6a63', ink3:'#b0aea6', rule:'#e4e1da', bg:'#f2f0eb', green:'#1a7a45', red:'#b83232' };
+const AVATAR_COLORS = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#64748b','#1a7a45','#b83232'];
 
-const TIMEZONES = [
-  { value: 'America/Sao_Paulo', label: '🇧🇷 Brasília (GMT-3)' },
-  { value: 'America/Manaus', label: '🇧🇷 Manaus (GMT-4)' },
-  { value: 'America/Rio_Branco', label: '🇧🇷 Acre (GMT-5)' },
-  { value: 'UTC', label: '🌍 UTC (GMT+0)' },
-  { value: 'America/New_York', label: '🇺🇸 New York (GMT-5/-4)' },
-  { value: 'America/Los_Angeles', label: '🇺🇸 Los Angeles (GMT-8/-7)' },
-  { value: 'Europe/Lisbon', label: '🇪🇺 Lisboa (GMT+0/+1)' },
-  { value: 'Europe/Madrid', label: '🇪🇺 Madrid (GMT+1/+2)' },
-];
-
-export default function Profile() {
+export default function ProfilePage() {
   const { user, signOut } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
   const { data: profile, isLoading } = useProfile();
   const updateProfile = useUpdateProfile();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [displayName, setDisplayName] = useState('');
+  const [avatarColor, setAvatarColor] = useState('');
+  const [editing, setEditing] = useState(false);
 
-  const { data: incomes } = useIncomes({});
-  const { data: accounts } = useAccounts();
-  const { data: creditCards } = useCreditCards();
-  const { data: families } = useMyFamilies();
-  const hasFamily = families && families.length > 0;
+  const currentName = profile?.display_name || user?.email?.split('@')[0] || 'Usuário';
+  const currentColor = profile?.avatar_color || '#3b82f6';
+  const initials = currentName.substring(0, 2).toUpperCase();
 
-  const whatsappRef = useRef<HTMLDivElement>(null);
-  const preferencesRef = useRef<HTMLDivElement>(null);
-
-  const [editingName, setEditingName] = useState(false);
-  const [nameValue, setNameValue] = useState('');
-  const [editingSalary, setEditingSalary] = useState(false);
-  const [salaryValue, setSalaryValue] = useState('');
-
-  useEffect(() => {
-    const scrollTo = (location.state as any)?.scrollTo;
-    if (scrollTo === 'whatsapp') {
-      setTimeout(() => whatsappRef.current?.scrollIntoView({ behavior: 'smooth' }), 300);
-    } else if (scrollTo === 'preferences') {
-      setTimeout(() => preferencesRef.current?.scrollIntoView({ behavior: 'smooth' }), 300);
-    }
-  }, [location.state]);
-
-  const salary = incomes?.find(i => i.recurrent && i.category === 'salario');
-
-  const handleSaveName = () => {
-    if (!nameValue.trim()) return;
-    updateProfile.mutate({ display_name: nameValue.trim() }, {
-      onSuccess: () => {
-        setEditingName(false);
-        toast({ title: 'Nome atualizado!' });
-      },
-    });
+  const handleStartEdit = () => {
+    setDisplayName(profile?.display_name || '');
+    setAvatarColor(profile?.avatar_color || '#3b82f6');
+    setEditing(true);
   };
 
-  const handleColorChange = (color: string) => {
-    updateProfile.mutate({ avatar_color: color });
+  const handleSave = async () => {
+    try {
+      await updateProfile.mutateAsync({ display_name: displayName.trim() || currentName, avatar_color: avatarColor });
+      toast({ title: 'Perfil atualizado!' });
+      setEditing(false);
+    } catch { toast({ title: 'Erro ao salvar', variant: 'destructive' }); }
   };
 
   const handleSignOut = async () => {
@@ -82,177 +45,92 @@ export default function Profile() {
     navigate('/login');
   };
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="h-32 bg-muted rounded-xl animate-pulse" />
-        <div className="h-24 bg-muted rounded-xl animate-pulse" />
-      </div>
-    );
-  }
-
-  const initials = (profile?.display_name || user?.email || '?').substring(0, 2).toUpperCase();
+  if (isLoading) return (
+    <div>
+      <div style={{ height:'40px', width:'200px', background:C.rule, borderRadius:'8px', marginBottom:'20px' }} />
+      <div style={{ height:'200px', background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px' }} />
+    </div>
+  );
 
   return (
-    <div className="space-y-6 max-w-lg mx-auto">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Meu Perfil</h1>
-
-      {/* Seção 1 — Identidade */}
-      <div className="card-surface p-6 space-y-4">
-        <div className="flex items-center gap-4">
-          <EmojiAvatar
-            emoji={profile?.avatar_emoji}
-            color={profile?.avatar_color}
-            userId={user?.id}
-            size="lg"
-          />
-          <div className="flex-1 min-w-0">
-            {editingName ? (
-              <div className="flex items-center gap-2">
-                <Input
-                  value={nameValue}
-                  onChange={e => setNameValue(e.target.value)}
-                  className="h-9"
-                  autoFocus
-                  onKeyDown={e => e.key === 'Enter' && handleSaveName()}
-                />
-                <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={handleSaveName}>
-                  <Check className="h-4 w-4" />
-                </Button>
-                <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setEditingName(false)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-semibold text-foreground truncate">
-                  {profile?.display_name || 'Sem nome'}
-                </span>
-                <button
-                  onClick={() => { setNameValue(profile?.display_name || ''); setEditingName(true); }}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            )}
-            <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
-          </div>
+    <div>
+      <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:'28px', paddingBottom:'20px', borderBottom:`1px solid ${C.rule}` }}>
+        <div>
+          <p style={{ fontSize:'11px', fontWeight:600, letterSpacing:'1.5px', textTransform:'uppercase', color:C.ink3, marginBottom:'6px' }}>conta</p>
+          <h1 style={{ fontFamily:"'Instrument Serif',Georgia,serif", fontSize:'34px', lineHeight:1, letterSpacing:'-0.5px', color:C.ink }}>Perfil</h1>
         </div>
       </div>
 
-      {/* Seção 2 — Renda mensal */}
-      <div className="card-surface p-5 space-y-3">
-        <h2 className="label-caps">Renda mensal</h2>
-        {salary ? (
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-foreground">{salary.description}</p>
-              <p className="currency text-lg font-semibold text-foreground">{formatBRL(Number(salary.amount))}</p>
+      {/* Avatar + info */}
+      <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'28px', marginBottom:'14px', display:'flex', alignItems:'center', gap:'20px' }}>
+        <div style={{ width:'72px', height:'72px', borderRadius:'50%', background: editing ? avatarColor : currentColor, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'24px', fontWeight:700, color:'#fff', flexShrink:0 }}>
+          {initials}
+        </div>
+        <div style={{ flex:1 }}>
+          <div style={{ fontFamily:"'Instrument Serif',serif", fontSize:'24px', letterSpacing:'-0.5px', color:C.ink }}>{currentName}</div>
+          <div style={{ fontSize:'13px', color:C.ink3, marginTop:'2px' }}>{user?.email}</div>
+          <div style={{ fontSize:'11px', color:C.ink3, marginTop:'4px' }}>
+            Membro desde {user?.created_at ? new Date(user.created_at).toLocaleDateString('pt-BR', { month:'long', year:'numeric' }) : '—'}
+          </div>
+        </div>
+        {!editing && (
+          <button onClick={handleStartEdit} style={{ padding:'6px 16px', borderRadius:'8px', fontSize:'12px', fontWeight:600, fontFamily:"'Cabinet Grotesk',sans-serif", border:`1px solid ${C.rule}`, background:'none', color:C.ink2, cursor:'pointer' }}>
+            Editar
+          </button>
+        )}
+      </div>
+
+      {editing && (
+        <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'24px', marginBottom:'14px' }}>
+          <p style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.5px', textTransform:'uppercase', color:C.ink2, marginBottom:'16px' }}>Editar perfil</p>
+          <div style={{ marginBottom:'16px' }}>
+            <Label>Nome de exibição</Label>
+            <Input value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder={currentName} className="mt-1.5" />
+          </div>
+          <div style={{ marginBottom:'20px' }}>
+            <Label>Cor do avatar</Label>
+            <div style={{ display:'flex', gap:'8px', marginTop:'8px', flexWrap:'wrap' }}>
+              {AVATAR_COLORS.map(c => (
+                <button key={c} onClick={() => setAvatarColor(c)}
+                  style={{ width:'32px', height:'32px', borderRadius:'50%', background:c, border: avatarColor===c ? `3px solid ${C.ink}` : '3px solid transparent', cursor:'pointer', transition:'all .15s' }} />
+              ))}
             </div>
           </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">Nenhum salário recorrente cadastrado.</p>
-        )}
-        <Link to="/income" className="text-sm text-primary hover:underline flex items-center gap-1">
-          Ver todas receitas <ChevronRight className="h-3.5 w-3.5" />
-        </Link>
-      </div>
-
-      {/* Seção 3 — Minhas contas */}
-      <div className="card-surface p-5 space-y-3">
-        <h2 className="label-caps">Minhas contas</h2>
-        {accounts && accounts.length > 0 ? (
-          <div className="space-y-2">
-            {accounts.map(a => (
-              <div key={a.id} className="flex items-center justify-between py-1.5">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{a.name}</p>
-                  {a.bank_name && <p className="text-xs text-muted-foreground">{a.bank_name}</p>}
-                </div>
-                <span className="currency text-sm text-foreground whitespace-nowrap">{formatBRL(Number(a.balance))}</span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">Nenhuma conta cadastrada.</p>
-        )}
-        <Link to="/accounts" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
-          <Plus className="h-3.5 w-3.5" /> Adicionar conta
-        </Link>
-      </div>
-
-      {/* Seção 4 — Meus cartões */}
-      <div className="card-surface p-5 space-y-3">
-        <h2 className="label-caps">Meus cartões</h2>
-        {creditCards && creditCards.length > 0 ? (
-          <div className="space-y-2">
-            {creditCards.map(c => (
-              <div key={c.id} className="flex items-center justify-between py-1.5">
-                <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
-                <span className="text-xs text-muted-foreground whitespace-nowrap">Limite: {formatBRL(Number(c.limit))}</span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">Nenhum cartão cadastrado.</p>
-        )}
-        <Link to="/credit-cards" className="inline-flex items-center gap-1 text-sm text-primary hover:underline">
-          <Plus className="h-3.5 w-3.5" /> Adicionar cartão
-        </Link>
-      </div>
-
-      {/* Seção 5 — Compartilhamento com a família */}
-      {hasFamily && <FamilySharingSettings />}
-
-      {/* Seção 6 — WhatsApp */}
-      <div ref={whatsappRef}>
-        <WhatsAppConnect />
-      </div>
-
-      {/* Seção 6 — Preferências */}
-      <div ref={preferencesRef} className="card-surface p-5 space-y-4">
-        <h2 className="label-caps">Preferências</h2>
-        <div>
-          <p className="text-sm text-foreground mb-2">Emoji do avatar</p>
-          <EmojiPicker
-            value={profile?.avatar_emoji}
-            onChange={(emoji) => updateProfile.mutate({ avatar_emoji: emoji })}
-          />
-        </div>
-        <div>
-          <p className="text-sm text-foreground mb-2">Cor do avatar</p>
-          <div className="flex gap-3">
-            {AVATAR_COLORS.map(c => (
-              <button
-                key={c}
-                onClick={() => handleColorChange(c)}
-                className={`h-8 w-8 rounded-full transition-transform ${profile?.avatar_color === c ? 'scale-125 ring-2 ring-offset-2 ring-primary' : 'hover:scale-110'}`}
-                style={{ backgroundColor: c }}
-              />
-            ))}
+          <div style={{ display:'flex', gap:'8px' }}>
+            <Button onClick={handleSave} disabled={updateProfile.isPending}>
+              {updateProfile.isPending ? 'Salvando...' : 'Salvar'}
+            </Button>
+            <Button variant="outline" onClick={() => setEditing(false)}>Cancelar</Button>
           </div>
         </div>
-        <div>
-          <p className="text-sm text-foreground mb-2">Fuso horário</p>
-          <select
-            value={profile?.timezone || 'America/Sao_Paulo'}
-            onChange={(e) => updateProfile.mutate({ timezone: e.target.value }, {
-              onSuccess: () => toast({ title: 'Fuso horário atualizado!' }),
-            })}
-            className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
-          >
-            {TIMEZONES.map(tz => (
-              <option key={tz.value} value={tz.value}>{tz.label}</option>
-            ))}
-          </select>
+      )}
+
+      {/* Conta info */}
+      <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', overflow:'hidden', marginBottom:'14px' }}>
+        <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.rule}` }}>
+          <span style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.5px', textTransform:'uppercase', color:C.ink2 }}>Conta</span>
         </div>
-        <div className="border-t border-border pt-4">
-          <Button variant="outline" className="w-full gap-2 text-muted-foreground" onClick={handleSignOut}>
-            <LogOut className="h-4 w-4" /> Sair
-          </Button>
+        <div style={{ padding:'0 20px' }}>
+          {[
+            { label:'Email', value: user?.email || '—' },
+            { label:'Método de login', value: user?.app_metadata?.provider === 'email' ? 'Email e senha' : user?.app_metadata?.provider || '—' },
+            { label:'ID', value: user?.id?.substring(0, 8) + '...' || '—' },
+          ].map(item => (
+            <div key={item.label} style={{ display:'flex', justifyContent:'space-between', padding:'12px 0', borderBottom:`1px solid ${C.rule}` }}>
+              <span style={{ fontSize:'13px', fontWeight:600, color:C.ink2 }}>{item.label}</span>
+              <span style={{ fontSize:'13px', color:C.ink3 }}>{item.value}</span>
+            </div>
+          ))}
         </div>
       </div>
+
+      {/* Sair */}
+      <button onClick={handleSignOut}
+        style={{ width:'100%', padding:'14px', borderRadius:'14px', border:`1px solid rgba(184,50,50,.2)`, background:'rgba(184,50,50,.04)', color:C.red, fontSize:'13px', fontWeight:600, fontFamily:"'Cabinet Grotesk',sans-serif", cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', transition:'all .15s' }}
+        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(184,50,50,.08)'; }}
+        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(184,50,50,.04)'; }}>
+        <LogOut size={16} /> Sair da conta
+      </button>
     </div>
   );
 }
