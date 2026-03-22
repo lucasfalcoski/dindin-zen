@@ -6,6 +6,7 @@ import { useWhatsAppConfirmedIds } from '@/hooks/useWhatsAppTransactions';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { format } from 'date-fns';
+import { useUserTimezone } from '@/contexts/TimezoneContext';
 
 interface ExpenseRowProps {
   expense: Expense;
