@@ -31,19 +31,13 @@ const links = [
   { to: '/reports', label: 'Relatórios', icon: BarChart3 },
 ];
 
-const DindinLogo = ({ size = 'md' }: { size?: 'sm' | 'md' }) => {
-  const dims = size === 'sm' ? 'w-7 h-7' : 'w-8 h-8';
-  const iconDims = size === 'sm' ? 'w-4 h-4' : 'w-5 h-5';
-  return (
-    <div className={`${dims} rounded-[10px] bg-foreground flex items-center justify-center flex-shrink-0`}>
-      <svg viewBox="0 0 32 32" className={iconDims} fill="none" xmlns="http://www.w3.org/2000/svg">
-        <text x="16" y="20" textAnchor="middle" style={{fontFamily:'sans-serif', fontSize:'16px', fontWeight:900, fill:'hsl(var(--primary))'}}>$</text>
-        <rect x="6" y="25" width="20" height="2" rx="1" fill="hsl(var(--primary))" opacity="0.5"/>
-        <rect x="9" y="28" width="14" height="1.5" rx="0.75" fill="hsl(var(--primary))" opacity="0.25"/>
-      </svg>
-    </div>
-  );
-};
+const mobileBottomLinks = [
+  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/expenses', label: 'Despesas', icon: Receipt },
+  // FAB placeholder in the middle
+  { to: '/goals', label: 'Metas', icon: Goal },
+  { to: '/family', label: 'Família', icon: Users },
+];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { signOut, user } = useAuth();
@@ -86,37 +80,33 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     navigate('/login');
   };
 
-  const mobileMainLinks = links.slice(0, 3); // Dashboard, Despesas, Receitas
-  const mobileMoreLinks = links.slice(3);
+  // Links not in the mobile bottom nav (for the "Mais" drawer)
+  const mobileMoreLinks = links.filter(
+    l => !mobileBottomLinks.some(mb => mb.to === l.to)
+  );
 
   return (
     <div className="flex flex-col h-dvh bg-background transition-colors duration-300">
-      {/* Mobile top bar */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-background border-b border-border sticky top-0 z-40">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-          <DindinLogo size="sm" />
-          <span className="text-sm font-extrabold tracking-tight">Din-Din <span className="text-primary">Zen</span></span>
-        </div>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <button onClick={() => setSearchOpen(true)} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent">
-            <Search className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Top nav for desktop */}
-      <header className="hidden md:block border-b border-border bg-card flex-shrink-0 z-50">
+      {/* Desktop header */}
+      <header className="hidden md:block sticky top-0 z-50 border-b border-border bg-card flex-shrink-0">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-14">
-          <div className="flex items-center gap-1 min-w-0 flex-1">
-            {/* Logo Din-Din Zen */}
-            <div className="flex items-center gap-2.5 mr-6 cursor-pointer" onClick={() => navigate('/')}>
-              <DindinLogo />
-              <span className="text-base font-extrabold tracking-tight text-foreground leading-none">
-                Din-Din <span className="text-primary">Zen</span>
-              </span>
+          {/* Left — logo */}
+          <div className="flex items-center gap-2.5 cursor-pointer shrink-0" onClick={() => navigate('/')}>
+            <div className="w-8 h-8 rounded-[10px] bg-foreground flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 32 32" className="w-5 h-5" fill="none">
+                <text x="16" y="21" textAnchor="middle" style={{fontFamily:'sans-serif',fontSize:'15px',fontWeight:900,fill:'#1a7a45'}}>$</text>
+                <rect x="7" y="25" width="18" height="2" rx="1" fill="#1a7a45" opacity="0.5"/>
+                <rect x="10" y="28" width="12" height="1.5" rx="0.75" fill="#1a7a45" opacity="0.25"/>
+              </svg>
             </div>
-            <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-hide min-w-0">
+            <span className="text-sm font-extrabold tracking-tight text-foreground">
+              Din-Din <span className="text-primary">Zen</span>
+            </span>
+          </div>
+
+          {/* Center — nav links */}
+          <nav className="flex-1 mx-4 overflow-x-auto scrollbar-hide min-w-0">
+            <div className="flex items-center gap-0.5">
               {links.map(l => (
                 <NavLink
                   key={l.to}
@@ -124,20 +114,21 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   end={l.to === '/'}
                   className={({ isActive }) =>
                     cn(
-                      'flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-colors duration-150 whitespace-nowrap shrink-0',
+                      'px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150 whitespace-nowrap shrink-0',
                       isActive
                         ? 'bg-primary/10 text-primary'
                         : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                     )
                   }
                 >
-                  <l.icon className="h-3.5 w-3.5" />
                   {l.label}
                 </NavLink>
               ))}
             </div>
-          </div>
-          <div className="flex items-center gap-3 shrink-0 ml-3">
+          </nav>
+
+          {/* Right — actions */}
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setSearchOpen(true)}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border border-border"
@@ -145,23 +136,42 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <Search className="h-3.5 w-3.5" />
               <kbd className="hidden lg:inline-flex h-5 items-center gap-1 rounded border border-border bg-muted px-1.5 text-[10px] text-muted-foreground">⌘K</kbd>
             </button>
-            <button
-              onClick={() => setHelpOpen(true)}
-              title="Ajuda"
-              className="p-2 rounded-lg text-muted-foreground hover:bg-accent transition-colors"
-            >
-              <HelpCircle className="h-4 w-4" />
-            </button>
             <ThemeToggle />
             <ViewSelector />
-            <ProfileDropdown />
+            <span className="text-xs text-muted-foreground truncate max-w-[140px] hidden xl:block">{user?.email}</span>
+            <button
+              onClick={handleSignOut}
+              title="Sair"
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </header>
 
+      {/* Mobile top bar */}
+      <div className="md:hidden sticky top-0 z-40 bg-background border-b border-border flex items-center justify-between px-4 h-12">
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
+          <div className="w-7 h-7 rounded-[8px] bg-foreground flex items-center justify-center">
+            <svg viewBox="0 0 32 32" className="w-4 h-4" fill="none">
+              <text x="16" y="21" textAnchor="middle" style={{fontFamily:'sans-serif',fontSize:'15px',fontWeight:900,fill:'#1a7a45'}}>$</text>
+              <rect x="7" y="25" width="18" height="2" rx="1" fill="#1a7a45" opacity="0.5"/>
+            </svg>
+          </div>
+          <span className="text-sm font-extrabold tracking-tight">Din-Din <span className="text-primary">Zen</span></span>
+        </div>
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <button onClick={() => setSearchOpen(true)} className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent">
+            <Search className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
       {/* Main content */}
       <main className="flex-1 overflow-y-auto min-h-0">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 pb-28 md:pb-6">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 pb-24 md:pb-6">
           {children}
         </div>
       </main>
@@ -169,24 +179,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Bottom nav for mobile */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 flex-shrink-0">
         <div className="flex items-center justify-around h-16">
-          {mobileMainLinks.map(l => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              end={l.to === '/'}
-              className={({ isActive }) =>
-                cn(
-                  'flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition-colors duration-150',
-                  isActive ? 'text-primary' : 'text-muted-foreground'
-                )
-              }
-            >
-              <l.icon className="h-5 w-5" />
-              {l.label}
-            </NavLink>
-          ))}
+          {/* Dashboard */}
           <NavLink
-            to="/profile"
+            to="/"
             end
             className={({ isActive }) =>
               cn(
@@ -195,9 +190,42 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               )
             }
           >
-            <EmojiAvatar emoji={profile?.avatar_emoji} color={profile?.avatar_color} userId={user?.id} size="xs" />
-            Perfil
+            <LayoutDashboard className="h-5 w-5" />
+            Dashboard
           </NavLink>
+
+          {/* Despesas */}
+          <NavLink
+            to="/expenses"
+            className={({ isActive }) =>
+              cn(
+                'flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition-colors duration-150',
+                isActive ? 'text-primary' : 'text-muted-foreground'
+              )
+            }
+          >
+            <Receipt className="h-5 w-5" />
+            Despesas
+          </NavLink>
+
+          {/* FAB spacer */}
+          <div className="w-14" />
+
+          {/* Metas */}
+          <NavLink
+            to="/goals"
+            className={({ isActive }) =>
+              cn(
+                'flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition-colors duration-150',
+                isActive ? 'text-primary' : 'text-muted-foreground'
+              )
+            }
+          >
+            <Goal className="h-5 w-5" />
+            Metas
+          </NavLink>
+
+          {/* Mais */}
           <button
             onClick={() => setMoreOpen(true)}
             className="flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium text-muted-foreground"
@@ -232,7 +260,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </NavLink>
             ))}
             <button
-              onClick={() => setSearchOpen(true)}
+              onClick={() => { setSearchOpen(true); setMoreOpen(false); }}
               className="flex flex-col items-center gap-1.5 p-3 rounded-xl text-xs font-medium text-muted-foreground hover:bg-accent"
             >
               <Search className="h-5 w-5" />
