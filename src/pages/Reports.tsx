@@ -125,8 +125,11 @@ export default function Reports() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Relatórios</h1>
+      <div className="page-header">
+        <div>
+          <p className="page-eyebrow">análise</p>
+          <h1 className="page-title">Relatórios</h1>
+        </div>
         <div className="flex items-center gap-2">
           <Link to="/reports/annual">
             <Button variant="outline" size="sm" className="gap-1.5">

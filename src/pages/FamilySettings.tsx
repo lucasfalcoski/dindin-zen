@@ -199,7 +199,12 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Família</h1>
+      <div className="page-header">
+        <div>
+          <p className="page-eyebrow">família</p>
+          <h1 className="page-title">Família</h1>
+        </div>
+      </div>
 
       {/* Family name */}
       <div className="card-surface p-5">

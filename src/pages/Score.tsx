@@ -168,7 +168,12 @@ export default function Score() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Score Financeiro</h1>
+      <div className="page-header">
+        <div>
+          <p className="page-eyebrow">análise</p>
+          <h1 className="page-title">Score Financeiro</h1>
+        </div>
+      </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Score ring */}
