@@ -244,15 +244,26 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* BOTTOM NAV MOBILE */}
       <nav className="din-bottom-nav" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: C.topbarBg, borderTop: `1px solid ${C.topbarBorder}`, height: 64, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
-        {mobileSlots.map((slot, i) => !slot
-          ? <button key="fab" onClick={() => navigate('/expenses?new=1')} style={{ width: 48, height: 48, borderRadius: '50%', background: C.green, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(26,122,69,.4)', marginTop: -16, flexShrink: 0 }}>
+        {mobileSlots.map((slot, i) => {
+          if (slot === null) return (
+            <button key="fab" onClick={() => navigate('/expenses?new=1')} style={{ width: 48, height: 48, borderRadius: '50%', background: C.green, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(26,122,69,.4)', marginTop: -16, flexShrink: 0 }}>
               <Plus size={22} style={{ color: '#fff' }} />
             </button>
-          : <NavLink key={slot.to} to={slot.to} end={slot.to === '/'}
+          );
+          if (slot === 'more') return (
+            <button key="more" onClick={() => setMoreOpen(true)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '4px 8px', background: 'none', border: 'none', cursor: 'pointer', flex: 1, color: moreOpen ? C.green : C.ink3, fontSize: 9, fontWeight: 600, fontFamily: "'Cabinet Grotesk', sans-serif", textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+              <LayoutGrid size={20} style={{ color: moreOpen ? C.green : C.ink3 }} />
+              Mais
+            </button>
+          );
+          return (
+            <NavLink key={slot.to} to={slot.to} end={slot.to === '/'}
               style={({ isActive }) => ({ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '4px 8px', textDecoration: 'none', flex: 1, color: isActive ? C.green : C.ink3, fontSize: 9, fontWeight: 600, fontFamily: "'Cabinet Grotesk', sans-serif", textTransform: 'uppercase', letterSpacing: '0.3px' })}>
               {({ isActive }) => <><slot.icon size={20} style={{ color: isActive ? C.green : C.ink3 }} />{slot.label}</>}
             </NavLink>
-        )}
+          );
+        })}
       </nav>
 
       <QuickAddFAB />
