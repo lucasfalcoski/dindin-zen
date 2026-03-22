@@ -54,7 +54,7 @@ const App = () => (
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/profile" element={<ProtectedPage><ProfilePage /></ProtectedPage>} />
+            <Route path="/profile" element={<Navigate to="/settings" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
