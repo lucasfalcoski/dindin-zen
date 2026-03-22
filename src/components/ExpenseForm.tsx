@@ -407,9 +407,22 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
                     {...register('installment_total')}
                     type="number"
                     min={2}
-                    max={72}
+                    max={48}
                     placeholder="12"
                   />
+                  {(() => {
+                    const total = parseFloat((watchedAmount || '0').replace(',', '.'));
+                    const parcelas = parseInt(watch('installment_total') || '2', 10);
+                    if (!isNaN(total) && total > 0 && !isNaN(parcelas) && parcelas >= 2) {
+                      const perMonth = total / parcelas;
+                      return (
+                        <p className="text-xs text-muted-foreground">
+                          💳 {parcelas}x de <span className="font-medium text-foreground">R$ {perMonth.toFixed(2).replace('.', ',')}</span> por mês
+                        </p>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
               )}
             </>
