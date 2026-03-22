@@ -98,7 +98,12 @@ export default function Groups() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Grupos</h1>
+        <div className="page-header">
+          <div>
+            <p className="page-eyebrow">organização</p>
+            <h1 className="page-title">Grupos</h1>
+          </div>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="card-surface p-5 h-28 animate-pulse">
