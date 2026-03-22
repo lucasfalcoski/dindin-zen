@@ -155,9 +155,18 @@
 [data-sidebar="menu-button"] {
   color: rgba(255,255,255,0.45) !important;
 }
+[data-sidebar="menu-button"] svg {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
 [data-sidebar="menu-button"]:hover,
 [data-sidebar="menu-button"][data-active="true"] {
   background-color: rgba(255,255,255,0.10) !important;
+  color: #ffffff !important;
+}
+[data-sidebar="menu-button"]:hover svg {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+[data-sidebar="menu-button"][data-active="true"] svg {
   color: #ffffff !important;
 }
 [data-sidebar="menu-button"][data-active="true"] {

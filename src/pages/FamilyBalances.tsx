@@ -71,7 +71,7 @@ export default function FamilyBalances() {
   const handleSettle = async (b: { fromId: string; toId: string; amount: number }) => {
     if (!familyId) return;
     try {
-      await createSettlement.mutateAsync({ familyId, fromUserId: b.fromId, toUserId: b.toId, amount: b.amount });
+      await createSettlement.mutateAsync({ family_id: familyId, from_user_id: b.fromId, to_user_id: b.toId, amount: b.amount });
       toast({ title: 'Pagamento registrado!' });
     } catch { toast({ title: 'Erro', variant: 'destructive' }); }
   };

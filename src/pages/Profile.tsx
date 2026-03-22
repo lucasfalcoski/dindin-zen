@@ -125,6 +125,16 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {/* WhatsApp Integration */}
+      <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', overflow:'hidden', marginBottom:'14px' }}>
+        <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.rule}` }}>
+          <span style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.5px', textTransform:'uppercase', color:C.ink2 }}>WhatsApp</span>
+        </div>
+        <div style={{ padding:'20px' }}>
+          <WhatsAppConnect />
+        </div>
+      </div>
+
       {/* Sair */}
       <button onClick={handleSignOut}
         style={{ width:'100%', padding:'14px', borderRadius:'14px', border:`1px solid rgba(184,50,50,.2)`, background:'rgba(184,50,50,.04)', color:C.red, fontSize:'13px', fontWeight:600, fontFamily:"'Cabinet Grotesk',sans-serif", cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:'8px', transition:'all .15s' }}

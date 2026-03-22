@@ -62,11 +62,9 @@ export default function Dashboard() {
   const { data: budgets } = useBudgets(monthStart);
   const { data: profiles } = useFamilyProfiles(memberUserIds);
   const { data: goals } = useGoals();
+  const { data: profile } = useProfile();
 
-  const userName =
-    user?.user_metadata?.full_name?.split(' ')[0] ||
-    user?.user_metadata?.name?.split(' ')[0] ||
-    user?.email?.split('@')[0] || '';
+  const userName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || '';
 
   const monthExpenses = useMemo(() => {
     if (!allMonthExpenses) return [];

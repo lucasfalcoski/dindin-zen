@@ -28,7 +28,7 @@ export default function Forecast() {
   const myIncomes = useMemo(() => (allIncomes || []).filter(i => i.user_id === user?.id), [allIncomes, user]);
 
   const currentBalance = useMemo(() => {
-    const totalAccounts = (accounts || []).filter(a => a.type !== 'credito').reduce((s, a) => s + Number(a.balance), 0);
+    const totalAccounts = (accounts || []).filter(a => a.type !== ('credito' as any)).reduce((s, a) => s + Number(a.balance), 0);
     return totalAccounts;
   }, [accounts]);
 
