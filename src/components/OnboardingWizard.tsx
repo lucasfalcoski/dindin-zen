@@ -109,7 +109,7 @@ export function OnboardingWizard() {
   };
 
   const handleStep2 = async () => {
-    const month = format(startOfMonth(new Date()), 'yyyy-MM-dd');
+    const month = format(startOfMonth(nowInUserTz()), 'yyyy-MM-dd');
     for (const [groupId, amount] of Object.entries(budgets)) {
       const val = parseFloat(amount);
       if (val > 0) {
