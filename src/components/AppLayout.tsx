@@ -160,12 +160,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     ?? ALL_LINKS.find(l => l.to !== '/' && location.pathname.startsWith(l.to))?.label
     ?? 'Página';
 
-  const mobileSlots: (typeof ALL_LINKS[0] | null)[] = [
+  const mobileSlots: (typeof ALL_LINKS[0] | null | 'more')[] = [
     { to: '/',         label: 'Início',   icon: LayoutDashboard },
     { to: '/expenses', label: 'Despesas', icon: Receipt },
     null,
     { to: '/income',   label: 'Receitas', icon: DollarSign },
-    { to: '/family',   label: 'Família',  icon: Users },
+    'more',
   ];
 
   return (
