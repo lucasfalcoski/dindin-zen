@@ -1,7 +1,8 @@
 import { Expense, useDeleteExpense, useCancelInstallments } from '@/hooks/useExpenses';
 import { formatBRL, formatDate } from '@/lib/format';
 import { GroupBadge } from './GroupBadge';
-import { Trash2, Pencil, XCircle } from 'lucide-react';
+import { Trash2, Pencil, XCircle, MessageCircle } from 'lucide-react';
+import { useWhatsAppConfirmedIds } from '@/hooks/useWhatsAppTransactions';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { format } from 'date-fns';
