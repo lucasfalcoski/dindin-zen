@@ -111,7 +111,7 @@ export default function Expenses() {
     <div className="space-y-5 w-full min-w-0">
 
       {/* ── PAGE HEADER ── */}
-      <div className="flex items-end justify-between pb-5 border-b border-border">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-5 border-b border-border gap-3">
         <div>
           <p className="label-caps mb-1.5 text-muted-foreground">saídas</p>
           <h1 className="page-title">Despesas</h1>
