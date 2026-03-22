@@ -29,6 +29,7 @@ import Score from "./pages/Score";
 import Goals from "./pages/Goals";
 import Forecast from "./pages/Forecast";
 import Profile from "./pages/Profile";
+import WhatsAppHistory from "./pages/WhatsAppHistory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
