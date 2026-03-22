@@ -112,7 +112,7 @@ export function QuickAddFAB() {
         amount: val,
         description: description.trim(),
         group_id: groupId,
-        date: new Date().toISOString().split('T')[0],
+        date: todayString(),
         recurrent: false,
         payment_method: 'outro',
       },
