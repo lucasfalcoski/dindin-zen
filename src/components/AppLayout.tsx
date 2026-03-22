@@ -141,18 +141,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </button>
             <ThemeToggle />
             <ViewSelector />
-            <Link to="/profile" className="hidden xl:flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <EmojiAvatar emoji={profile?.avatar_emoji} color={profile?.avatar_color} userId={user?.id} size="sm" />
-              <span className="text-xs text-muted-foreground truncate max-w-[120px]">
-                {profile?.display_name || user?.email?.split('@')[0]}
-              </span>
-            </Link>
-            <button
-              onClick={handleSignOut}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-150"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
+            <ProfileDropdown />
           </div>
         </div>
       </header>
