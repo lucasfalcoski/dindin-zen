@@ -62,7 +62,7 @@ export default function AccountsPage() {
           {[...Array(3)].map((_, i) => <div key={i} style={{ height:'100px', background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px' }} />)}
         </div>
       ) : accounts && accounts.length > 0 ? (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'14px', marginBottom:'20px' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
           {accounts.map(a => {
             const typeInfo = ACCOUNT_TYPES.find(t => t.value === a.type);
             const isSelected = selectedAccount?.id === a.id;

@@ -204,7 +204,7 @@ export default function Expenses() {
         {/* Lista de despesas */}
         <div className="card-surface overflow-hidden">
           {/* Filtros de grupo */}
-          <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border flex-wrap">
+          <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border overflow-x-auto">
             <span className="sec-title mr-1">Todas as despesas</span>
             <button
               onClick={() => setGroupFilter('')}

@@ -140,7 +140,7 @@ export default function Dashboard() {
   if (isLoading) return (
     <div>
       <div style={{ height: '56px', width: '300px', background: C.rule, borderRadius: '8px', marginBottom: '28px' }} />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[...Array(4)].map((_, i) => <div key={i} style={{ height: '110px', background: '#fff', border: `1px solid ${C.rule}`, borderRadius: '14px' }} />)}
       </div>
     </div>

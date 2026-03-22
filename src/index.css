@@ -84,6 +84,24 @@
   }
 }
 
+/* ── Mobile-first base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+@media (max-width: 767px) {
+  .din-page > * {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+}
+
 @layer base {
   * { @apply border-border; }
   body {

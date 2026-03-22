@@ -113,7 +113,7 @@ export default function Score() {
         </div>
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'14px' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
         {/* Score ring */}
         <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'32px', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
           <div style={{ position:'relative', width:'160px', height:'160px' }}>

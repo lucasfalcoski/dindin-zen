@@ -130,7 +130,7 @@ export default function CreditCardsPage() {
         </div>
       ) : cards && cards.length > 0 ? (
         <>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'14px', marginBottom:'20px' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-5">
             {cards.map(card => (
               <CardVisual
                 key={card.id}
