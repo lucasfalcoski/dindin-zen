@@ -1,45 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import {
-  useMyFamilies,
-  useFamilyMembers,
-  useCreateFamily,
-  useUpdateFamily,
-  useInviteMember,
-  useRemoveMember,
+  useMyFamilies, useFamilyMembers, useCreateFamily, useUpdateFamily,
+  useInviteMember, useRemoveMember,
 } from '@/hooks/useFamily';
-import { useFamilyProfiles, type Profile } from '@/hooks/useProfiles';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Users, Plus, Trash2, Copy, Check, Crown, Clock, Mail, ArrowRight, Target } from 'lucide-react';
-import { EmojiAvatar } from '@/components/EmojiAvatar';
-import { FamilySharingSettings } from '@/components/FamilySharingSettings';
-import { FamilyOverview } from '@/components/FamilyOverview';
-import { FamilyBalanceTab } from '@/components/FamilyBalanceTab';
+import { Users, Plus, Trash2, Copy, Check, Crown, Clock, Mail, ArrowRight, Target, Scale } from 'lucide-react';
+import { useFamilyProfiles } from '@/hooks/useProfiles';
 
-type TabId = 'members' | 'overview' | 'balance';
+const C = { ink:'#16150f', ink2:'#6b6a63', ink3:'#b0aea6', rule:'#e4e1da', bg:'#f2f0eb', green:'#1a7a45', green_s:'#d4eddd', red:'#b83232', red_s:'#f5dede', blue:'#1d4ed8', blue_s:'#dce8ff', amber:'#92580a', amber_s:'#fdefd4', purple:'#5b3589' };
 
 export default function FamilySettings() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { data: families, isLoading } = useMyFamilies();
   const createFamily = useCreateFamily();
-
-  // Force refetch family data on mount
-  useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ['families'] });
-    queryClient.invalidateQueries({ queryKey: ['family_members'] });
-  }, [queryClient]);
-
   const [createOpen, setCreateOpen] = useState(false);
   const [familyName, setFamilyName] = useState('');
-
   const myFamily = families?.[0];
 
   const handleCreate = async () => {
@@ -49,67 +31,49 @@ export default function FamilySettings() {
       toast({ title: 'Família criada!' });
       setCreateOpen(false);
       setFamilyName('');
-    } catch {
-      toast({ title: 'Erro ao criar família', variant: 'destructive' });
-    }
+    } catch { toast({ title: 'Erro ao criar família', variant: 'destructive' }); }
   };
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <div className="page-header">
-          <div>
-            <p className="page-eyebrow">família</p>
-            <h1 className="page-title">Família</h1>
-          </div>
-        </div>
-        <div className="card-surface p-8 animate-pulse">
-          <div className="h-6 w-40 bg-muted rounded mb-4" />
-          <div className="h-4 w-60 bg-muted rounded" />
-        </div>
+      <div>
+        <div style={{ height:'40px', width:'200px', background:'#e4e1da', borderRadius:'8px', marginBottom:'20px' }} />
+        <div style={{ height:'120px', background:'#e4e1da', borderRadius:'14px' }} />
       </div>
     );
   }
 
   if (!myFamily) {
     return (
-      <div className="space-y-4">
-        <div className="page-header">
+      <div>
+        {/* HEADER */}
+        <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:'28px', paddingBottom:'20px', borderBottom:`1px solid ${C.rule}` }}>
           <div>
-            <p className="page-eyebrow">família</p>
-            <h1 className="page-title">Família</h1>
+            <p style={{ fontSize:'11px', fontWeight:600, letterSpacing:'1.5px', textTransform:'uppercase', color:C.ink3, marginBottom:'6px' }}>família</p>
+            <h1 style={{ fontFamily:"'Instrument Serif', Georgia, serif", fontSize:'34px', lineHeight:1, letterSpacing:'-0.5px', color:C.ink }}>Família</h1>
           </div>
         </div>
-        <div className="card-surface p-8 text-center space-y-4">
-          <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <Users className="h-8 w-8 text-primary" />
+
+        <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'48px', textAlign:'center' }}>
+          <div style={{ width:'64px', height:'64px', borderRadius:'50%', background:'rgba(26,122,69,.1)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px' }}>
+            <Users style={{ width:'28px', height:'28px', color:C.green }} />
           </div>
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Modo Família</h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Compartilhe despesas e receitas com sua família. Crie um grupo familiar e convide membros.
-            </p>
-          </div>
-          <Button onClick={() => setCreateOpen(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Criar família
-          </Button>
+          <h2 style={{ fontSize:'18px', fontWeight:700, color:C.ink, marginBottom:'8px' }}>Modo Família</h2>
+          <p style={{ fontSize:'13px', color:C.ink3, maxWidth:'320px', margin:'0 auto 24px', lineHeight:1.6 }}>
+            Compartilhe despesas e receitas com sua família. Crie um grupo familiar e convide membros.
+          </p>
+          <button onClick={() => setCreateOpen(true)} style={{ padding:'10px 20px', borderRadius:'10px', fontSize:'13px', fontWeight:600, fontFamily:"'Cabinet Grotesk',sans-serif", background:C.ink, color:'#fff', border:'none', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'8px' }}>
+            <Plus size={14} /> Criar família
+          </button>
         </div>
 
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogContent className="sm:max-w-sm">
-            <DialogHeader>
-              <DialogTitle>Criar família</DialogTitle>
-            </DialogHeader>
+            <DialogHeader><DialogTitle>Criar família</DialogTitle></DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Nome da família</Label>
-                <Input
-                  value={familyName}
-                  onChange={e => setFamilyName(e.target.value)}
-                  placeholder="Ex: Família Silva"
-                  onKeyDown={e => { if (e.key === 'Enter') handleCreate(); }}
-                />
+                <Input value={familyName} onChange={e => setFamilyName(e.target.value)} placeholder="Ex: Família Silva" onKeyDown={e => { if (e.key === 'Enter') handleCreate(); }} />
               </div>
               <Button onClick={handleCreate} className="w-full" disabled={createFamily.isPending}>
                 {createFamily.isPending ? 'Criando...' : 'Criar'}
@@ -127,41 +91,31 @@ export default function FamilySettings() {
 function FamilyPanel({ family, userId }: { family: { id: string; name: string; created_by: string }; userId: string }) {
   const { toast } = useToast();
   const { data: members } = useFamilyMembers(family.id);
+  const { data: profiles } = useFamilyProfiles();
   const updateFamily = useUpdateFamily();
   const inviteMember = useInviteMember();
   const removeMember = useRemoveMember();
-
-  // Fetch profiles for active members
-  const memberUserIds = (members || []).filter(m => m.user_id).map(m => m.user_id!);
-  const { data: profiles } = useFamilyProfiles(memberUserIds);
-  const profileMap = new Map((profiles || []).map(p => [p.id, p]));
-
-  const [activeTab, setActiveTab] = useState<TabId>('members');
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(family.name);
   const [inviteEmail, setInviteEmail] = useState('');
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
 
   const isAdmin = family.created_by === userId;
+  const activeMembers = (members || []).filter(m => m.status === 'active');
+  const memberCount = activeMembers.length;
 
-  const tabs: { id: TabId; label: string; icon: string }[] = [
-    { id: 'members', label: 'Membros', icon: '👥' },
-    { id: 'overview', label: 'Visão Geral', icon: '📊' },
-    { id: 'balance', label: 'Acerto de Contas', icon: '⚖️' },
-  ];
+  const getMemberProfile = (email: string | null) => {
+    if (!email) return null;
+    return profiles?.find(p => p.email === email || p.display_name === email?.split('@')[0]);
+  };
 
   const handleUpdateName = async () => {
-    if (!name.trim() || name === family.name) {
-      setEditingName(false);
-      return;
-    }
+    if (!name.trim() || name === family.name) { setEditingName(false); return; }
     try {
       await updateFamily.mutateAsync({ id: family.id, name: name.trim() });
       toast({ title: 'Nome atualizado' });
       setEditingName(false);
-    } catch {
-      toast({ title: 'Erro ao atualizar', variant: 'destructive' });
-    }
+    } catch { toast({ title: 'Erro ao atualizar', variant: 'destructive' }); }
   };
 
   const handleInvite = async () => {
@@ -175,9 +129,7 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
       setCopiedToken(member.invite_token);
       setTimeout(() => setCopiedToken(null), 3000);
       toast({ title: 'Link copiado para a área de transferência!' });
-    } catch {
-      toast({ title: 'Erro ao convidar', variant: 'destructive' });
-    }
+    } catch { toast({ title: 'Erro ao convidar', variant: 'destructive' }); }
   };
 
   const handleCopyLink = async (token: string) => {
@@ -192,193 +144,170 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
     try {
       await removeMember.mutateAsync(memberId);
       toast({ title: 'Membro removido' });
-    } catch {
-      toast({ title: 'Erro ao remover', variant: 'destructive' });
-    }
+    } catch { toast({ title: 'Erro ao remover', variant: 'destructive' }); }
   };
 
+  // Avatar colors
+  const avatarColors = [
+    { bg: '#dce8ff', text: '#1d4ed8' },
+    { bg: '#f5dede', text: '#b83232' },
+    { bg: '#d4eddd', text: '#1a7a45' },
+    { bg: '#fdefd4', text: '#92580a' },
+    { bg: '#ece4f9', text: '#5b3589' },
+  ];
+
   return (
-    <div className="space-y-4">
-      <div className="page-header">
+    <div>
+      {/* HEADER */}
+      <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:'28px', paddingBottom:'20px', borderBottom:`1px solid ${C.rule}` }}>
         <div>
-          <p className="page-eyebrow">família</p>
-          <h1 className="page-title">Família</h1>
-        </div>
-      </div>
-
-      {/* Family name */}
-      <div className="card-surface p-5">
-        <div className="flex items-center justify-between">
+          <p style={{ fontSize:'11px', fontWeight:600, letterSpacing:'1.5px', textTransform:'uppercase', color:C.ink3, marginBottom:'6px' }}>família</p>
           {editingName ? (
-            <div className="flex items-center gap-2 flex-1">
-              <Input
-                value={name}
-                onChange={e => setName(e.target.value)}
-                className="max-w-xs"
-                onBlur={handleUpdateName}
-                onKeyDown={e => { if (e.key === 'Enter') handleUpdateName(); }}
-                autoFocus
-              />
-            </div>
+            <input
+              value={name}
+              onChange={e => setName(e.target.value)}
+              onBlur={handleUpdateName}
+              onKeyDown={e => { if (e.key === 'Enter') handleUpdateName(); }}
+              autoFocus
+              style={{ fontFamily:"'Instrument Serif',serif", fontSize:'34px', lineHeight:1, letterSpacing:'-0.5px', color:C.ink, border:'none', borderBottom:`2px solid ${C.green}`, background:'none', outline:'none', width:'300px' }}
+            />
           ) : (
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Users className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">{family.name}</h2>
-                <p className="text-xs text-muted-foreground">{members?.filter(m => m.status === 'active').length || 0} membro(s) ativo(s)</p>
-              </div>
-            </div>
+            <h1
+              style={{ fontFamily:"'Instrument Serif', Georgia, serif", fontSize:'34px', lineHeight:1, letterSpacing:'-0.5px', color:C.ink, cursor: isAdmin ? 'pointer' : 'default' }}
+              onClick={() => isAdmin && setEditingName(true)}
+              title={isAdmin ? 'Clique para editar' : undefined}
+            >
+              Família <em style={{ fontStyle:'italic', color:C.ink2 }}>{family.name}</em>
+            </h1>
           )}
-          {isAdmin && !editingName && (
-            <Button variant="ghost" size="sm" onClick={() => setEditingName(true)}>
-              Editar
-            </Button>
-          )}
+        </div>
+        {isAdmin && (
+          <button onClick={() => document.getElementById('invite-email')?.focus()} style={{ padding:'6px 16px', borderRadius:'8px', fontSize:'12px', fontWeight:600, fontFamily:"'Cabinet Grotesk',sans-serif", background:C.ink, color:'#fff', border:`1px solid ${C.ink}`, cursor:'pointer', display:'flex', alignItems:'center', gap:'6px' }}>
+            <Plus size={14} /> Convidar membro
+          </button>
+        )}
+      </div>
+
+      {/* BANNER ESCURO */}
+      <div style={{ background:C.ink, borderRadius:'16px', padding:'24px 28px', marginBottom:'20px', display:'flex', alignItems:'center', gap:'28px', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', right:'-30px', top:'-30px', width:'160px', height:'160px', borderRadius:'50%', border:'1px solid rgba(255,255,255,.05)' }} />
+        <div style={{ fontFamily:"'Instrument Serif',serif", fontSize:'48px', color:'#fff', letterSpacing:'-2px', lineHeight:1, flexShrink:0 }}>
+          {memberCount}
+        </div>
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:'10px', letterSpacing:'2px', textTransform:'uppercase', color:'rgba(255,255,255,.4)', marginBottom:'8px', fontWeight:600 }}>
+            membros ativos
+          </div>
+          <div style={{ display:'flex' }}>
+            {activeMembers.slice(0, 5).map((m, i) => {
+              const col = avatarColors[i % avatarColors.length];
+              const initials = (m.invited_email || '?').substring(0, 2).toUpperCase();
+              return (
+                <div key={m.id} style={{ width:'38px', height:'38px', borderRadius:'50%', border:`2px solid ${C.ink}`, background:col.bg, color:col.text, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'12px', fontWeight:700, marginLeft: i > 0 ? '-10px' : 0, flexShrink:0 }}>
+                  {initials}
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ fontSize:'12px', color:'rgba(255,255,255,.4)', marginTop:'8px' }}>
+            Família {family.name}
+          </div>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2">
-        {tabs.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setActiveTab(t.id)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === t.id
-                ? 'bg-primary/10 text-primary'
-                : 'bg-accent text-muted-foreground hover:text-foreground'
-            }`}
+      {/* MEMBROS GRID */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'14px', marginBottom:'20px' }}>
+        {(members || []).map((m, i) => {
+          const col = avatarColors[i % avatarColors.length];
+          const initials = (m.invited_email || '?').substring(0, 2).toUpperCase();
+          const isPending = m.status === 'pending';
+          return (
+            <div key={m.id} style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'20px', transition:'border-color .15s', opacity: isPending ? 0.7 : 1 }}>
+              <div style={{ width:'44px', height:'44px', borderRadius:'50%', background:col.bg, color:col.text, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'16px', fontWeight:700, marginBottom:'12px' }}>
+                {initials}
+              </div>
+              <div style={{ fontSize:'14px', fontWeight:700, color:C.ink }}>{m.invited_email?.split('@')[0] || 'Membro'}</div>
+              <div style={{ fontSize:'11px', color:C.ink3, marginBottom:'8px', display:'flex', alignItems:'center', gap:'4px' }}>
+                {m.role === 'admin' && <Crown size={10} style={{ color:'#f59e0b' }} />}
+                {isPending ? <><Clock size={10} /> Pendente</> : m.role === 'admin' ? 'Administrador' : 'Membro'}
+              </div>
+              {isPending && m.invite_token && (
+                <button
+                  onClick={() => handleCopyLink(m.invite_token!)}
+                  style={{ fontSize:'11px', color:C.blue, background:'none', border:'none', cursor:'pointer', padding:0, display:'flex', alignItems:'center', gap:'4px', fontFamily:"'Cabinet Grotesk',sans-serif" }}
+                >
+                  {copiedToken === m.invite_token ? <><Check size={11} /> Copiado!</> : <><Copy size={11} /> Copiar link</>}
+                </button>
+              )}
+              {isAdmin && m.user_id !== userId && (
+                <button
+                  onClick={() => handleRemove(m.id)}
+                  style={{ marginTop:'4px', fontSize:'11px', color:C.red, background:'none', border:'none', cursor:'pointer', padding:0, display:'flex', alignItems:'center', gap:'4px', fontFamily:"'Cabinet Grotesk',sans-serif" }}
+                >
+                  <Trash2 size={11} /> Remover
+                </button>
+              )}
+            </div>
+          );
+        })}
+
+        {/* Convidar card */}
+        {isAdmin && (
+          <div style={{ background:'#fff', border:`1.5px dashed ${C.rule}`, borderRadius:'14px', padding:'20px', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:'6px', cursor:'pointer' }}
+            onClick={() => document.getElementById('invite-email')?.focus()}
           >
-            <span>{t.icon}</span>
-            {t.label}
-          </button>
-        ))}
+            <div style={{ fontSize:'24px', color:C.ink3 }}>+</div>
+            <div style={{ fontSize:'13px', fontWeight:700, color:C.ink2 }}>Convidar</div>
+            <div style={{ fontSize:'11px', color:C.ink3, textAlign:'center', maxWidth:'100px' }}>Adicionar membro à família</div>
+          </div>
+        )}
       </div>
 
-      {activeTab === 'members' && (
-        <>
-          {/* Members list */}
-          <div className="card-surface">
-            <div className="p-4 pb-2">
-              <h3 className="label-caps">Membros</h3>
-            </div>
-            <div className="divide-y divide-border/50">
-              {members?.map(m => {
-                const profile = m.user_id ? profileMap.get(m.user_id) : null;
-                const displayName = profile?.display_name || m.invited_email || 'Membro pendente';
-                const isPending = m.status === 'pending';
-                return (
-                <div key={m.id} className="flex items-center gap-3 p-4">
-                  {isPending ? (
-                    <EmojiAvatar emoji="👤" color="#94a3b8" size="sm" />
-                  ) : (
-                    <EmojiAvatar
-                      emoji={profile?.avatar_emoji}
-                      color={profile?.avatar_color || '#3b82f6'}
-                      userId={m.user_id || m.id}
-                      size="sm"
-                    />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-medium text-foreground truncate">
-                        {displayName}
-                      </p>
-                      {m.role === 'admin' && (
-                        <Crown className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      {isPending ? (
-                        <>
-                          <Clock className="h-3 w-3" />
-                          <span>Pendente</span>
-                        </>
-                      ) : (
-                        <span>Ativo</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {m.status === 'pending' && (
-                      <button
-                        onClick={() => handleCopyLink(m.invite_token)}
-                        className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                        title="Copiar link de convite"
-                      >
-                        {copiedToken === m.invite_token ? (
-                          <Check className="h-3.5 w-3.5 text-emerald-500" />
-                        ) : (
-                          <Copy className="h-3.5 w-3.5" />
-                        )}
-                      </button>
-                    )}
-                    {isAdmin && m.user_id !== userId && (
-                      <button
-                        onClick={() => handleRemove(m.id)}
-                        className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-                );
-              })}
-            </div>
+      {/* SUB-PAGES */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px', marginBottom:'20px' }}>
+        <Link to="/family/balances" style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'16px', display:'flex', alignItems:'center', gap:'12px', textDecoration:'none', transition:'border-color .15s' }}>
+          <div style={{ width:'40px', height:'40px', borderRadius:'10px', background:'rgba(26,122,69,.1)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+            <Scale style={{ width:'18px', height:'18px', color:C.green }} />
           </div>
-
-          {/* Invite section (admin only) */}
-          {isAdmin && (
-            <div className="card-surface p-5">
-              <h3 className="label-caps mb-3">Convidar membro</h3>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <Input
-                    value={inviteEmail}
-                    onChange={e => setInviteEmail(e.target.value)}
-                    placeholder="email@exemplo.com"
-                    type="email"
-                    onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }}
-                  />
-                </div>
-                <Button onClick={handleInvite} disabled={inviteMember.isPending} className="gap-1.5">
-                  <Mail className="h-4 w-4" />
-                  Convidar
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Um link de convite será gerado e copiado automaticamente.
-              </p>
-            </div>
-          )}
-
-          {/* Sharing settings */}
-          <FamilySharingSettings />
-
-          {/* Family sub-pages */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Link
-              to="/family/budget"
-              className="card-surface p-4 flex items-center gap-3 hover:bg-accent/50 transition-colors rounded-lg"
-            >
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Target className="h-5 w-5 text-primary" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-foreground">Orçamento Familiar</p>
-                <p className="text-xs text-muted-foreground">Orçamento consolidado da família</p>
-              </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground" />
-            </Link>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:'13px', fontWeight:600, color:C.ink }}>Quem deve pra quem</div>
+            <div style={{ fontSize:'11px', color:C.ink3 }}>Saldos de despesas divididas</div>
           </div>
-        </>
+          <ArrowRight style={{ width:'14px', height:'14px', color:C.ink3 }} />
+        </Link>
+        <Link to="/family/budget" style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'16px', display:'flex', alignItems:'center', gap:'12px', textDecoration:'none', transition:'border-color .15s' }}>
+          <div style={{ width:'40px', height:'40px', borderRadius:'10px', background:'rgba(26,122,69,.1)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+            <Target style={{ width:'18px', height:'18px', color:C.green }} />
+          </div>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:'13px', fontWeight:600, color:C.ink }}>Orçamento Familiar</div>
+            <div style={{ fontSize:'11px', color:C.ink3 }}>Orçamento consolidado da família</div>
+          </div>
+          <ArrowRight style={{ width:'14px', height:'14px', color:C.ink3 }} />
+        </Link>
+      </div>
+
+      {/* CONVIDAR */}
+      {isAdmin && (
+        <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'20px' }}>
+          <p style={{ fontSize:'11px', fontWeight:700, letterSpacing:'1px', textTransform:'uppercase', color:C.ink2, marginBottom:'12px' }}>Convidar membro</p>
+          <div style={{ display:'flex', gap:'8px' }}>
+            <Input
+              id="invite-email"
+              value={inviteEmail}
+              onChange={e => setInviteEmail(e.target.value)}
+              placeholder="email@exemplo.com"
+              type="email"
+              onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }}
+              style={{ flex:1 }}
+            />
+            <Button onClick={handleInvite} disabled={inviteMember.isPending} className="gap-1.5">
+              <Mail className="h-4 w-4" /> Convidar
+            </Button>
+          </div>
+          <p style={{ fontSize:'11px', color:C.ink3, marginTop:'8px' }}>Um link de convite será gerado e copiado automaticamente.</p>
+        </div>
       )}
-
-      {activeTab === 'overview' && <FamilyOverview />}
-      {activeTab === 'balance' && <FamilyBalanceTab />}
     </div>
   );
 }
