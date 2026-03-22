@@ -34,7 +34,7 @@ export default function AccountsPage() {
       </div>
 
       {/* SALDO TOTAL */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'14px', marginBottom:'20px' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
         <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'20px' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'8px' }}>
             <span style={{ width:'7px', height:'7px', borderRadius:'50%', background: totalBalance >= 0 ? C.green : C.red, display:'inline-block' }} />
