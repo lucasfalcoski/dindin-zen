@@ -28,6 +28,7 @@ import {
   useSendWhatsAppCode,
   useVerifyWhatsAppCode,
   useDisconnectWhatsApp,
+  useTestWhatsAppConnection,
   formatPhone,
 } from '@/hooks/useWhatsApp';
 import { cn } from '@/lib/utils';
