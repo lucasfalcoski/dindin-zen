@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   useMyFamilies,
   useFamilyMembers,
@@ -8,13 +9,14 @@ import {
   useInviteMember,
   useRemoveMember,
 } from '@/hooks/useFamily';
+import { useFamilyProfiles, type Profile } from '@/hooks/useProfiles';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Users, Plus, Trash2, Copy, Check, Crown, Clock, Mail, ArrowRight, Target, Scale } from 'lucide-react';
+import { Users, Plus, Trash2, Copy, Check, Crown, Clock, Mail, ArrowRight, Target } from 'lucide-react';
 import { EmojiAvatar } from '@/components/EmojiAvatar';
 import { FamilySharingSettings } from '@/components/FamilySharingSettings';
 import { FamilyOverview } from '@/components/FamilyOverview';
