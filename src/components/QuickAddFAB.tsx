@@ -3,6 +3,7 @@ import { Plus, ArrowDown } from 'lucide-react';
 import { useGroups } from '@/hooks/useGroups';
 import { useCreateExpense } from '@/hooks/useExpenses';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserTimezone } from '@/contexts/TimezoneContext';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Input } from '@/components/ui/input';

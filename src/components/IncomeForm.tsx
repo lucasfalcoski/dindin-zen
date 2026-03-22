@@ -67,7 +67,7 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
       reset({
         description: '',
         amount: '',
-        date: new Date().toISOString().split('T')[0],
+        date: todayString(),
         category: 'outro',
         recurrent: false,
         notes: '',
