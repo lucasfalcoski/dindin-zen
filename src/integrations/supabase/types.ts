@@ -498,6 +498,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          timezone: string
         }
         Insert: {
           avatar_color?: string
@@ -505,6 +506,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          timezone?: string
         }
         Update: {
           avatar_color?: string
@@ -512,6 +514,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          timezone?: string
         }
         Relationships: []
       }
