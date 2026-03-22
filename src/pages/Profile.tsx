@@ -188,10 +188,12 @@ export default function Profile() {
       </div>
 
       {/* Seção 5 — WhatsApp */}
-      <WhatsAppConnect />
+      <div ref={whatsappRef}>
+        <WhatsAppConnect />
+      </div>
 
       {/* Seção 6 — Preferências */}
-      <div className="card-surface p-5 space-y-4">
+      <div ref={preferencesRef} className="card-surface p-5 space-y-4">
         <h2 className="label-caps">Preferências</h2>
         <div>
           <p className="text-sm text-foreground mb-2">Emoji do avatar</p>
