@@ -7,6 +7,7 @@ export interface Profile {
   display_name: string | null;
   avatar_color: string;
   avatar_emoji: string | null;
+  timezone: string;
   created_at: string;
 }
 
