@@ -168,7 +168,7 @@ export default function Dashboard() {
           <h1 style={{ fontFamily: "'Instrument Serif', Georgia, serif", fontSize: '34px', lineHeight: 1, letterSpacing: '-0.5px', color: C.ink }}>
             {viewMode === 'family'
               ? <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Users size={28} style={{ color: C.green }} /> Familiar</span>
-              : <>Bom dia, <em style={{ fontStyle: 'italic', color: C.ink2 }}>{userName}</em></>
+              : <>{(() => { const h = new Date().getHours(); return h >= 5 && h < 12 ? 'Bom dia,' : h < 18 ? 'Boa tarde,' : 'Boa noite,'; })()} <em style={{ fontStyle: 'italic', color: C.ink2 }}>{userName}</em></>
             }
           </h1>
         </div>
