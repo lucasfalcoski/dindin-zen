@@ -8,7 +8,7 @@ import { useGroups } from '@/hooks/useGroups';
 import { useCreditCards } from '@/hooks/useCreditCards';
 import { useBudgets } from '@/hooks/useBudgets';
 import { useView } from '@/contexts/ViewContext';
-import { useFamilyProfiles } from '@/hooks/useProfiles';
+import { useFamilyProfiles, useProfile } from '@/hooks/useProfiles';
 import { useGoals } from '@/hooks/useGoals';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
