@@ -19,6 +19,17 @@ import { FamilySharingSettings } from '@/components/FamilySharingSettings';
 
 const AVATAR_COLORS = ['#6BAE7A', '#D4AF6A', '#2C3E2D', '#3b82f6', '#ef4444', '#8b5cf6'];
 
+const TIMEZONES = [
+  { value: 'America/Sao_Paulo', label: '🇧🇷 Brasília (GMT-3)' },
+  { value: 'America/Manaus', label: '🇧🇷 Manaus (GMT-4)' },
+  { value: 'America/Rio_Branco', label: '🇧🇷 Acre (GMT-5)' },
+  { value: 'UTC', label: '🌍 UTC (GMT+0)' },
+  { value: 'America/New_York', label: '🇺🇸 New York (GMT-5/-4)' },
+  { value: 'America/Los_Angeles', label: '🇺🇸 Los Angeles (GMT-8/-7)' },
+  { value: 'Europe/Lisbon', label: '🇪🇺 Lisboa (GMT+0/+1)' },
+  { value: 'Europe/Madrid', label: '🇪🇺 Madrid (GMT+1/+2)' },
+];
+
 export default function Profile() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
