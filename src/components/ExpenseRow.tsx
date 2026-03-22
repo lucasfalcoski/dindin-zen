@@ -17,6 +17,8 @@ export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
   const cancelInstallments = useCancelInstallments();
   const { toast } = useToast();
   const [confirming, setConfirming] = useState(false);
+  const { data: waIds } = useWhatsAppConfirmedIds();
+  const isWhatsApp = waIds?.expenseIds.has(expense.id);
   const group = expense.expense_groups;
   const isInstallment = expense.installment_total && expense.installment_current;
 
