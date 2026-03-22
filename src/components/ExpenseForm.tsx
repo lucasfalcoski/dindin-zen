@@ -87,7 +87,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
     defaultValues: {
       description: '',
       amount: '',
-      date: new Date().toISOString().split('T')[0],
+      date: todayString(),
       group_id: '',
       recurrent: false,
       notes: '',
