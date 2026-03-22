@@ -106,7 +106,7 @@ export default function CreditCardsPage() {
       </div>
 
       {/* STATS */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'14px', marginBottom:'20px' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
         <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'20px' }}>
           <div style={{ fontSize:'11px', fontWeight:600, letterSpacing:'1px', textTransform:'uppercase', color:C.ink3, marginBottom:'8px' }}>Fatura total</div>
           <p style={{ fontFamily:"'Instrument Serif',serif", fontSize:'28px', letterSpacing:'-0.5px', lineHeight:1, color:C.red }}>{formatBRL(totalDebt)}</p>
