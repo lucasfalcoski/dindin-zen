@@ -59,6 +59,7 @@ interface ExpenseFormProps {
 
 export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormProps) {
   const { user } = useAuth();
+  const { todayString } = useUserTimezone();
   const { data: groups } = useGroups();
   const { data: accounts } = useAccounts();
   const { data: creditCards } = useCreditCards();
