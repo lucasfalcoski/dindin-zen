@@ -12,7 +12,7 @@ import { useFamilyProfiles } from '@/hooks/useProfiles';
 import { useGoals } from '@/hooks/useGoals';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
-import { InsightsSection } from '@/components/InsightsSection';
+// InsightsSection movido para topbar (TopbarInsights)
 import { formatBRL } from '@/lib/format';
 import { useAuth } from '@/contexts/AuthContext';
 import { CreditCard, Users } from 'lucide-react';
@@ -241,7 +241,7 @@ export default function Dashboard() {
               ? <div>{recentExpenses.map(e => <ExpenseRow key={e.id} expense={e} />)}</div>
               : <p style={{ fontSize: '13px', color: C.ink3, padding: '32px', textAlign: 'center' }}>Nenhuma despesa este mês.</p>}
           </>)}
-          {viewMode === 'personal' && <InsightsSection />}
+          {/* Insights exibidos na topbar via TopbarInsights */}
         </div>
 
         {/* DIREITA */}
