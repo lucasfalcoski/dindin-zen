@@ -6,6 +6,7 @@ import { useBudgets, useUpsertBudget } from '@/hooks/useBudgets';
 import { useCreateCreditCard } from '@/hooks/useCreditCards';
 import { useMyFamilies, useCreateFamily } from '@/hooks/useFamily';
 import { format, startOfMonth } from 'date-fns';
+import { useUserTimezone } from '@/contexts/TimezoneContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -42,6 +43,7 @@ export function OnboardingWizard() {
   const [cardName, setCardName] = useState('');
   const [cardLimit, setCardLimit] = useState('');
   const createCard = useCreateCreditCard();
+  const { todayString, nowInUserTz } = useUserTimezone();
 
   // Step 4
   const [familyName, setFamilyName] = useState('');
@@ -98,7 +100,7 @@ export function OnboardingWizard() {
       await createIncome.mutateAsync({
         description: 'Salário',
         amount,
-        date: format(new Date(), 'yyyy-MM-dd'),
+        date: todayString(),
         category: 'salario',
         recurrent: true,
       });
@@ -107,7 +109,7 @@ export function OnboardingWizard() {
   };
 
   const handleStep2 = async () => {
-    const month = format(startOfMonth(new Date()), 'yyyy-MM-dd');
+    const month = format(startOfMonth(nowInUserTz()), 'yyyy-MM-dd');
     for (const [groupId, amount] of Object.entries(budgets)) {
       const val = parseFloat(amount);
       if (val > 0) {

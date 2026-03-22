@@ -3,6 +3,7 @@ import { Plus, ArrowDown } from 'lucide-react';
 import { useGroups } from '@/hooks/useGroups';
 import { useCreateExpense } from '@/hooks/useExpenses';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserTimezone } from '@/contexts/TimezoneContext';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Input } from '@/components/ui/input';
@@ -92,6 +93,7 @@ export function QuickAddFAB() {
   const { data: groups } = useGroups();
   const createExpense = useCreateExpense();
   const { user } = useAuth();
+  const { todayString } = useUserTimezone();
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -110,7 +112,7 @@ export function QuickAddFAB() {
         amount: val,
         description: description.trim(),
         group_id: groupId,
-        date: new Date().toISOString().split('T')[0],
+        date: todayString(),
         recurrent: false,
         payment_method: 'outro',
       },

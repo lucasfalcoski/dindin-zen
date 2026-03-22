@@ -10,6 +10,7 @@ import { useMyFamilies, useFamilyMembers } from '@/hooks/useFamily';
 import { useCreateExpense, useUpdateExpense, Expense, useCreateInstallments } from '@/hooks/useExpenses';
 import { useSetExpenseTags, useExpenseTags } from '@/hooks/useTags';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserTimezone } from '@/contexts/TimezoneContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -58,6 +59,7 @@ interface ExpenseFormProps {
 
 export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormProps) {
   const { user } = useAuth();
+  const { todayString } = useUserTimezone();
   const { data: groups } = useGroups();
   const { data: accounts } = useAccounts();
   const { data: creditCards } = useCreditCards();
@@ -85,7 +87,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
     defaultValues: {
       description: '',
       amount: '',
-      date: new Date().toISOString().split('T')[0],
+      date: todayString(),
       group_id: '',
       recurrent: false,
       notes: '',
@@ -151,7 +153,7 @@ export function ExpenseForm({ open, onOpenChange, editingExpense }: ExpenseFormP
       reset({
         description: '',
         amount: '',
-        date: new Date().toISOString().split('T')[0],
+        date: todayString(),
         group_id: groups?.[0]?.id || '',
         recurrent: false,
         notes: '',

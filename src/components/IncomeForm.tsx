@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useUserTimezone } from '@/contexts/TimezoneContext';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -36,13 +37,14 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
   const { data: families } = useMyFamilies();
   const hasFamily = families && families.length > 0;
   const { toast } = useToast();
+  const { todayString } = useUserTimezone();
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(incomeSchema),
     defaultValues: {
       description: '',
       amount: '',
-      date: new Date().toISOString().split('T')[0],
+      date: todayString(),
       category: 'outro',
       recurrent: false,
       notes: '',
@@ -65,7 +67,7 @@ export function IncomeForm({ open, onOpenChange, editingIncome }: IncomeFormProp
       reset({
         description: '',
         amount: '',
-        date: new Date().toISOString().split('T')[0],
+        date: todayString(),
         category: 'outro',
         recurrent: false,
         notes: '',

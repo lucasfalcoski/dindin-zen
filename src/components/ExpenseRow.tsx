@@ -6,6 +6,7 @@ import { useWhatsAppConfirmedIds } from '@/hooks/useWhatsAppTransactions';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { format } from 'date-fns';
+import { useUserTimezone } from '@/contexts/TimezoneContext';
 
 interface ExpenseRowProps {
   expense: Expense;
@@ -17,6 +18,7 @@ export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
   const cancelInstallments = useCancelInstallments();
   const { toast } = useToast();
   const [confirming, setConfirming] = useState(false);
+  const { todayString } = useUserTimezone();
   const { data: waIds } = useWhatsAppConfirmedIds();
   const isWhatsApp = waIds?.expenseIds.has(expense.id);
   const group = expense.expense_groups;
@@ -34,7 +36,7 @@ export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
 
   const handleCancelInstallments = async () => {
     if (!expense.installment_group_id) return;
-    const today = format(new Date(), 'yyyy-MM-dd');
+    const today = todayString();
     await cancelInstallments.mutateAsync({
       installmentGroupId: expense.installment_group_id,
       keepBeforeDate: today,
