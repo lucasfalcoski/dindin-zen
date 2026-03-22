@@ -1,6 +1,5 @@
-import ProfilePage from "./pages/Profile";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -30,7 +29,7 @@ import AnnualReport from "./pages/AnnualReport";
 import Score from "./pages/Score";
 import Goals from "./pages/Goals";
 import Forecast from "./pages/Forecast";
-import Profile from "./pages/Profile";
+
 import WhatsAppHistory from "./pages/WhatsAppHistory";
 import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -55,7 +54,7 @@ const App = () => (
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/profile" element={<ProtectedPage><ProfilePage /></ProtectedPage>} />
+            <Route path="/profile" element={<Navigate to="/settings" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -73,7 +72,7 @@ const App = () => (
             <Route path="/score" element={<ProtectedPage><Score /></ProtectedPage>} />
             <Route path="/goals" element={<ProtectedPage><Goals /></ProtectedPage>} />
             <Route path="/forecast" element={<ProtectedPage><Forecast /></ProtectedPage>} />
-            <Route path="/profile" element={<ProtectedPage><Profile /></ProtectedPage>} />
+            
             <Route path="/whatsapp-history" element={<ProtectedPage><WhatsAppHistory /></ProtectedPage>} />
             <Route path="/family" element={<ProtectedPage><FamilySettings /></ProtectedPage>} />
             <Route path="/family/balances" element={<ProtectedPage><FamilyBalances /></ProtectedPage>} />

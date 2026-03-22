@@ -108,7 +108,7 @@ function UserMenu({ name, email, color, onSignOut }: { name: string; email: stri
             <div style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>{name}</div>
             <div style={{ fontSize: 11, color: C.ink3, marginTop: 1 }}>{email}</div>
           </div>
-          {[{ icon: User, label: 'Meu perfil', to: '/profile' }, { icon: Settings, label: 'Configurações', to: '/settings' }].map(item => (
+          {[{ icon: User, label: 'Meu perfil', to: '/settings' }, { icon: Settings, label: 'Configurações', to: '/settings' }].map(item => (
             <button key={item.label} onClick={() => { navigate(item.to); setOpen(false); }}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 13, color: C.ink, fontFamily: "'Cabinet Grotesk', sans-serif", fontWeight: 500, textAlign: 'left', transition: 'background .1s' }}
               onMouseEnter={e => (e.currentTarget.style.background = C.pageBg)}
