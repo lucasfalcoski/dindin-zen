@@ -58,7 +58,7 @@ export default function AccountsPage() {
 
       {/* LISTA DE CONTAS */}
       {isLoading ? (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'14px' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[...Array(3)].map((_, i) => <div key={i} style={{ height:'100px', background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px' }} />)}
         </div>
       ) : accounts && accounts.length > 0 ? (
