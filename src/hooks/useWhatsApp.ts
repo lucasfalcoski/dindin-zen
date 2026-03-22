@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 
 export interface WhatsAppUser {
@@ -29,8 +29,6 @@ function formatPhone(phone: string): string {
 
 export { normalizePhone, formatPhone };
 
-const BASE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/whatsapp-verify`;
-
 export function useWhatsAppUser() {
   const { user } = useAuth();
   return useQuery({
@@ -50,82 +48,54 @@ export function useWhatsAppUser() {
 }
 
 export function useSendWhatsAppCode() {
-  const { session } = useAuth();
   return useMutation({
     mutationFn: async (phone: string) => {
       const normalized = normalizePhone(phone);
-      const res = await fetch(`${BASE_URL}?action=send`, {
+      const { error } = await supabase.functions.invoke('whatsapp-verify?action=send', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session!.access_token}`,
-        },
-        body: JSON.stringify({ phone: normalized }),
+        body: { phone: normalized },
       });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'Erro ao enviar código');
-      }
+      if (error) throw new Error(error.message || 'Erro ao enviar código');
       return normalized;
     },
   });
 }
 
 export function useVerifyWhatsAppCode() {
-  const { session } = useAuth();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ phone, code }: { phone: string; code: string }) => {
-      const res = await fetch(`${BASE_URL}?action=confirm`, {
+      const { error } = await supabase.functions.invoke('whatsapp-verify?action=confirm', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session!.access_token}`,
-        },
-        body: JSON.stringify({ phone, code }),
+        body: { phone, code },
       });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'Código inválido ou expirado');
-      }
+      if (error) throw new Error(error.message || 'Código inválido ou expirado');
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['whatsapp_user'] }),
   });
 }
 
 export function useTestWhatsAppConnection() {
-  const { session } = useAuth();
   return useMutation({
     mutationFn: async () => {
-      const res = await fetch(`${BASE_URL}?action=test`, {
+      const { error } = await supabase.functions.invoke('whatsapp-verify?action=test', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${session!.access_token}`,
-        },
+        body: {},
       });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'Erro ao enviar mensagem de teste');
-      }
+      if (error) throw new Error(error.message || 'Erro ao enviar mensagem de teste');
     },
   });
 }
 
 export function useDisconnectWhatsApp() {
-  const { session } = useAuth();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      const res = await fetch(`${BASE_URL}?action=disconnect`, {
+      const { error } = await supabase.functions.invoke('whatsapp-verify?action=disconnect', {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${session!.access_token}`,
-        },
+        body: {},
       });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || 'Erro ao desconectar');
-      }
+      if (error) throw new Error(error.message || 'Erro ao desconectar');
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['whatsapp_user'] }),
   });
