@@ -116,7 +116,7 @@ export default function Expenses() {
           <p className="label-caps mb-1.5 text-muted-foreground">saídas</p>
           <h1 className="page-title">Despesas</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {[
             { key: 'today', label: 'Hoje' },
             { key: 'week', label: 'Semana' },
