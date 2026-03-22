@@ -31,23 +31,19 @@ const links = [
   { to: '/reports', label: 'Relatórios', icon: BarChart3 },
 ];
 
-const DindinLogo = () => (
-  <svg viewBox="0 0 100 100" width="28" height="28" fill="none" className="shrink-0">
-    <circle cx="50" cy="54" r="30" stroke="hsl(var(--accent))" strokeWidth="2" opacity="0.7"/>
-    <line x1="50" y1="34" x2="50" y2="74" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinecap="round"/>
-    <path d="M42 42 Q50 37 58 42" stroke="hsl(var(--primary))" strokeWidth="2" fill="none" strokeLinecap="round"/>
-    <path d="M42 54 Q50 49 58 54" stroke="hsl(var(--primary))" strokeWidth="2" fill="none" strokeLinecap="round"/>
-    <path d="M42 66 Q50 71 58 66" stroke="hsl(var(--primary))" strokeWidth="2" fill="none" strokeLinecap="round"/>
-    <path d="M50 24 C50 24 38 14 30 8 C38 8 54 10 58 24 C60 30 58 38 50 42 C42 38 40 30 42 24 C44 18 50 16 50 24Z" fill="url(#lf)"/>
-    <circle cx="50" cy="23" r="2.5" fill="hsl(var(--secondary))"/>
-    <defs>
-      <linearGradient id="lf" x1="30" y1="8" x2="58" y2="42" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stopColor="hsl(var(--secondary))"/>
-        <stop offset="100%" stopColor="hsl(var(--primary))"/>
-      </linearGradient>
-    </defs>
-  </svg>
-);
+const DindinLogo = ({ size = 'md' }: { size?: 'sm' | 'md' }) => {
+  const dims = size === 'sm' ? 'w-7 h-7' : 'w-8 h-8';
+  const iconDims = size === 'sm' ? 'w-4 h-4' : 'w-5 h-5';
+  return (
+    <div className={`${dims} rounded-[10px] bg-foreground flex items-center justify-center flex-shrink-0`}>
+      <svg viewBox="0 0 32 32" className={iconDims} fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text x="16" y="20" textAnchor="middle" style={{fontFamily:'sans-serif', fontSize:'16px', fontWeight:900, fill:'hsl(var(--primary))'}}>$</text>
+        <rect x="6" y="25" width="20" height="2" rx="1" fill="hsl(var(--primary))" opacity="0.5"/>
+        <rect x="9" y="28" width="14" height="1.5" rx="0.75" fill="hsl(var(--primary))" opacity="0.25"/>
+      </svg>
+    </div>
+  );
+};
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { signOut, user } = useAuth();
@@ -95,13 +91,30 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex flex-col h-dvh bg-background transition-colors duration-300">
+      {/* Mobile top bar */}
+      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-background border-b border-border sticky top-0 z-40">
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
+          <DindinLogo size="sm" />
+          <span className="text-sm font-extrabold tracking-tight">Din-Din <span className="text-primary">Zen</span></span>
+        </div>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button onClick={() => setSearchOpen(true)} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent">
+            <Search className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
       {/* Top nav for desktop */}
       <header className="hidden md:block border-b border-border bg-card flex-shrink-0 z-50">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-14">
           <div className="flex items-center gap-1 min-w-0 flex-1">
-            <div className="flex items-center gap-2 mr-4 shrink-0">
+            {/* Logo Din-Din Zen */}
+            <div className="flex items-center gap-2.5 mr-6 cursor-pointer" onClick={() => navigate('/')}>
               <DindinLogo />
-              <span className="text-lg font-semibold tracking-tight text-foreground font-brand">Din-din Zen</span>
+              <span className="text-base font-extrabold tracking-tight text-foreground leading-none">
+                Din-Din <span className="text-primary">Zen</span>
+              </span>
             </div>
             <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-hide min-w-0">
               {links.map(l => (
