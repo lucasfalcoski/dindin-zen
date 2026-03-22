@@ -108,7 +108,7 @@ export default function Expenses() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 w-full min-w-0">
 
       {/* ── PAGE HEADER ── */}
       <div className="flex items-end justify-between pb-5 border-b border-border">
