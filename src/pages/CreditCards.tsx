@@ -1,17 +1,18 @@
 import { useState, useMemo } from 'react';
-import { format, subMonths } from 'date-fns';
+import { format } from 'date-fns';
 import { useCreditCards, CreditCard, useCreateCreditCard, useDeleteCreditCard } from '@/hooks/useCreditCards';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useExpenses } from '@/hooks/useExpenses';
 import { formatBRL } from '@/lib/format';
 import { ExpenseRow } from '@/components/ExpenseRow';
-import { Plus, CreditCard as CreditCardIcon } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+
+const C = { ink: '#16150f', ink2: '#6b6a63', ink3: '#b0aea6', rule: '#e4e1da', bg: '#f2f0eb', green: '#1a7a45', red: '#b83232', blue: '#1d4ed8', amber: '#92580a' };
 
 function getInvoicePeriod(closingDay: number) {
   const now = new Date();
@@ -34,113 +35,144 @@ function getNextDueDate(dueDay: number) {
   return format(due, 'dd/MM/yyyy');
 }
 
+function CardVisual({ card, invoiceTotal, onClick, isSelected }: { card: CreditCard; invoiceTotal: number; onClick: () => void; isSelected: boolean }) {
+  const pct = card.limit > 0 ? (invoiceTotal / card.limit) * 100 : 0;
+  const cardColors = ['#16150f', '#1a3a5c', '#0e5050', '#3b1f5c', '#1a4a1a'];
+  const bgColor = cardColors[Math.abs(card.name.charCodeAt(0)) % cardColors.length];
+
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        borderRadius: '16px', padding: '22px', background: bgColor,
+        color: '#fff', position: 'relative', overflow: 'hidden',
+        minHeight: '140px', textAlign: 'left', border: isSelected ? '2.5px solid #fff' : '2.5px solid transparent',
+        cursor: 'pointer', transition: 'all .15s', width: '100%',
+        boxShadow: isSelected ? '0 0 0 3px rgba(26,122,69,0.4)' : '0 4px 20px rgba(0,0,0,.15)',
+      }}
+    >
+      <div style={{ position:'absolute', right:'-30px', top:'-30px', width:'140px', height:'140px', borderRadius:'50%', background:'rgba(255,255,255,.04)' }} />
+      <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: 'auto' }}>{card.name}</div>
+      <div style={{ fontFamily:"'Instrument Serif',serif", fontSize:'24px', marginTop:'20px' }}>
+        {formatBRL(invoiceTotal)} <span style={{ fontSize:'14px', opacity:.45 }}>/ {formatBRL(card.limit)}</span>
+      </div>
+      <div style={{ fontSize: '11px', color: 'rgba(255,255,255,.45)', marginTop: '2px' }}>
+        Fecha dia {card.closing_day} · Vence {getNextDueDate(card.due_day)}
+      </div>
+      <div style={{ height:'3px', background:'rgba(255,255,255,.15)', borderRadius:'100px', overflow:'hidden', marginTop:'12px' }}>
+        <div style={{ height:'100%', width:`${Math.min(pct,100)}%`, borderRadius:'100px', background:'rgba(255,255,255,.7)' }} />
+      </div>
+    </button>
+  );
+}
+
 export default function CreditCardsPage() {
   const { data: cards, isLoading } = useCreditCards();
   const [formOpen, setFormOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState<CreditCard | null>(null);
 
+  const now = new Date();
+  const { data: allExpenses } = useExpenses({
+    startDate: format(new Date(now.getFullYear(), now.getMonth() - 1, 1), 'yyyy-MM-dd'),
+    endDate: format(new Date(now.getFullYear(), now.getMonth() + 1, 0), 'yyyy-MM-dd'),
+  });
+
+  const cardInvoices = useMemo(() => {
+    if (!cards || !allExpenses) return {};
+    const map: Record<string, number> = {};
+    cards.forEach(card => {
+      const period = getInvoicePeriod(card.closing_day);
+      map[card.id] = (allExpenses as any[])
+        .filter(e => e.credit_card_id === card.id && e.date >= period.start && e.date <= period.end)
+        .reduce((s, e) => s + Number(e.amount), 0);
+    });
+    return map;
+  }, [cards, allExpenses]);
+
+  const totalDebt = Object.values(cardInvoices).reduce((s, v) => s + v, 0);
+  const totalLimit = (cards || []).reduce((s, c) => s + c.limit, 0);
+
   return (
-    <div className="space-y-6">
-      <div className="page-header">
+    <div>
+      {/* HEADER */}
+      <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:'28px', paddingBottom:'20px', borderBottom:`1px solid ${C.rule}` }}>
         <div>
-          <p className="page-eyebrow">crédito</p>
-          <h1 className="page-title">Cartões</h1>
+          <p style={{ fontSize:'11px', fontWeight:600, letterSpacing:'1.5px', textTransform:'uppercase', color:C.ink3, marginBottom:'6px' }}>crédito</p>
+          <h1 style={{ fontFamily:"'Instrument Serif', Georgia, serif", fontSize:'34px', lineHeight:1, letterSpacing:'-0.5px', color:C.ink }}>Cartões</h1>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setFormOpen(true)}
-            className="flex items-center gap-1.5 rounded-[7px] bg-foreground text-background px-3.5 py-1.5 text-xs font-semibold hover:opacity-90 transition-opacity"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            Novo cartão
-          </button>
+        <button onClick={() => setFormOpen(true)} style={{ padding:'6px 16px', borderRadius:'8px', fontSize:'12px', fontWeight:600, fontFamily:"'Cabinet Grotesk',sans-serif", background:C.ink, color:'#fff', border:`1px solid ${C.ink}`, cursor:'pointer', display:'flex', alignItems:'center', gap:'6px' }}>
+          <Plus size={14} /> Novo cartão
+        </button>
+      </div>
+
+      {/* STATS */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'14px', marginBottom:'20px' }}>
+        <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'20px' }}>
+          <div style={{ fontSize:'11px', fontWeight:600, letterSpacing:'1px', textTransform:'uppercase', color:C.ink3, marginBottom:'8px' }}>Fatura total</div>
+          <p style={{ fontFamily:"'Instrument Serif',serif", fontSize:'28px', letterSpacing:'-0.5px', lineHeight:1, color:C.red }}>{formatBRL(totalDebt)}</p>
+        </div>
+        <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'20px' }}>
+          <div style={{ fontSize:'11px', fontWeight:600, letterSpacing:'1px', textTransform:'uppercase', color:C.ink3, marginBottom:'8px' }}>Limite total</div>
+          <p style={{ fontFamily:"'Instrument Serif',serif", fontSize:'28px', letterSpacing:'-0.5px', lineHeight:1, color:C.blue }}>{formatBRL(totalLimit)}</p>
+        </div>
+        <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'20px' }}>
+          <div style={{ fontSize:'11px', fontWeight:600, letterSpacing:'1px', textTransform:'uppercase', color:C.ink3, marginBottom:'8px' }}>Utilização</div>
+          <p style={{ fontFamily:"'Instrument Serif',serif", fontSize:'28px', letterSpacing:'-0.5px', lineHeight:1, color: totalLimit > 0 && (totalDebt/totalLimit) > 0.7 ? C.red : C.amber }}>
+            {totalLimit > 0 ? `${((totalDebt / totalLimit) * 100).toFixed(0)}%` : '—'}
+          </p>
         </div>
       </div>
 
+      {/* CARDS GRID */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[...Array(2)].map((_, i) => (
-            <div key={i} className="card-surface p-5 h-36 animate-pulse">
-              <div className="h-3 w-20 bg-muted rounded mb-3" />
-              <div className="h-6 w-28 bg-muted rounded" />
-            </div>
-          ))}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'14px' }}>
+          {[...Array(2)].map((_, i) => <div key={i} style={{ height:'140px', background:C.ink, borderRadius:'16px', opacity:.3 }} />)}
         </div>
       ) : cards && cards.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {cards.map(c => (
-            <CardItem key={c.id} card={c} selected={selectedCard?.id === c.id} onSelect={() => setSelectedCard(selectedCard?.id === c.id ? null : c)} />
-          ))}
-        </div>
+        <>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'14px', marginBottom:'20px' }}>
+            {cards.map(card => (
+              <CardVisual
+                key={card.id}
+                card={card}
+                invoiceTotal={cardInvoices[card.id] || 0}
+                isSelected={selectedCard?.id === card.id}
+                onClick={() => setSelectedCard(selectedCard?.id === card.id ? null : card)}
+              />
+            ))}
+          </div>
+          {selectedCard && <CardExpenses card={selectedCard} />}
+        </>
       ) : (
-        <div className="card-surface p-8 text-center">
-          <CreditCardIcon className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">Nenhum cartão cadastrado.</p>
+        <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'48px', textAlign:'center' }}>
+          <p style={{ fontSize:'32px', marginBottom:'12px' }}>💳</p>
+          <p style={{ color:C.ink2, fontWeight:600 }}>Nenhum cartão cadastrado.</p>
         </div>
       )}
-
-      {selectedCard && <CardInvoice card={selectedCard} />}
 
       <CreditCardForm open={formOpen} onOpenChange={setFormOpen} />
     </div>
   );
 }
 
-function CardItem({ card, selected, onSelect }: { card: CreditCard; selected: boolean; onSelect: () => void }) {
+function CardExpenses({ card }: { card: CreditCard }) {
   const period = getInvoicePeriod(card.closing_day);
-  const { data: expenses } = useExpenses({ startDate: period.start, endDate: period.end, creditCardId: card.id });
-  const used = (expenses || []).reduce((s, e) => s + Number(e.amount), 0);
-  const pct = Number(card.limit) > 0 ? (used / Number(card.limit)) * 100 : 0;
+  const { data: expenses, isLoading } = useExpenses({ startDate: period.start, endDate: period.end });
+  const cardExpenses = (expenses as any[] || []).filter(e => e.credit_card_id === card.id);
 
   return (
-    <button
-      onClick={onSelect}
-      className={`card-surface-hover p-5 text-left transition-all ${selected ? 'ring-2 ring-primary' : ''}`}
-    >
-      <div className="flex items-center gap-3 mb-3">
-        <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: card.color + '20' }}>
-          <CreditCardIcon className="h-5 w-5" style={{ color: card.color }} />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm font-medium text-foreground">{card.name}</p>
-          <p className="text-[11px] text-muted-foreground">Vence: {getNextDueDate(card.due_day)} · Fecha dia {card.closing_day}</p>
-        </div>
-      </div>
-      <div className="space-y-1.5">
-        <div className="flex justify-between text-xs">
-          <span className="text-muted-foreground">Usado: {formatBRL(used)}</span>
-          <span className="text-muted-foreground">Limite: {formatBRL(Number(card.limit))}</span>
-        </div>
-        <Progress value={Math.min(pct, 100)} className="h-2" />
-        <p className="text-[11px] text-muted-foreground text-right">
-          Disponível: {formatBRL(Math.max(Number(card.limit) - used, 0))}
-        </p>
-      </div>
-    </button>
-  );
-}
-
-function CardInvoice({ card }: { card: CreditCard }) {
-  const period = getInvoicePeriod(card.closing_day);
-  const { data: expenses, isLoading } = useExpenses({ startDate: period.start, endDate: period.end, creditCardId: card.id });
-  const total = (expenses || []).reduce((s, e) => s + Number(e.amount), 0);
-
-  return (
-    <div className="card-surface">
-      <div className="flex items-center justify-between p-4 pb-2">
-        <h2 className="label-caps">Fatura atual — {card.name}</h2>
-        <span className="currency text-sm font-semibold text-foreground">{formatBRL(total)}</span>
+    <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', overflow:'hidden' }}>
+      <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.rule}` }}>
+        <span style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.5px', textTransform:'uppercase', color:C.ink2 }}>
+          Fatura — {card.name}
+        </span>
       </div>
       {isLoading ? (
-        <div className="p-4 animate-pulse"><div className="h-4 w-40 bg-muted rounded" /></div>
-      ) : expenses && expenses.length > 0 ? (
-        <div className="divide-y divide-border/50">
-          {expenses.map(e => (
-            <ExpenseRow key={e.id} expense={e} />
-          ))}
-        </div>
+        <div style={{ padding:'16px 20px' }}><div style={{ height:'16px', width:'160px', background:C.rule, borderRadius:'4px' }} /></div>
+      ) : cardExpenses.length > 0 ? (
+        <div>{cardExpenses.map((e: any) => <ExpenseRow key={e.id} expense={e} />)}</div>
       ) : (
-        <p className="text-sm text-muted-foreground p-4 text-center">Nenhuma despesa nesta fatura.</p>
+        <p style={{ fontSize:'13px', color:C.ink3, padding:'24px 20px', textAlign:'center' }}>Nenhuma despesa nesta fatura.</p>
       )}
     </div>
   );
@@ -161,71 +193,33 @@ function CreditCardForm({ open, onOpenChange }: { open: boolean; onOpenChange: (
     e.preventDefault();
     if (!name.trim()) return;
     try {
-      await createCard.mutateAsync({
-        name: name.trim(),
-        limit: parseFloat(limit.replace(',', '.')) || 0,
-        closing_day: parseInt(closingDay) || 1,
-        due_day: parseInt(dueDay) || 10,
-        account_id: accountId || undefined,
-        color,
-      });
+      await createCard.mutateAsync({ name: name.trim(), limit: parseFloat(limit.replace(',', '.')) || 0, closing_day: parseInt(closingDay), due_day: parseInt(dueDay), account_id: accountId || undefined, color } as any);
       toast({ title: 'Cartão criado' });
       setName(''); setLimit(''); setClosingDay('5'); setDueDay('15'); setAccountId(''); setColor('#8b5cf6');
       onOpenChange(false);
-    } catch {
-      toast({ title: 'Erro ao criar cartão', variant: 'destructive' });
-    }
+    } catch { toast({ title: 'Erro ao criar cartão', variant: 'destructive' }); }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex flex-col max-h-[90dvh] p-0 gap-0 sm:max-w-md">
-        <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
-          <DialogTitle>Novo cartão de crédito</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-          <div className="flex-1 overflow-y-auto px-6 pb-4 min-h-0 space-y-4">
-          <div className="space-y-2">
-            <Label>Nome</Label>
-            <Input value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Nubank Platinum" required />
-          </div>
-          <div className="space-y-2">
-            <Label>Limite (R$)</Label>
-            <Input value={limit} onChange={e => setLimit(e.target.value)} placeholder="5000,00" inputMode="decimal" />
-          </div>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader><DialogTitle>Novo cartão</DialogTitle></DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2"><Label>Nome</Label><Input value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Nubank Roxinho" required /></div>
+          <div className="space-y-2"><Label>Limite</Label><Input type="number" step="0.01" value={limit} onChange={e => setLimit(e.target.value)} placeholder="5000.00" /></div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Dia do fechamento</Label>
-              <Input type="number" min={1} max={31} value={closingDay} onChange={e => setClosingDay(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>Dia do vencimento</Label>
-              <Input type="number" min={1} max={31} value={dueDay} onChange={e => setDueDay(e.target.value)} />
-            </div>
+            <div className="space-y-2"><Label>Dia fechamento</Label><Input type="number" min="1" max="28" value={closingDay} onChange={e => setClosingDay(e.target.value)} /></div>
+            <div className="space-y-2"><Label>Dia vencimento</Label><Input type="number" min="1" max="28" value={dueDay} onChange={e => setDueDay(e.target.value)} /></div>
           </div>
           {accounts && accounts.length > 0 && (
-            <div className="space-y-2">
-              <Label>Conta vinculada (opcional)</Label>
-              <select
-                value={accountId}
-                onChange={e => setAccountId(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              >
-                <option value="">Nenhuma</option>
-                {accounts.map(a => (
-                  <option key={a.id} value={a.id}>{a.name}</option>
-                ))}
+            <div className="space-y-2"><Label>Conta vinculada (opcional)</Label>
+              <select value={accountId} onChange={e => setAccountId(e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                <option value="">Selecione...</option>
+                {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
             </div>
           )}
-          <div className="space-y-2">
-            <Label>Cor</Label>
-            <input type="color" value={color} onChange={e => setColor(e.target.value)} className="h-10 w-14 rounded-lg border border-input cursor-pointer" />
-          </div>
-          </div>
-          <div className="px-6 pb-6 pt-3 flex-shrink-0 border-t border-border bg-card rounded-b-lg">
-            <Button type="submit" className="w-full" disabled={createCard.isPending}>Salvar</Button>
-          </div>
+          <Button type="submit" className="w-full" disabled={createCard.isPending}>{createCard.isPending ? 'Criando...' : 'Criar cartão'}</Button>
         </form>
       </DialogContent>
     </Dialog>
