@@ -20,6 +20,7 @@ const AVATAR_COLORS = ['#6BAE7A', '#D4AF6A', '#2C3E2D', '#3b82f6', '#ef4444', '#
 export default function Profile() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { data: profile, isLoading } = useProfile();
   const updateProfile = useUpdateProfile();
   const { toast } = useToast();
@@ -28,10 +29,22 @@ export default function Profile() {
   const { data: accounts } = useAccounts();
   const { data: creditCards } = useCreditCards();
 
+  const whatsappRef = useRef<HTMLDivElement>(null);
+  const preferencesRef = useRef<HTMLDivElement>(null);
+
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState('');
   const [editingSalary, setEditingSalary] = useState(false);
   const [salaryValue, setSalaryValue] = useState('');
+
+  useEffect(() => {
+    const scrollTo = (location.state as any)?.scrollTo;
+    if (scrollTo === 'whatsapp') {
+      setTimeout(() => whatsappRef.current?.scrollIntoView({ behavior: 'smooth' }), 300);
+    } else if (scrollTo === 'preferences') {
+      setTimeout(() => preferencesRef.current?.scrollIntoView({ behavior: 'smooth' }), 300);
+    }
+  }, [location.state]);
 
   const salary = incomes?.find(i => i.recurrent && i.category === 'salario');
 
