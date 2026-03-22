@@ -148,29 +148,32 @@
   background: var(--progress-color, hsl(var(--primary))) !important;
 }
 
-/* ── Sidebar shadcn — forçar cor escura ── */
+/* ── Sidebar escura — Din-Din Zen ── */
 [data-sidebar="sidebar"] {
   background-color: #16150f !important;
 }
 [data-sidebar="menu-button"] {
-  color: rgba(255,255,255,0.45) !important;
+  color: rgba(255,255,255,0.4) !important;
 }
-[data-sidebar="menu-button"] svg {
-  color: rgba(255, 255, 255, 0.45) !important;
+[data-sidebar="menu-button"] svg,
+[data-sidebar="menu-button"] svg * {
+  color: rgba(255,255,255,0.4) !important;
+  stroke: rgba(255,255,255,0.4) !important;
 }
-[data-sidebar="menu-button"]:hover,
+[data-sidebar="menu-button"]:hover svg,
+[data-sidebar="menu-button"]:hover svg * {
+  color: rgba(255,255,255,0.75) !important;
+  stroke: rgba(255,255,255,0.75) !important;
+}
+[data-sidebar="menu-button"][data-active="true"] svg,
+[data-sidebar="menu-button"][data-active="true"] svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
 [data-sidebar="menu-button"][data-active="true"] {
   background-color: rgba(255,255,255,0.10) !important;
-  color: #ffffff !important;
-}
-[data-sidebar="menu-button"]:hover svg {
-  color: rgba(255, 255, 255, 0.85) !important;
-}
-[data-sidebar="menu-button"][data-active="true"] svg {
-  color: #ffffff !important;
-}
-[data-sidebar="menu-button"][data-active="true"] {
-  border-left: 2px solid #1a7a45;
+  border-left: 2px solid #1a7a45 !important;
+  border-radius: 0 !important;
 }
 [data-sidebar="separator"] {
   background-color: rgba(255,255,255,0.07) !important;

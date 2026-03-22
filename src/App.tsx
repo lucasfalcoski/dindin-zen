@@ -78,6 +78,7 @@ const App = () => (
             <Route path="/family" element={<ProtectedPage><FamilySettings /></ProtectedPage>} />
             <Route path="/family/balances" element={<ProtectedPage><FamilyBalances /></ProtectedPage>} />
             <Route path="/family/budget" element={<ProtectedPage><FamilyBudgetPage /></ProtectedPage>} />
+            <Route path="/settings" element={<ProtectedPage><SettingsPage /></ProtectedPage>} />
             <Route path="/invite/:token" element={<InvitePage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
