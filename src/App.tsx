@@ -32,6 +32,7 @@ import Goals from "./pages/Goals";
 import Forecast from "./pages/Forecast";
 import Profile from "./pages/Profile";
 import WhatsAppHistory from "./pages/WhatsAppHistory";
+import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
