@@ -125,7 +125,7 @@ export default function CreditCardsPage() {
 
       {/* CARDS GRID */}
       {isLoading ? (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'14px' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           {[...Array(2)].map((_, i) => <div key={i} style={{ height:'140px', background:C.ink, borderRadius:'16px', opacity:.3 }} />)}
         </div>
       ) : cards && cards.length > 0 ? (
