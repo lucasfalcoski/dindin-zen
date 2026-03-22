@@ -266,6 +266,43 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         })}
       </nav>
 
+      {/* DRAWER MAIS — mobile */}
+      {moreOpen && (
+        <>
+          <div onClick={() => setMoreOpen(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(22,21,15,0.5)', zIndex: 60, backdropFilter: 'blur(2px)' }} />
+          <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 61, background: C.topbarBg, borderRadius: '16px 16px 0 0', padding: '12px 16px 24px', animation: 'slideUpMore .25s ease-out' }}>
+            <div style={{ width: 40, height: 4, borderRadius: 2, background: C.ink3, margin: '0 auto 12px', opacity: 0.4 }} />
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, fontFamily: "'Cabinet Grotesk', sans-serif", marginBottom: 12 }}>Menu</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
+              {[
+                { to: '/accounts',     label: 'Contas',     icon: Building2 },
+                { to: '/credit-cards', label: 'Cartões',    icon: CreditCard },
+                { to: '/groups',       label: 'Grupos',     icon: FolderOpen },
+                { to: '/tags',         label: 'Tags',       icon: Tag },
+                { to: '/budget',       label: 'Orçamento',  icon: Target },
+                { to: '/score',        label: 'Score',      icon: Gauge },
+                { to: '/goals',        label: 'Metas',      icon: Goal },
+                { to: '/forecast',     label: 'Projeção',   icon: TrendingUp },
+                { to: '/reports',      label: 'Relatórios', icon: BarChart3 },
+                { to: '/family',       label: 'Família',    icon: Users },
+                { to: '/settings',     label: 'Config.',    icon: Settings },
+              ].map(item => {
+                const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to));
+                return (
+                  <Link key={item.to} to={item.to} onClick={() => setMoreOpen(false)}
+                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '14px 8px', textDecoration: 'none', color: isActive ? C.green : C.ink2, fontSize: 10, fontWeight: 600, fontFamily: "'Cabinet Grotesk', sans-serif", transition: 'color .15s' }}>
+                    <item.icon size={20} />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+          <style>{`@keyframes slideUpMore { from { transform: translateY(100%); } to { transform: translateY(0); } }`}</style>
+        </>
+      )}
+
       <QuickAddFAB />
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
 
