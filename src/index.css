@@ -4,277 +4,165 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ══ VARIÁVEIS — extraídas do protótipo aprovado ══ */
 @layer base {
   :root {
-    /* Paleta Din-Din Zen */
-    --background:           40 20% 94%;    /* #f2f0eb — bege página */
-    --foreground:           45 65% 7%;     /* #16150f — tinta */
+    /* ── Cores base protótipo ── */
+    --background: 42 20% 94%;          /* #f2f0eb */
+    --foreground: 40 96% 4%;           /* #16150f */
 
-    --card:                 0 0% 100%;     /* #ffffff */
-    --card-foreground:      45 65% 7%;
+    --card: 0 0% 100%;
+    --card-foreground: 40 96% 4%;
 
-    --popover:              0 0% 100%;
-    --popover-foreground:   45 65% 7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 40 96% 4%;
 
-    --primary:              150 64% 29%;   /* #1a7a45 — verde */
-    --primary-foreground:   0 0% 100%;
+    --primary: 148 66% 29%;            /* #1a7a45 verde */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary:            40 20% 97%;    /* #faf9f7 — paper */
-    --secondary-foreground: 45 65% 7%;
+    --secondary: 42 14% 90%;
+    --secondary-foreground: 40 96% 4%;
 
-    --muted:                40 15% 89%;    /* #e4e1da */
-    --muted-foreground:     42 5% 41%;     /* #6b6a63 */
+    --muted: 42 14% 90%;
+    --muted-foreground: 40 10% 45%;    /* #6b6a63 */
 
-    --accent:               40 12% 91%;
-    --accent-foreground:    45 65% 7%;
+    --accent: 42 20% 94%;              /* #f2f0eb */
+    --accent-foreground: 40 96% 4%;
 
-    --destructive:          0 60% 46%;     /* #b83232 */
+    --destructive: 0 60% 46%;          /* #b83232 */
     --destructive-foreground: 0 0% 100%;
 
-    --success:              150 64% 29%;
-    --success-foreground:   0 0% 100%;
+    --success: 148 66% 29%;
+    --success-foreground: 0 0% 100%;
 
-    --border:               40 18% 87%;    /* #e4e1da */
-    --input:                40 18% 87%;
-    --ring:                 150 64% 29%;
+    --border: 40 18% 87%;              /* #e4e1da */
+    --input: 40 18% 87%;
+    --ring: 148 66% 29%;
 
-    --radius: 0.875rem;
+    --radius: 0.75rem;
 
-    /* Sombras fiéis ao protótipo */
-    --shadow-card:       0 0 0 1px #e4e1da, 0 2px 6px rgba(0,0,0,0.04);
-    --shadow-card-hover: 0 0 0 1px #ccc9c0, 0 4px 16px rgba(0,0,0,0.06);
-
-    /* Sidebar escura (#16150f) */
-    --sidebar-background:           45 65% 7%;
-    --sidebar-foreground:           0 0% 100%;
-    --sidebar-primary:              150 64% 29%;
-    --sidebar-primary-foreground:   0 0% 100%;
-    --sidebar-accent:               45 30% 14%;
-    --sidebar-accent-foreground:    0 0% 100%;
-    --sidebar-border:               45 20% 15%;
-    --sidebar-ring:                 150 64% 29%;
+    /* ── SIDEBAR — cor escura do protótipo ── */
+    --sidebar-background: 40 96% 4%;           /* #16150f */
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 148 66% 29%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 100% / 0.10;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 100% / 0.07;
+    --sidebar-ring: 148 66% 29%;
   }
 
   .dark {
-    --background:           45 65% 5%;
-    --foreground:           40 20% 92%;
-    --card:                 45 40% 8%;
-    --card-foreground:      40 20% 92%;
-    --popover:              45 40% 8%;
-    --popover-foreground:   40 20% 92%;
-    --primary:              150 55% 38%;
-    --primary-foreground:   0 0% 100%;
-    --secondary:            45 20% 12%;
-    --secondary-foreground: 40 20% 92%;
-    --muted:                45 20% 12%;
-    --muted-foreground:     40 10% 55%;
-    --accent:               45 20% 13%;
-    --accent-foreground:    40 20% 92%;
-    --destructive:          0 55% 40%;
+    --background: 40 96% 4%;
+    --foreground: 42 20% 94%;
+    --card: 40 50% 8%;
+    --card-foreground: 42 20% 94%;
+    --popover: 40 50% 8%;
+    --popover-foreground: 42 20% 94%;
+    --primary: 148 66% 29%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 20% 14%;
+    --secondary-foreground: 42 20% 94%;
+    --muted: 40 20% 14%;
+    --muted-foreground: 40 10% 60%;
+    --accent: 40 20% 14%;
+    --accent-foreground: 42 20% 94%;
+    --destructive: 0 60% 46%;
     --destructive-foreground: 0 0% 100%;
-    --success:              150 55% 38%;
-    --success-foreground:   0 0% 100%;
-    --border:               45 20% 16%;
-    --input:                45 20% 16%;
-    --ring:                 150 55% 38%;
-    --shadow-card:       0 0 0 1px rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.2);
-    --shadow-card-hover: 0 0 0 1px rgba(255,255,255,0.1), 0 4px 16px rgba(0,0,0,0.3);
-    --sidebar-background:   45 65% 4%;
-    --sidebar-foreground:   0 0% 100%;
-    --sidebar-primary:      150 55% 38%;
+    --success: 148 66% 29%;
+    --success-foreground: 0 0% 100%;
+    --border: 40 18% 20%;
+    --input: 40 18% 20%;
+    --ring: 148 66% 29%;
+    --sidebar-background: 40 96% 4%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 148 66% 29%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent:       45 30% 10%;
+    --sidebar-accent: 0 0% 100% / 0.10;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border:       45 20% 12%;
-    --sidebar-ring:         150 55% 38%;
+    --sidebar-border: 0 0% 100% / 0.07;
+    --sidebar-ring: 148 66% 29%;
   }
-}
-
-/* Transição suave de tema */
-.theme-transition,
-.theme-transition *,
-.theme-transition *::before,
-.theme-transition *::after {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
 }
 
 @layer base {
   * { @apply border-border; }
   body {
-    @apply bg-background text-foreground antialiased;
-    font-family: 'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    @apply bg-background text-foreground;
+    font-family: 'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
   }
 }
 
-/* ══ UTILITÁRIOS — extraídos do protótipo ══ */
-@layer utilities {
+/* ── Utilitários do protótipo ── */
+.card-surface {
+  @apply bg-white rounded-[14px];
+  border: 1px solid #e4e1da;
+}
 
-  /* Label em caixa alta — igual .card-label do protótipo */
-  .label-caps {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: hsl(var(--muted-foreground));
-  }
+.card-surface-hover {
+  @apply bg-white rounded-[14px] transition-all duration-150;
+  border: 1px solid #e4e1da;
+}
+.card-surface-hover:hover {
+  border-color: #ccc9c0;
+  box-shadow: 0 4px 16px rgba(0,0,0,.06);
+}
 
-  /* Card padrão — igual .card do protótipo */
-  .card-surface {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: 14px;
-    box-shadow: var(--shadow-card);
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
-  .card-surface:hover {
-    border-color: #ccc9c0;
-    box-shadow: var(--shadow-card-hover);
-  }
+.label-caps {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #b0aea6;
+  font-family: 'Cabinet Grotesk', sans-serif;
+}
 
-  /* Alias com hover explícito */
-  .card-surface-hover {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: 14px;
-    box-shadow: var(--shadow-card);
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
-  .card-surface-hover:hover {
-    border-color: #ccc9c0;
-    box-shadow: var(--shadow-card-hover);
-  }
+.currency {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-variant-numeric: tabular-nums;
+}
 
-  /* Valores monetários — serif itálico do protótipo */
-  .currency {
-    font-family: 'Instrument Serif', Georgia, serif;
-    font-style: italic;
-    letter-spacing: -0.02em;
-    font-variant-numeric: tabular-nums;
-  }
+/* ── Scrollbars ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #ccc9c0; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #b0aea6; }
 
-  /* Valores grandes — 28px serif igual .card-value do protótipo */
-  .value-display {
-    font-family: 'Instrument Serif', Georgia, serif;
-    font-size: 28px;
-    letter-spacing: -0.5px;
-    line-height: 1;
-  }
+/* ── Animações ── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fade-in 0.15s cubic-bezier(0.4,0,0.2,1); }
 
-  /* Seção card — igual .sec do protótipo */
-  .sec-card {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: 14px;
-    overflow: hidden;
-  }
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+.animate-pulse-dot { animation: pulse-dot 1.5s ease-in-out infinite; }
 
-  /* Cabeçalho de seção — igual .sec-head */
-  .sec-head {
-    padding: 14px 20px;
-    border-bottom: 1px solid hsl(var(--border));
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+/* ── Progress bar customizável ── */
+[data-radix-collection-item] {}
+.progress-bar [data-indicator] {
+  background: var(--progress-color, hsl(var(--primary))) !important;
+}
 
-  /* Título de seção — igual .sec-title */
-  .sec-title {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: hsl(var(--muted-foreground));
-  }
-
-  /* Linha de transação — igual .tx do protótipo */
-  .tx-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 20px;
-    border-bottom: 1px solid hsl(var(--border));
-  }
-  .tx-row:last-child { border-bottom: none; }
-
-  /* Badge de método de pagamento */
-  .tx-tag {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 7px;
-    border-radius: 100px;
-    background: hsl(var(--background));
-    color: hsl(var(--muted-foreground));
-  }
-
-  /* Header de página — igual .ph do protótipo */
-  .page-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 28px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid hsl(var(--border));
-  }
-
-  /* Eyebrow acima do título */
-  .page-eyebrow {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: hsl(var(--muted-foreground));
-    margin-bottom: 6px;
-    opacity: 0.7;
-  }
-
-  /* Título de página — Instrument Serif 34px */
-  .page-title {
-    font-family: 'Instrument Serif', Georgia, serif;
-    font-size: 34px;
-    line-height: 1;
-    letter-spacing: -0.5px;
-    color: hsl(var(--foreground));
-  }
-  .page-title em {
-    font-style: italic;
-    color: hsl(var(--muted-foreground));
-  }
-
-  /* Tab pill — igual .ph-tab */
-  .pill-tab {
-    padding: 6px 14px;
-    border-radius: 100px;
-    font-size: 12px;
-    font-weight: 600;
-    border: 1px solid hsl(var(--border));
-    color: hsl(var(--muted-foreground));
-    cursor: pointer;
-    transition: all 0.15s;
-    background: none;
-    font-family: 'Cabinet Grotesk', sans-serif;
-  }
-  .pill-tab:hover { border-color: hsl(var(--foreground)); color: hsl(var(--foreground)); }
-  .pill-tab.active { background: hsl(var(--foreground)); color: #fff; border-color: hsl(var(--foreground)); }
-
-  /* Barra de progresso de orçamento */
-  .budget-bar-track {
-    height: 4px;
-    background: hsl(var(--background));
-    border-radius: 100px;
-    overflow: hidden;
-  }
-  .budget-bar-fill {
-    height: 100%;
-    border-radius: 100px;
-  }
-
-  /* Animação de entrada */
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .animate-fade-in {
-    animation: fade-up 0.35s ease both;
-  }
+/* ── Sidebar shadcn — forçar cor escura ── */
+[data-sidebar="sidebar"] {
+  background-color: #16150f !important;
+}
+[data-sidebar="menu-button"] {
+  color: rgba(255,255,255,0.45) !important;
+}
+[data-sidebar="menu-button"]:hover,
+[data-sidebar="menu-button"][data-active="true"] {
+  background-color: rgba(255,255,255,0.10) !important;
+  color: #ffffff !important;
+}
+[data-sidebar="menu-button"][data-active="true"] {
+  border-left: 2px solid #1a7a45;
+}
+[data-sidebar="separator"] {
+  background-color: rgba(255,255,255,0.07) !important;
 }
