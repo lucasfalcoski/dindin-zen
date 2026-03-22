@@ -5,6 +5,7 @@ import { useProfile, useUpdateProfile } from '@/hooks/useProfiles';
 import { useIncomes } from '@/hooks/useIncomes';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCreditCards } from '@/hooks/useCreditCards';
+import { useMyFamilies } from '@/hooks/useFamily';
 import { formatBRL } from '@/lib/format';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
@@ -14,6 +15,7 @@ import { LogOut, ChevronRight, Plus, Pencil, Check, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EmojiAvatar, EmojiPicker } from '@/components/EmojiAvatar';
 import WhatsAppConnect from '@/components/WhatsAppConnect';
+import { FamilySharingSettings } from '@/components/FamilySharingSettings';
 
 const AVATAR_COLORS = ['#6BAE7A', '#D4AF6A', '#2C3E2D', '#3b82f6', '#ef4444', '#8b5cf6'];
 
