@@ -36,7 +36,7 @@ export function ExpenseRow({ expense, onEdit }: ExpenseRowProps) {
 
   const handleCancelInstallments = async () => {
     if (!expense.installment_group_id) return;
-    const today = format(new Date(), 'yyyy-MM-dd');
+    const today = todayString();
     await cancelInstallments.mutateAsync({
       installmentGroupId: expense.installment_group_id,
       keepBeforeDate: today,
