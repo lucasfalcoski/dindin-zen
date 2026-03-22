@@ -10,7 +10,7 @@ import { TopbarInsights } from '@/components/TopbarInsights';
 import {
   LayoutDashboard, Receipt, DollarSign, Building2, CreditCard,
   FolderOpen, Tag, Target, Gauge, TrendingUp, Users, BarChart3,
-  LogOut, Plus, Search, User, Settings, ChevronDown, Goal,
+  LogOut, Plus, Search, User, Settings, ChevronDown, Goal, LayoutGrid,
 } from 'lucide-react';
 
 const C = {
