@@ -158,10 +158,10 @@ export default function Dashboard() {
   );
 
   return (
-    <div>
+    <div className="w-full min-w-0">
       {/* HEADER */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '28px', paddingBottom: '20px', borderBottom: `1px solid ${C.rule}` }}>
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-7 pb-5 border-b" style={{ borderColor: C.rule }}>
+        <div className="mb-3 sm:mb-0">
           <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase', color: C.ink3, marginBottom: '6px' }}>
             {format(now, 'MMMM yyyy', { locale: ptBR })}
           </p>
@@ -182,7 +182,7 @@ export default function Dashboard() {
       </div>
 
       {/* 4 CARDS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px', marginBottom: '20px' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
         {/* Saldo */}
         <div style={{ background: '#fff', border: `1px solid ${C.rule}`, borderRadius: '14px', padding: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
