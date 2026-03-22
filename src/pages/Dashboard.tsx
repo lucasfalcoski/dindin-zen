@@ -22,6 +22,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { InsightsSection } from '@/components/InsightsSection';
+import { WhatsAppPendingBanner } from '@/components/WhatsAppPendingBanner';
 
 function getInvoicePeriod(closingDay: number) {
   const now = new Date();
