@@ -494,6 +494,8 @@ export default function Dashboard() {
           <Plus className="h-6 w-6" />
         </button>
       )}
+      {/* WhatsApp quick action */}
+      <WhatsAppDashboardCard />
 
       <ExpenseForm open={formOpen} onOpenChange={setFormOpen} />
     </div>
