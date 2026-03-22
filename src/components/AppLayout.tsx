@@ -172,6 +172,19 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               {l.label}
             </NavLink>
           ))}
+          <NavLink
+            to="/profile"
+            end
+            className={({ isActive }) =>
+              cn(
+                'flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition-colors duration-150',
+                isActive ? 'text-primary' : 'text-muted-foreground'
+              )
+            }
+          >
+            <EmojiAvatar emoji={profile?.avatar_emoji} color={profile?.avatar_color} userId={user?.id} size="xs" />
+            Perfil
+          </NavLink>
           <button
             onClick={() => setMoreOpen(true)}
             className="flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium text-muted-foreground"
