@@ -176,7 +176,8 @@ export default function WhatsAppConnect() {
                   Desconectar
                 </AlertDialogAction>
               </AlertDialogFooter>
-           </AlertDialog>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
         <Link to="/whatsapp-history" className="text-xs text-primary hover:underline">
           Ver histórico de mensagens →
