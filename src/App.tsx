@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ViewProvider } from "@/contexts/ViewContext";
+import { TimezoneProvider } from "@/contexts/TimezoneContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
