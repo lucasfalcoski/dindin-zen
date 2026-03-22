@@ -74,7 +74,12 @@ export default function FamilySettings() {
   if (!myFamily) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Família</h1>
+        <div className="page-header">
+          <div>
+            <p className="page-eyebrow">família</p>
+            <h1 className="page-title">Família</h1>
+          </div>
+        </div>
         <div className="card-surface p-8 text-center space-y-4">
           <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
             <Users className="h-8 w-8 text-primary" />
