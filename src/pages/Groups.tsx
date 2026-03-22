@@ -98,7 +98,12 @@ export default function Groups() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Grupos</h1>
+        <div className="page-header">
+          <div>
+            <p className="page-eyebrow">organização</p>
+            <h1 className="page-title">Grupos</h1>
+          </div>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="card-surface p-5 h-28 animate-pulse">
@@ -114,15 +119,20 @@ export default function Groups() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Grupos</h1>
-        <button
-          onClick={() => { setEditingGroup(null); setName(''); setColor(COLORS[0]); setIcon(EMOJIS[0]); setDialogOpen(true); }}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Novo grupo
-        </button>
+      <div className="page-header">
+        <div>
+          <p className="page-eyebrow">organização</p>
+          <h1 className="page-title">Grupos</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => { setEditingGroup(null); setName(''); setColor(COLORS[0]); setIcon(EMOJIS[0]); setDialogOpen(true); }}
+            className="flex items-center gap-1.5 rounded-[7px] bg-foreground text-background px-3.5 py-1.5 text-xs font-semibold hover:opacity-90 transition-opacity"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Novo grupo
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

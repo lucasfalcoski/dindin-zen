@@ -161,16 +161,17 @@ export default function Forecast() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Projeção Financeira</h1>
-        <div className="flex gap-1 bg-accent rounded-lg p-0.5">
+      <div className="page-header">
+        <div>
+          <p className="page-eyebrow">planejamento</p>
+          <h1 className="page-title">Projeção</h1>
+        </div>
+        <div className="flex items-center gap-1">
           {periods.map(p => (
             <button
               key={p.value}
               onClick={() => setDays(p.value)}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                days === p.value ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-              }`}
+              className={`pill-tab ${days === p.value ? 'active' : ''}`}
             >
               {p.label}
             </button>

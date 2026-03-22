@@ -73,18 +73,23 @@ export default function BudgetPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Orçamento</h1>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCopy}
-          disabled={copyBudgets.isPending}
-          className="flex items-center gap-1.5"
-        >
-          <Copy className="h-3.5 w-3.5" />
-          Copiar mês anterior
-        </Button>
+      <div className="page-header">
+        <div>
+          <p className="page-eyebrow">limites</p>
+          <h1 className="page-title">Orçamento</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCopy}
+            disabled={copyBudgets.isPending}
+            className="flex items-center gap-1.5"
+          >
+            <Copy className="h-3.5 w-3.5" />
+            Copiar mês anterior
+          </Button>
+        </div>
       </div>
 
       {/* Month selector */}

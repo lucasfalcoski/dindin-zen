@@ -164,66 +164,72 @@ export default function Goals() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Metas</h1>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="gap-1.5">
-              <Plus className="h-4 w-4" /> Nova meta
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="flex flex-col max-h-[90dvh] p-0 gap-0">
-            <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
-              <DialogTitle>Nova meta</DialogTitle>
-            </DialogHeader>
-            <div className="flex-1 overflow-y-auto px-6 pb-4 min-h-0 space-y-4">
-              <div>
-                <label className="label-caps block mb-1.5">Nome</label>
-                <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Ex: Viagem Europa" />
-              </div>
-              <div>
-                <label className="label-caps block mb-1.5">Valor objetivo</label>
-                <Input type="number" min="0" step="0.01" value={form.target_amount} onChange={e => setForm(f => ({ ...f, target_amount: e.target.value }))} placeholder="10000.00" />
-              </div>
-              <div>
-                <label className="label-caps block mb-1.5">Prazo (opcional)</label>
-                <Input type="date" value={form.deadline} onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))} />
-              </div>
-              <div>
-                <label className="label-caps block mb-1.5">Ícone</label>
-                <div className="flex flex-wrap gap-2">
-                  {ICONS.map(icon => (
-                    <button
-                      key={icon}
-                      onClick={() => setForm(f => ({ ...f, icon }))}
-                      className={`h-9 w-9 rounded-lg text-lg flex items-center justify-center transition-colors ${form.icon === icon ? 'bg-primary/10 ring-2 ring-primary' : 'bg-accent hover:bg-accent/80'}`}
-                    >
-                      {icon}
-                    </button>
-                  ))}
+      <div className="page-header">
+        <div>
+          <p className="page-eyebrow">planejamento</p>
+          <h1 className="page-title">Suas Metas</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <button className="flex items-center gap-1.5 rounded-[7px] bg-foreground text-background px-3.5 py-1.5 text-xs font-semibold hover:opacity-90 transition-opacity">
+                <Plus className="h-3.5 w-3.5" />
+                Nova meta
+              </button>
+            </DialogTrigger>
+            <DialogContent className="flex flex-col max-h-[90dvh] p-0 gap-0">
+              <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
+                <DialogTitle>Nova meta</DialogTitle>
+              </DialogHeader>
+              <div className="flex-1 overflow-y-auto px-6 pb-4 min-h-0 space-y-4">
+                <div>
+                  <label className="label-caps block mb-1.5">Nome</label>
+                  <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Ex: Viagem Europa" />
+                </div>
+                <div>
+                  <label className="label-caps block mb-1.5">Valor objetivo</label>
+                  <Input type="number" min="0" step="0.01" value={form.target_amount} onChange={e => setForm(f => ({ ...f, target_amount: e.target.value }))} placeholder="10000.00" />
+                </div>
+                <div>
+                  <label className="label-caps block mb-1.5">Prazo (opcional)</label>
+                  <Input type="date" value={form.deadline} onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="label-caps block mb-1.5">Ícone</label>
+                  <div className="flex flex-wrap gap-2">
+                    {ICONS.map(icon => (
+                      <button
+                        key={icon}
+                        onClick={() => setForm(f => ({ ...f, icon }))}
+                        className={`h-9 w-9 rounded-lg text-lg flex items-center justify-center transition-colors ${form.icon === icon ? 'bg-primary/10 ring-2 ring-primary' : 'bg-accent hover:bg-accent/80'}`}
+                      >
+                        {icon}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="label-caps block mb-1.5">Cor</label>
+                  <div className="flex gap-2">
+                    {COLORS.map(c => (
+                      <button
+                        key={c}
+                        onClick={() => setForm(f => ({ ...f, color: c }))}
+                        className={`h-7 w-7 rounded-full transition-transform ${form.color === c ? 'scale-125 ring-2 ring-offset-2 ring-primary' : ''}`}
+                        style={{ backgroundColor: c }}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
-              <div>
-                <label className="label-caps block mb-1.5">Cor</label>
-                <div className="flex gap-2">
-                  {COLORS.map(c => (
-                    <button
-                      key={c}
-                      onClick={() => setForm(f => ({ ...f, color: c }))}
-                      className={`h-7 w-7 rounded-full transition-transform ${form.color === c ? 'scale-125 ring-2 ring-offset-2 ring-primary' : ''}`}
-                      style={{ backgroundColor: c }}
-                    />
-                  ))}
-                </div>
+              <div className="px-6 pb-6 pt-3 flex-shrink-0 border-t border-border bg-card rounded-b-lg">
+                <Button onClick={handleCreate} disabled={createGoal.isPending} className="w-full">
+                  Criar meta
+                </Button>
               </div>
-            </div>
-            <div className="px-6 pb-6 pt-3 flex-shrink-0 border-t border-border bg-card rounded-b-lg">
-              <Button onClick={handleCreate} disabled={createGoal.isPending} className="w-full">
-                Criar meta
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {isLoading ? (

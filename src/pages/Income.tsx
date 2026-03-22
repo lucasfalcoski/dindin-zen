@@ -75,17 +75,22 @@ export default function IncomePage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Receitas</h1>
-        {viewMode === 'personal' && (
-          <button
-            onClick={() => { setEditingIncome(null); setFormOpen(true); }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            Nova
-          </button>
-        )}
+      <div className="page-header">
+        <div>
+          <p className="page-eyebrow">entradas</p>
+          <h1 className="page-title">Receitas</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          {viewMode === 'personal' && (
+            <button
+              onClick={() => { setEditingIncome(null); setFormOpen(true); }}
+              className="flex items-center gap-1.5 rounded-[7px] bg-foreground text-background px-3.5 py-1.5 text-xs font-semibold hover:opacity-90 transition-opacity"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Nova receita
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">

@@ -75,7 +75,12 @@ export default function Tags() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Tags</h1>
+      <div className="page-header">
+        <div>
+          <p className="page-eyebrow">organização</p>
+          <h1 className="page-title">Tags</h1>
+        </div>
+      </div>
 
       {isLoading ? (
         <div className="space-y-2">

@@ -178,9 +178,11 @@ export default function Dashboard() {
       .sort((a, b) => b.pct - a.pct);
   }, [budgets, groups, monthExpenses, viewMode]);
 
-  const userName = user?.user_metadata?.full_name?.split(' ')[0]
-    || user?.email?.split('@')[0]
-    || '';
+  const userName =
+    user?.user_metadata?.full_name?.split(' ')[0] ||
+    user?.user_metadata?.name?.split(' ')[0] ||
+    user?.email?.split('@')[0] ||
+    '';
 
   if (isLoading) {
     return (
@@ -335,7 +337,58 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Metas */}
+          {/* Insights inside left column */}
+          {viewMode === 'personal' && <InsightsSection />}
+        </div>
+
+        {/* COLUNA DIREITA — orçamento + metas */}
+        <div className="flex flex-col gap-3.5">
+
+          {/* Orçamento por categoria */}
+          {budgetAlerts.length > 0 && (
+            <div className="card-surface overflow-hidden">
+              <div className="sec-head">
+                <span className="sec-title">Orçamento por categoria</span>
+                <button
+                  onClick={() => navigate('/budget')}
+                  className="text-[11px] font-semibold cursor-pointer bg-transparent border-none"
+                  style={{ color: C.blue }}
+                >
+                  ajustar →
+                </button>
+              </div>
+              <div className="px-5 py-1">
+                {budgetAlerts.slice(0, 5).map(b => (
+                  <div key={b.group!.id} className="py-2.5 border-b border-border last:border-b-0">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs font-semibold text-muted-foreground">
+                        {b.group!.icon} {b.group!.name}
+                      </span>
+                      <span
+                        className="text-[11px] font-bold"
+                        style={{
+                          color: b.pct > 100 ? C.red : b.pct >= 80 ? C.amber : C.green,
+                        }}
+                      >
+                        {b.pct.toFixed(0)}%
+                      </span>
+                    </div>
+                    <div className="budget-bar-track">
+                      <div
+                        className="budget-bar-fill"
+                        style={{
+                          width: `${Math.min(b.pct, 100)}%`,
+                          background: b.pct > 100 ? C.red : b.pct >= 80 ? C.amber : b.group!.color,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Metas (top spending groups) */}
           {donutData.length > 0 && (
             <div className="card-surface overflow-hidden">
               <div className="sec-head">
@@ -356,20 +409,25 @@ export default function Dashboard() {
                         {d.icon} {d.name}
                       </span>
                       <span className="text-[11px] font-bold" style={{ color: d.color }}>
-                        {((d.value / stats.total) * 100).toFixed(0)}%
+                        {stats.total > 0 ? ((d.value / stats.total) * 100).toFixed(0) : 0}%
                       </span>
                     </div>
                     <div className="budget-bar-track">
                       <div
                         className="budget-bar-fill"
                         style={{
-                          width: `${Math.min((d.value / stats.total) * 100, 100)}%`,
+                          width: stats.total > 0 ? `${Math.min((d.value / stats.total) * 100, 100)}%` : '0%',
                           background: d.color,
                         }}
                       />
                     </div>
                   </div>
                 ))}
+                {donutData.length === 0 && (
+                  <p className="text-xs text-muted-foreground py-4 text-center">
+                    Nenhuma despesa este mês
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -403,9 +461,6 @@ export default function Dashboard() {
           )}
         </div>
       </div>
-
-      {/* ── INSIGHTS ── */}
-      {viewMode === 'personal' && <InsightsSection />}
 
       <ExpenseForm open={formOpen} onOpenChange={setFormOpen} />
     </div>
