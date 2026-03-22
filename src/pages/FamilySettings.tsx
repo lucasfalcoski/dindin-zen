@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   useMyFamilies,
   useFamilyMembers,
@@ -8,13 +9,14 @@ import {
   useInviteMember,
   useRemoveMember,
 } from '@/hooks/useFamily';
+import { useFamilyProfiles, type Profile } from '@/hooks/useProfiles';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Users, Plus, Trash2, Copy, Check, Crown, Clock, Mail, ArrowRight, Target, Scale } from 'lucide-react';
+import { Users, Plus, Trash2, Copy, Check, Crown, Clock, Mail, ArrowRight, Target } from 'lucide-react';
 import { EmojiAvatar } from '@/components/EmojiAvatar';
 import { FamilySharingSettings } from '@/components/FamilySharingSettings';
 import { FamilyOverview } from '@/components/FamilyOverview';
@@ -25,8 +27,15 @@ type TabId = 'members' | 'overview' | 'balance';
 export default function FamilySettings() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { data: families, isLoading } = useMyFamilies();
   const createFamily = useCreateFamily();
+
+  // Force refetch family data on mount
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['families'] });
+    queryClient.invalidateQueries({ queryKey: ['family_members'] });
+  }, [queryClient]);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [familyName, setFamilyName] = useState('');
@@ -111,6 +120,11 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
   const updateFamily = useUpdateFamily();
   const inviteMember = useInviteMember();
   const removeMember = useRemoveMember();
+
+  // Fetch profiles for active members
+  const memberUserIds = (members || []).filter(m => m.user_id).map(m => m.user_id!);
+  const { data: profiles } = useFamilyProfiles(memberUserIds);
+  const profileMap = new Map((profiles || []).map(p => [p.id, p]));
 
   const [activeTab, setActiveTab] = useState<TabId>('members');
   const [editingName, setEditingName] = useState(false);
@@ -236,20 +250,33 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
               <h3 className="label-caps">Membros</h3>
             </div>
             <div className="divide-y divide-border/50">
-              {members?.map(m => (
+              {members?.map(m => {
+                const profile = m.user_id ? profileMap.get(m.user_id) : null;
+                const displayName = profile?.display_name || m.invited_email || 'Membro pendente';
+                const isPending = m.status === 'pending';
+                return (
                 <div key={m.id} className="flex items-center gap-3 p-4">
-                  <EmojiAvatar userId={m.user_id || m.id} size="sm" />
+                  {isPending ? (
+                    <EmojiAvatar emoji="👤" color="#94a3b8" size="sm" />
+                  ) : (
+                    <EmojiAvatar
+                      emoji={profile?.avatar_emoji}
+                      color={profile?.avatar_color || '#3b82f6'}
+                      userId={m.user_id || m.id}
+                      size="sm"
+                    />
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <p className="text-sm font-medium text-foreground truncate">
-                        {m.invited_email || 'Sem email'}
+                        {displayName}
                       </p>
                       {m.role === 'admin' && (
                         <Crown className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
                       )}
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      {m.status === 'pending' ? (
+                      {isPending ? (
                         <>
                           <Clock className="h-3 w-3" />
                           <span>Pendente</span>
@@ -283,7 +310,8 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
