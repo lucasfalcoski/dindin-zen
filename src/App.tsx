@@ -37,10 +37,12 @@ const queryClient = new QueryClient();
 
 const ProtectedPage = ({ children }: { children: React.ReactNode }) => (
   <ProtectedRoute>
-    <ViewProvider>
-      <AppLayout>{children}</AppLayout>
-      <OnboardingWizard />
-    </ViewProvider>
+    <TimezoneProvider>
+      <ViewProvider>
+        <AppLayout>{children}</AppLayout>
+        <OnboardingWizard />
+      </ViewProvider>
+    </TimezoneProvider>
   </ProtectedRoute>
 );
 
