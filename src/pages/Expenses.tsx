@@ -10,7 +10,7 @@ import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { ImportExpensesModal } from '@/components/ImportExpensesModal';
 import { formatBRL } from '@/lib/format';
-import { Search } from 'lucide-react';
+import { Search, Upload } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
