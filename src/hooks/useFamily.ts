@@ -14,9 +14,9 @@ export interface FamilyMember {
   family_id: string;
   user_id: string | null;
   role: 'admin' | 'member';
-  status: 'pending' | 'active';
+  status: 'pending' | 'active' | 'manual';
   invited_email: string | null;
-  invite_token: string;
+  invite_token: string | null;
   invited_at: string;
   joined_at: string | null;
 }
