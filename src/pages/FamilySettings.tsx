@@ -245,15 +245,45 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
       {isAdmin && (
         <div style={{ background: '#fff', border: `1px solid ${C.rule}`, borderRadius: '14px', padding: '20px' }}>
           <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: C.ink2, marginBottom: '12px' }}>Convidar membro</p>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <Input id="invite-email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} placeholder="email@exemplo.com" type="email" onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }} style={{ flex: 1 }} />
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <Input id="invite-email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} placeholder="email@exemplo.com" type="email" onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }} style={{ flex: 1, minWidth: '180px' }} />
             <Button onClick={handleInvite} disabled={inviteMember.isPending} className="gap-1.5">
               <Mail className="h-4 w-4" /> Convidar
+            </Button>
+            <Button variant="outline" onClick={() => setManualOpen(true)} className="gap-1.5">
+              <UserPlus className="h-4 w-4" /> Adicionar sem conta
             </Button>
           </div>
           <p style={{ fontSize: '11px', color: C.ink3, marginTop: '8px' }}>Um link de convite será gerado e copiado automaticamente.</p>
         </div>
       )}
+
+      {/* DIALOG ADICIONAR MANUAL */}
+      <Dialog open={manualOpen} onOpenChange={setManualOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader><DialogTitle>Adicionar membro sem conta</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">Adicione uma pessoa que não tem conta no app. Ela aparecerá na família para divisão de despesas.</p>
+            <div className="space-y-2">
+              <Label>Nome da pessoa</Label>
+              <Input value={manualName} onChange={e => setManualName(e.target.value)} placeholder="Ex: Maria" onKeyDown={e => { if (e.key === 'Enter') handleAddManual(); }} />
+            </div>
+            <Button onClick={handleAddManual} className="w-full" disabled={addManualMember.isPending}>
+              {addManualMember.isPending ? 'Adicionando...' : 'Adicionar'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
+
+  async function handleAddManual() {
+    if (!manualName.trim()) return;
+    try {
+      await addManualMember.mutateAsync({ familyId: family.id, name: manualName.trim() });
+      toast({ title: 'Membro adicionado!' });
+      setManualName('');
+      setManualOpen(false);
+    } catch { toast({ title: 'Erro ao adicionar', variant: 'destructive' }); }
+  }
 }
