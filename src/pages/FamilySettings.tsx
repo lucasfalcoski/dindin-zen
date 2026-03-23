@@ -168,9 +168,11 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
           <div style={{ display: 'flex' }}>
             {activeMembers.slice(0, 5).map((m, i) => {
               const col = AVATAR_COLORS[i % AVATAR_COLORS.length];
+              const prof = m.user_id ? profileMap[m.user_id] : null;
+              const initials = (prof?.display_name || m.invited_email || '?').substring(0, 2).toUpperCase();
               return (
                 <div key={m.id} style={{ width: '38px', height: '38px', borderRadius: '50%', border: `2px solid ${C.ink}`, background: col.bg, color: col.text, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, marginLeft: i > 0 ? '-10px' : 0, flexShrink: 0 }}>
-                  {(m.invited_email || '?').substring(0, 2).toUpperCase()}
+                  {initials}
                 </div>
               );
             })}
