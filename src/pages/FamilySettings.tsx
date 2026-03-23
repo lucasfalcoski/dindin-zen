@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useMyFamilies, useFamilyMembers, useCreateFamily, useUpdateFamily, useInviteMember, useRemoveMember } from '@/hooks/useFamily';
+import { useMyFamilies, useFamilyMembers, useCreateFamily, useUpdateFamily, useInviteMember, useRemoveMember, useAddManualMember } from '@/hooks/useFamily';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
