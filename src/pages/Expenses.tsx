@@ -133,8 +133,9 @@ export default function Expenses() {
           ))}
           <button
             onClick={() => setImportOpen(true)}
-            className="pill-tab"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-border text-foreground bg-transparent cursor-pointer transition-colors hover:bg-muted"
           >
+            <Upload size={14} />
             Importar
           </button>
           <button
