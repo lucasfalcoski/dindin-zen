@@ -125,6 +125,28 @@ export function useInviteMember() {
   });
 }
 
+export function useAddManualMember() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ familyId, name }: { familyId: string; name: string }) => {
+      const { data, error } = await supabase
+        .from('family_members')
+        .insert({
+          family_id: familyId,
+          invited_email: name,
+          role: 'member',
+          status: 'manual',
+          invite_token: null,
+        } as any)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as FamilyMember;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['family_members'] }),
+  });
+}
+
 export function useRemoveMember() {
   const qc = useQueryClient();
   return useMutation({
