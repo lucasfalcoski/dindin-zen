@@ -101,7 +101,7 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
     [members]
   );
   const isAdmin = family.created_by === userId;
-  const activeMembers = (members || []).filter(m => m.status === 'active');
+  const activeMembers = (members || []).filter(m => m.status === 'active' || m.status === 'manual');
 
   const handleUpdateName = async () => {
     if (!name.trim() || name === family.name) { setEditingName(false); return; }
