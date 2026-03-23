@@ -85,9 +85,12 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
   const { toast } = useToast();
   const { data: members } = useFamilyMembers(family.id);
   const inviteMember = useInviteMember();
+  const addManualMember = useAddManualMember();
   const removeMember = useRemoveMember();
   const updateFamily = useUpdateFamily();
   const [inviteEmail, setInviteEmail] = useState('');
+  const [manualName, setManualName] = useState('');
+  const [manualOpen, setManualOpen] = useState(false);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(family.name);
