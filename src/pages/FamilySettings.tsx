@@ -187,12 +187,17 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
           const col = AVATAR_COLORS[i % AVATAR_COLORS.length];
           const isPending = m.status === 'pending';
           const isManual = m.status === 'manual';
+          const prof = m.user_id ? profileMap[m.user_id] : null;
+          const displayName = prof?.display_name || m.invited_email?.split('@')[0] || 'Membro';
+          const initials = (prof?.display_name || m.invited_email || '?').substring(0, 2).toUpperCase();
+          const emailLabel = m.invited_email || (m.user_id && prof ? null : null);
           return (
             <div key={m.id} style={{ background: '#fff', border: `1px solid ${C.rule}`, borderRadius: '14px', padding: '20px', opacity: isPending ? 0.7 : 1 }}>
               <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: col.bg, color: col.text, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 700, marginBottom: '12px' }}>
-                {(m.invited_email || '?').substring(0, 2).toUpperCase()}
+                {initials}
               </div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: C.ink }}>{m.invited_email?.split('@')[0] || 'Membro'}</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: C.ink }}>{displayName}</div>
+              {m.invited_email && <div style={{ fontSize: '11px', color: C.ink3, marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.invited_email}</div>}
               <div style={{ fontSize: '11px', color: C.ink3, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 {m.role === 'admin' && <Crown size={10} style={{ color: '#f59e0b' }} />}
                 {isManual ? <><UserPlus size={10} /> Sem conta</> : isPending ? <><Clock size={10} /> Pendente</> : m.role === 'admin' ? 'Administrador' : 'Membro'}
