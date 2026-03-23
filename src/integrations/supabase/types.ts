@@ -685,7 +685,7 @@ export type Database = {
     Enums: {
       account_type: "corrente" | "poupanca" | "carteira" | "investimento"
       family_role: "admin" | "member"
-      family_status: "pending" | "active"
+      family_status: "pending" | "active" | "manual"
       income_category:
         | "salario"
         | "freelance"
@@ -829,7 +829,7 @@ export const Constants = {
     Enums: {
       account_type: ["corrente", "poupanca", "carteira", "investimento"],
       family_role: ["admin", "member"],
-      family_status: ["pending", "active"],
+      family_status: ["pending", "active", "manual"],
       income_category: [
         "salario",
         "freelance",
