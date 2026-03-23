@@ -222,6 +222,7 @@ export default function Expenses() {
                   borderColor: groupFilter === g.id ? g.color : 'hsl(var(--border))',
                   background: groupFilter === g.id ? g.color + '15' : 'none',
                   color: groupFilter === g.id ? g.color : 'hsl(var(--muted-foreground))',
+                  opacity: groupFilter === g.id ? 1 : 0.75,
                 }}
               >
                 {g.icon}
@@ -267,7 +268,7 @@ export default function Expenses() {
               ))}
             </div>
           ) : (
-            <p className="text-sm p-8 text-center text-muted-foreground">
+            <p className="text-sm font-medium p-8 text-center text-muted-foreground">
               Nenhuma despesa encontrada.
             </p>
           )}
@@ -315,7 +316,7 @@ export default function Expenses() {
                   </div>
                 ));
             })() : (
-              <p className="text-sm py-8 text-center text-muted-foreground">
+              <p className="text-sm font-medium py-8 text-center text-muted-foreground">
                 Nenhuma despesa.
               </p>
             )}
