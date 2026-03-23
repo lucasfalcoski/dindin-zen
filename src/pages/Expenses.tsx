@@ -222,6 +222,7 @@ export default function Expenses() {
                   borderColor: groupFilter === g.id ? g.color : 'hsl(var(--border))',
                   background: groupFilter === g.id ? g.color + '15' : 'none',
                   color: groupFilter === g.id ? g.color : 'hsl(var(--muted-foreground))',
+                  opacity: groupFilter === g.id ? 1 : 0.75,
                 }}
               >
                 {g.icon}
