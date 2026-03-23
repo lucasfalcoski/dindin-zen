@@ -149,12 +149,6 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
               </h1>
           }
         </div>
-        {isAdmin && (
-          <button onClick={() => document.getElementById('invite-email')?.focus()}
-            style={{ padding: '6px 16px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, fontFamily: "'Cabinet Grotesk',sans-serif", background: C.ink, color: '#fff', border: `1px solid ${C.ink}`, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Plus size={14} /> Convidar membro
-          </button>
-        )}
       </div>
 
       {/* BANNER ESCURO */}
