@@ -165,7 +165,7 @@ export default function Reports() {
         <div style={{ background:'#fff', border:`1px solid ${C.rule}`, borderRadius:'14px', padding:'20px' }}>
           <div style={{ fontSize:'11px', fontWeight:600, letterSpacing:'1px', textTransform:'uppercase', color:C.ink3, marginBottom:'8px' }}>Média diária</div>
           <p style={{ fontFamily:"'Instrument Serif',serif", fontSize:'28px', letterSpacing:'-0.5px', lineHeight:1, color:C.amber }}>
-            {breakdown.length > 0 && dailyData.length > 0 ? formatBRL(totalPeriod / dailyData.length) : '—'}
+            {breakdown.length > 0 ? formatBRL(breakdown.reduce((s, g) => s + g.avgDay, 0)) : '—'}
           </p>
         </div>
       </div>
