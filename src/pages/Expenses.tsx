@@ -10,7 +10,7 @@ import { ExpenseRow } from '@/components/ExpenseRow';
 import { ExpenseForm } from '@/components/ExpenseForm';
 import { ImportExpensesModal } from '@/components/ImportExpensesModal';
 import { formatBRL } from '@/lib/format';
-import { Search } from 'lucide-react';
+import { Search, Upload } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
@@ -133,8 +133,9 @@ export default function Expenses() {
           ))}
           <button
             onClick={() => setImportOpen(true)}
-            className="pill-tab"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-border text-foreground bg-transparent cursor-pointer transition-colors hover:bg-muted"
           >
+            <Upload size={14} />
             Importar
           </button>
           <button
