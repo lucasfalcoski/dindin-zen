@@ -100,6 +100,12 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
     () => (members || []).filter(m => m.user_id).map(m => m.user_id!),
     [members]
   );
+  const { data: profiles } = useFamilyProfiles(memberUserIds);
+  const profileMap = useMemo(() => {
+    const map: Record<string, { display_name: string | null; avatar_color: string }> = {};
+    (profiles || []).forEach(p => { map[p.id] = { display_name: p.display_name, avatar_color: p.avatar_color }; });
+    return map;
+  }, [profiles]);
   const isAdmin = family.created_by === userId;
   const activeMembers = (members || []).filter(m => m.status === 'active' || m.status === 'manual');
 
