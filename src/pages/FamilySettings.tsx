@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Users, Plus, Trash2, Copy, Check, Crown, Clock, Mail, ArrowRight, Target, Scale } from 'lucide-react';
+import { Users, Plus, Trash2, Copy, Check, Crown, Clock, Mail, ArrowRight, Target, Scale, UserPlus } from 'lucide-react';
 import { useFamilyProfiles } from '@/hooks/useProfiles';
 
 const C = { ink: '#16150f', ink2: '#6b6a63', ink3: '#b0aea6', rule: '#e4e1da', bg: '#f2f0eb', green: '#1a7a45', red: '#b83232', blue: '#1d4ed8' };
