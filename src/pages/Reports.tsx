@@ -60,10 +60,19 @@ export default function Reports() {
   const breakdown = useMemo(() => {
     if (!expenses.length || !groups) return [];
     const byGroup: Record<string, number> = {};
-    expenses.forEach(e => { byGroup[e.group_id] = (byGroup[e.group_id] || 0) + Number(e.amount); });
-    const days = startDate && endDate ? Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1) : 1;
+    let firstExpenseDate: Date | null = null;
+    expenses.forEach(e => {
+      byGroup[e.group_id] = (byGroup[e.group_id] || 0) + Number(e.amount);
+      const d = new Date(e.date);
+      if (!firstExpenseDate || d < firstExpenseDate) firstExpenseDate = d;
+    });
+    const today = new Date();
+    const effectiveEnd = endDate ? (new Date(endDate) < today ? new Date(endDate) : today) : today;
+    const effectiveDays = firstExpenseDate
+      ? Math.max(1, Math.ceil((effectiveEnd.getTime() - firstExpenseDate.getTime()) / (1000 * 60 * 60 * 24)) + 1)
+      : 1;
     return groups.filter(g => byGroup[g.id])
-      .map(g => ({ ...g, total: byGroup[g.id], pct: totalPeriod > 0 ? (byGroup[g.id] / totalPeriod * 100) : 0, avgDay: byGroup[g.id] / days }))
+      .map(g => ({ ...g, total: byGroup[g.id], pct: totalPeriod > 0 ? (byGroup[g.id] / totalPeriod * 100) : 0, avgDay: byGroup[g.id] / effectiveDays }))
       .sort((a, b) => b.total - a.total);
   }, [expenses, groups, totalPeriod, startDate, endDate]);
 
