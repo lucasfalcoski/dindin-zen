@@ -8,19 +8,27 @@ import { QuickAddFAB } from '@/components/QuickAddFAB';
 import { NotificationAlerts } from '@/components/NotificationAlerts';
 import { TopbarInsights } from '@/components/TopbarInsights';
 import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarSeparator,
+  SidebarTrigger,
+  useSidebar,
+} from '@/components/ui/sidebar';
+import {
   LayoutDashboard, Receipt, DollarSign, Building2, CreditCard,
   FolderOpen, Tag, Target, Gauge, TrendingUp, Users, BarChart3,
   LogOut, Plus, Search, User, Settings, ChevronDown, Goal, LayoutGrid,
 } from 'lucide-react';
 
 const C = {
-  sidebarBg: '#16150f',
-  sidebarActive: 'rgba(255,255,255,0.10)',
-  sidebarHover: 'rgba(255,255,255,0.05)',
-  sidebarIcon: 'rgba(255,255,255,0.40)',
-  sidebarIconActive: '#ffffff',
-  sidebarIndicator: '#1a7a45',
-  sidebarSep: 'rgba(255,255,255,0.07)',
   topbarBg: '#faf9f7',
   topbarBorder: '#e4e1da',
   ink: '#16150f', ink2: '#6b6a63', ink3: '#b0aea6',
@@ -58,22 +66,8 @@ const LABEL_MAP: Record<string, string> = Object.fromEntries(ALL_LINKS.map(l => 
 
 function Logo() {
   return (
-    <div style={{ width: 36, height: 36, borderRadius: 10, background: C.green, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-      <span style={{ fontSize: 17, fontWeight: 800, color: '#fff', fontFamily: "'Cabinet Grotesk', sans-serif", lineHeight: 1 }}>$</span>
-    </div>
-  );
-}
-
-function Tip({ label, children }: { label: string; children: React.ReactNode }) {
-  const [show, setShow] = useState(false);
-  return (
-    <div style={{ position: 'relative' }} onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
-      {children}
-      {show && (
-        <div style={{ position: 'absolute', left: 58, top: '50%', transform: 'translateY(-50%)', background: '#1a1a14', color: '#fff', fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, whiteSpace: 'nowrap', zIndex: 200, pointerEvents: 'none', fontFamily: "'Cabinet Grotesk', sans-serif", boxShadow: '0 4px 12px rgba(0,0,0,.5)' }}>
-          {label}
-        </div>
-      )}
+    <div className="w-9 h-9 rounded-[10px] bg-[hsl(148,66%,29%)] flex items-center justify-center shrink-0">
+      <span className="text-[17px] font-extrabold text-white leading-none" style={{ fontFamily: "'Cabinet Grotesk', sans-serif" }}>$</span>
     </div>
   );
 }
@@ -92,38 +86,31 @@ function UserMenu({ name, email, color, onSignOut }: { name: string; email: stri
   return (
     <div ref={ref} style={{ position: 'relative' }}>
       <button onClick={() => setOpen(o => !o)}
-        style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 10px 4px 4px', borderRadius: 100, border: `1px solid ${C.topbarBorder}`, background: 'none', cursor: 'pointer', transition: 'background .15s' }}
-        onMouseEnter={e => (e.currentTarget.style.background = C.pageBg)}
-        onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-      >
-        <div style={{ width: 28, height: 28, borderRadius: '50%', background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+        className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border border-border bg-transparent cursor-pointer hover:bg-muted transition-colors">
+        <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0" style={{ background: color }}>
           {name.substring(0, 2).toUpperCase()}
         </div>
-        <span style={{ fontSize: 12, fontWeight: 600, color: C.ink, fontFamily: "'Cabinet Grotesk', sans-serif" }}>{name}</span>
-        <ChevronDown size={12} style={{ color: C.ink3, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }} />
+        <span className="text-xs font-semibold text-foreground" style={{ fontFamily: "'Cabinet Grotesk', sans-serif" }}>{name}</span>
+        <ChevronDown size={12} className={`text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 6, background: '#fff', border: `1px solid ${C.topbarBorder}`, borderRadius: 12, minWidth: 200, boxShadow: '0 8px 24px rgba(0,0,0,.1)', zIndex: 100, overflow: 'hidden' }}>
-          <div style={{ padding: '14px 16px', borderBottom: `1px solid ${C.topbarBorder}` }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>{name}</div>
-            <div style={{ fontSize: 11, color: C.ink3, marginTop: 1 }}>{email}</div>
+        <div className="absolute right-0 top-full mt-1.5 bg-popover border border-border rounded-xl min-w-[200px] shadow-lg z-[100] overflow-hidden">
+          <div className="p-3.5 border-b border-border">
+            <div className="text-[13px] font-bold text-foreground">{name}</div>
+            <div className="text-[11px] text-muted-foreground mt-0.5">{email}</div>
           </div>
-          {[{ icon: User, label: 'Meu perfil', to: '/settings' }, { icon: Settings, label: 'Configurações', to: '/settings' }].map(item => (
+          {[{ icon: Settings, label: 'Configurações', to: '/settings' }].map(item => (
             <button key={item.label} onClick={() => { navigate(item.to); setOpen(false); }}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 13, color: C.ink, fontFamily: "'Cabinet Grotesk', sans-serif", fontWeight: 500, textAlign: 'left', transition: 'background .1s' }}
-              onMouseEnter={e => (e.currentTarget.style.background = C.pageBg)}
-              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-            >
-              <item.icon size={14} style={{ color: C.ink2 }} />{item.label}
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 border-none bg-transparent cursor-pointer text-[13px] text-foreground hover:bg-muted transition-colors text-left"
+              style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontWeight: 500 }}>
+              <item.icon size={14} className="text-muted-foreground" />{item.label}
             </button>
           ))}
-          <div style={{ borderTop: `1px solid ${C.topbarBorder}` }}>
+          <div className="border-t border-border">
             <button onClick={() => { onSignOut(); setOpen(false); }}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 13, color: C.red, fontFamily: "'Cabinet Grotesk', sans-serif", fontWeight: 500, textAlign: 'left', transition: 'background .1s' }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#fef2f2')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-            >
-              <LogOut size={14} style={{ color: C.red }} />Sair
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 border-none bg-transparent cursor-pointer text-[13px] text-destructive hover:bg-destructive/10 transition-colors text-left"
+              style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontWeight: 500 }}>
+              <LogOut size={14} className="text-destructive" />Sair
             </button>
           </div>
         </div>
@@ -132,7 +119,67 @@ function UserMenu({ name, email, color, onSignOut }: { name: string; email: stri
   );
 }
 
-export function AppLayout({ children }: { children: React.ReactNode }) {
+function AppSidebar() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => { await signOut(); navigate('/login'); };
+
+  const isLinkActive = (to: string) =>
+    to === '/' ? location.pathname === '/' : location.pathname === to || location.pathname.startsWith(to + '/');
+
+  return (
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="p-3 flex items-center justify-center">
+        <Link to="/" className="no-underline flex justify-center">
+          <Logo />
+        </Link>
+      </SidebarHeader>
+
+      <SidebarContent>
+        {NAV_GROUPS.map((group, gi) => (
+          <div key={gi}>
+            {gi > 0 && <SidebarSeparator />}
+            <SidebarGroup className="py-0.5">
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {group.links.map(link => (
+                    <SidebarMenuItem key={link.to}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isLinkActive(link.to)}
+                        tooltip={link.label}
+                      >
+                        <NavLink to={link.to} end={link.to === '/'}>
+                          <link.icon />
+                          <span>{link.label}</span>
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </div>
+        ))}
+      </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip="Sair" onClick={handleSignOut}>
+              <LogOut />
+              <span>Sair</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
+
+function AppContent({ children }: { children: React.ReactNode }) {
   const { signOut, user } = useAuth();
   const { data: profile } = useProfile();
   const navigate = useNavigate();
@@ -169,90 +216,51 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <>
+    <div className="flex flex-1 flex-col min-h-svh overflow-x-hidden" style={{ background: C.pageBg }}>
       <NotificationAlerts />
 
-      {/* SIDEBAR */}
-      <aside className="din-sidebar" style={{ position: 'fixed', top: 0, left: 0, bottom: 0, width: 64, zIndex: 50, background: C.sidebarBg, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 12, paddingBottom: 10, overflowY: 'auto', overflowX: 'visible' }}>
-        <Link to="/" style={{ marginBottom: 14, display: 'flex', justifyContent: 'center', textDecoration: 'none' }}><Logo /></Link>
-        <div style={{ flex: 1, width: '100%' }}>
-          {NAV_GROUPS.map((group, gi) => (
-            <div key={gi}>
-              {gi > 0 && <div style={{ height: 1, background: C.sidebarSep, margin: '3px 14px' }} />}
-              {group.links.map(link => (
-                <Tip key={link.to} label={link.label}>
-                  <NavLink to={link.to} end={link.to === '/'}
-                    style={({ isActive }) => ({ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: 44, background: isActive ? C.sidebarActive : 'none', textDecoration: 'none', transition: 'background .15s' })}>
-                    {({ isActive }) => (
-                      <>
-                        {isActive && <div style={{ position: 'absolute', left: 0, top: 8, bottom: 8, width: 2, borderRadius: '0 2px 2px 0', background: C.sidebarIndicator }} />}
-                        <link.icon size={18} style={{ color: isActive ? C.sidebarIconActive : C.sidebarIcon, transition: 'color .15s' }} />
-                      </>
-                    )}
-                  </NavLink>
-                </Tip>
-              ))}
-            </div>
-          ))}
+      {/* TOPBAR */}
+      <header className="sticky top-0 z-40 shrink-0 h-[52px] flex items-center justify-between px-6 border-b" style={{ background: C.topbarBg, borderColor: C.topbarBorder }}>
+        <div className="flex items-center gap-1.5">
+          <SidebarTrigger className="mr-2 hidden md:flex" />
+          <span className="text-[13px] text-muted-foreground font-medium" style={{ fontFamily: "'Cabinet Grotesk', sans-serif" }}>Din-Din Zen</span>
+          <span className="text-sm" style={{ color: C.topbarBorder }}>/</span>
+          <span className="text-[13px] font-bold text-foreground" style={{ fontFamily: "'Cabinet Grotesk', sans-serif" }}>{currentLabel}</span>
         </div>
-        <div style={{ width: '100%', borderTop: `1px solid ${C.sidebarSep}`, paddingTop: 3 }}>
-          <Tip label="Sair">
-            <button onClick={handleSignOut}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: 44, background: 'none', border: 'none', cursor: 'pointer', transition: 'background .15s' }}
-              onMouseEnter={e => (e.currentTarget.style.background = C.sidebarActive)}
-              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-            >
-              <LogOut size={17} style={{ color: C.sidebarIcon }} />
-            </button>
-          </Tip>
+
+        <div className="flex-1 hidden md:flex justify-center px-4">
+          <TopbarInsights />
         </div>
-      </aside>
 
-      {/* MAIN */}
-      <div className="din-main" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: C.pageBg, overflowX: 'hidden', overflowY: 'auto' }}>
+        <div className="flex items-center gap-2.5">
+          <button onClick={() => setSearchOpen(true)}
+            className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-lg text-muted-foreground bg-transparent border border-border cursor-pointer text-xs font-medium"
+            style={{ fontFamily: "'Cabinet Grotesk', sans-serif" }}>
+            <Search size={13} />Buscar
+            <kbd className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded border border-border">⌘K</kbd>
+          </button>
+          <ViewSelector />
+          <UserMenu name={displayName} email={user?.email || ''} color={avatarColor} onSignOut={handleSignOut} />
+        </div>
+      </header>
 
-        {/* TOPBAR */}
-        <header style={{ position: 'sticky', top: 0, zIndex: 40, background: C.topbarBg, borderBottom: `1px solid ${C.topbarBorder}`, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', flexShrink: 0 }}>
-          {/* Breadcrumb */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 13, color: C.ink3, fontFamily: "'Cabinet Grotesk', sans-serif", fontWeight: 500 }}>Din-Din Zen</span>
-            <span style={{ color: C.topbarBorder, fontSize: 14 }}>/</span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: C.ink, fontFamily: "'Cabinet Grotesk', sans-serif" }}>{currentLabel}</span>
-          </div>
-
-          {/* Insights pill — centro */}
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '0 16px' }}>
-            <TopbarInsights />
-          </div>
-
-          {/* Ações */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button onClick={() => setSearchOpen(true)}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 8, color: C.ink2, background: 'none', border: `1px solid ${C.topbarBorder}`, cursor: 'pointer', fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 12, fontWeight: 500 }}>
-              <Search size={13} />Buscar<kbd style={{ fontSize: 10, color: C.ink3, background: C.pageBg, padding: '1px 5px', borderRadius: 4, border: `1px solid ${C.topbarBorder}` }}>⌘K</kbd>
-            </button>
-            <ViewSelector />
-            <UserMenu name={displayName} email={user?.email || ''} color={avatarColor} onSignOut={handleSignOut} />
-          </div>
-        </header>
-
-        {/* PAGE */}
-        <main className="din-page" style={{ flex: 1, padding: '28px 32px', maxWidth: 1200, width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
-          {children}
-        </main>
-      </div>
+      {/* PAGE */}
+      <main className="din-page flex-1 p-4 md:p-7 md:pb-7 pb-20 max-w-[1200px] w-full mx-auto box-border">
+        {children}
+      </main>
 
       {/* BOTTOM NAV MOBILE */}
-      <nav className="din-bottom-nav" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: C.topbarBg, borderTop: `1px solid ${C.topbarBorder}`, height: 64, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 z-50 flex items-center justify-around border-t" style={{ background: C.topbarBg, borderColor: C.topbarBorder }}>
         {mobileSlots.map((slot, i) => {
           if (slot === null) return (
-            <button key="fab" onClick={() => navigate('/expenses?new=1')} style={{ width: 48, height: 48, borderRadius: '50%', background: C.green, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(26,122,69,.4)', marginTop: -16, flexShrink: 0 }}>
-              <Plus size={22} style={{ color: '#fff' }} />
+            <button key="fab" onClick={() => navigate('/expenses?new=1')} className="w-12 h-12 rounded-full border-none cursor-pointer flex items-center justify-center shrink-0 -mt-4" style={{ background: C.green, boxShadow: '0 4px 16px rgba(26,122,69,.4)' }}>
+              <Plus size={22} className="text-white" />
             </button>
           );
           if (slot === 'more') return (
             <button key="more" onClick={() => setMoreOpen(true)}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '4px 8px', background: 'none', border: 'none', cursor: 'pointer', flex: 1, color: moreOpen ? C.green : C.ink3, fontSize: 9, fontWeight: 600, fontFamily: "'Cabinet Grotesk', sans-serif", textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+              className="flex flex-col items-center gap-0.5 px-2 py-1 bg-transparent border-none cursor-pointer flex-1"
+              style={{ color: moreOpen ? C.green : C.ink3, fontSize: 9, fontWeight: 600, fontFamily: "'Cabinet Grotesk', sans-serif", textTransform: 'uppercase', letterSpacing: '0.3px' }}>
               <LayoutGrid size={20} style={{ color: moreOpen ? C.green : C.ink3 }} />
               Mais
             </button>
@@ -270,11 +278,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {moreOpen && (
         <>
           <div onClick={() => setMoreOpen(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(22,21,15,0.5)', zIndex: 60, backdropFilter: 'blur(2px)' }} />
-          <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 61, background: C.topbarBg, borderRadius: '16px 16px 0 0', padding: '12px 16px 24px', animation: 'slideUpMore .25s ease-out' }}>
-            <div style={{ width: 40, height: 4, borderRadius: 2, background: C.ink3, margin: '0 auto 12px', opacity: 0.4 }} />
-            <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, fontFamily: "'Cabinet Grotesk', sans-serif", marginBottom: 12 }}>Menu</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
+            className="fixed inset-0 z-[60]" style={{ background: 'rgba(22,21,15,0.5)', backdropFilter: 'blur(2px)' }} />
+          <div className="fixed bottom-0 left-0 right-0 z-[61] rounded-t-2xl p-4 pb-6" style={{ background: C.topbarBg, animation: 'slideUpMore .25s ease-out' }}>
+            <div className="w-10 h-1 rounded-full mx-auto mb-3" style={{ background: C.ink3, opacity: 0.4 }} />
+            <div className="text-sm font-bold mb-3" style={{ color: C.ink, fontFamily: "'Cabinet Grotesk', sans-serif" }}>Menu</div>
+            <div className="grid grid-cols-4 gap-1">
               {[
                 { to: '/accounts',     label: 'Contas',     icon: Building2 },
                 { to: '/credit-cards', label: 'Cartões',    icon: CreditCard },
@@ -291,7 +299,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to));
                 return (
                   <Link key={item.to} to={item.to} onClick={() => setMoreOpen(false)}
-                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '14px 8px', textDecoration: 'none', color: isActive ? C.green : C.ink2, fontSize: 10, fontWeight: 600, fontFamily: "'Cabinet Grotesk', sans-serif", transition: 'color .15s' }}>
+                    className="flex flex-col items-center gap-1 py-3.5 px-2 no-underline text-[10px] font-semibold transition-colors"
+                    style={{ color: isActive ? C.green : C.ink2, fontFamily: "'Cabinet Grotesk', sans-serif" }}>
                     <item.icon size={20} />
                     {item.label}
                   </Link>
@@ -305,22 +314,17 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       <QuickAddFAB />
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+    </div>
+  );
+}
 
-      <style>{`
-        @media (min-width: 768px) {
-          .din-sidebar { display: flex !important; }
-          .din-main { margin-left: 64px !important; }
-          .din-bottom-nav { display: none !important; }
-          .din-page { padding: 28px 32px !important; padding-bottom: 28px !important; }
-        }
-        @media (max-width: 767px) {
-          .din-sidebar { display: none !important; }
-          .din-main { margin-left: 0 !important; }
-          .din-bottom-nav { display: flex !important; }
-          .din-page { padding: 16px !important; padding-bottom: 80px !important; max-width: 100% !important; }
-        }
-        .din-sidebar::-webkit-scrollbar { width: 0; }
-      `}</style>
-    </>
+export function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <SidebarProvider>
+      <div className="min-h-svh flex w-full">
+        <AppSidebar />
+        <AppContent>{children}</AppContent>
+      </div>
+    </SidebarProvider>
   );
 }
