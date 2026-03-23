@@ -184,6 +184,7 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
         {(members || []).map((m, i) => {
           const col = AVATAR_COLORS[i % AVATAR_COLORS.length];
           const isPending = m.status === 'pending';
+          const isManual = m.status === 'manual';
           return (
             <div key={m.id} style={{ background: '#fff', border: `1px solid ${C.rule}`, borderRadius: '14px', padding: '20px', opacity: isPending ? 0.7 : 1 }}>
               <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: col.bg, color: col.text, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 700, marginBottom: '12px' }}>
@@ -192,7 +193,7 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
               <div style={{ fontSize: '14px', fontWeight: 700, color: C.ink }}>{m.invited_email?.split('@')[0] || 'Membro'}</div>
               <div style={{ fontSize: '11px', color: C.ink3, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 {m.role === 'admin' && <Crown size={10} style={{ color: '#f59e0b' }} />}
-                {isPending ? <><Clock size={10} /> Pendente</> : m.role === 'admin' ? 'Administrador' : 'Membro'}
+                {isManual ? <><UserPlus size={10} /> Sem conta</> : isPending ? <><Clock size={10} /> Pendente</> : m.role === 'admin' ? 'Administrador' : 'Membro'}
               </div>
               {isPending && m.invite_token && (
                 <button onClick={() => handleCopyLink(m.invite_token!)} style={{ fontSize: '11px', color: C.blue, background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: '4px', fontFamily: "'Cabinet Grotesk',sans-serif" }}>
