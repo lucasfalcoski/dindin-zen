@@ -316,7 +316,7 @@ export default function Expenses() {
                   </div>
                 ));
             })() : (
-              <p className="text-sm py-8 text-center text-muted-foreground">
+              <p className="text-sm font-medium py-8 text-center text-muted-foreground">
                 Nenhuma despesa.
               </p>
             )}
