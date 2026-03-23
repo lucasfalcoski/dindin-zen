@@ -47,7 +47,7 @@ export function useFamilyMembers(familyId: string | undefined) {
         .eq('family_id', familyId!)
         .order('joined_at', { ascending: true });
       if (error) throw error;
-      // Filter out ghost members (active but no user_id = orphaned)
+      // Filter out ghost members (active but no user_id = orphaned), keep manual members
       return (data as FamilyMember[]).filter(
         m => !(m.user_id === null && m.status === 'active')
       );
