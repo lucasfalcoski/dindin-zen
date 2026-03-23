@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useMyFamilies, useFamilyMembers, useCreateFamily, useUpdateFamily, useInviteMember, useRemoveMember } from '@/hooks/useFamily';
+import { useMyFamilies, useFamilyMembers, useCreateFamily, useUpdateFamily, useInviteMember, useRemoveMember, useAddManualMember } from '@/hooks/useFamily';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Users, Plus, Trash2, Copy, Check, Crown, Clock, Mail, ArrowRight, Target, Scale } from 'lucide-react';
+import { Users, Plus, Trash2, Copy, Check, Crown, Clock, Mail, ArrowRight, Target, Scale, UserPlus } from 'lucide-react';
 import { useFamilyProfiles } from '@/hooks/useProfiles';
 
 const C = { ink: '#16150f', ink2: '#6b6a63', ink3: '#b0aea6', rule: '#e4e1da', bg: '#f2f0eb', green: '#1a7a45', red: '#b83232', blue: '#1d4ed8' };
@@ -85,9 +85,12 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
   const { toast } = useToast();
   const { data: members } = useFamilyMembers(family.id);
   const inviteMember = useInviteMember();
+  const addManualMember = useAddManualMember();
   const removeMember = useRemoveMember();
   const updateFamily = useUpdateFamily();
   const [inviteEmail, setInviteEmail] = useState('');
+  const [manualName, setManualName] = useState('');
+  const [manualOpen, setManualOpen] = useState(false);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState(family.name);
@@ -98,7 +101,7 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
     [members]
   );
   const isAdmin = family.created_by === userId;
-  const activeMembers = (members || []).filter(m => m.status === 'active');
+  const activeMembers = (members || []).filter(m => m.status === 'active' || m.status === 'manual');
 
   const handleUpdateName = async () => {
     if (!name.trim() || name === family.name) { setEditingName(false); return; }
@@ -181,6 +184,7 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
         {(members || []).map((m, i) => {
           const col = AVATAR_COLORS[i % AVATAR_COLORS.length];
           const isPending = m.status === 'pending';
+          const isManual = m.status === 'manual';
           return (
             <div key={m.id} style={{ background: '#fff', border: `1px solid ${C.rule}`, borderRadius: '14px', padding: '20px', opacity: isPending ? 0.7 : 1 }}>
               <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: col.bg, color: col.text, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 700, marginBottom: '12px' }}>
@@ -189,7 +193,7 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
               <div style={{ fontSize: '14px', fontWeight: 700, color: C.ink }}>{m.invited_email?.split('@')[0] || 'Membro'}</div>
               <div style={{ fontSize: '11px', color: C.ink3, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 {m.role === 'admin' && <Crown size={10} style={{ color: '#f59e0b' }} />}
-                {isPending ? <><Clock size={10} /> Pendente</> : m.role === 'admin' ? 'Administrador' : 'Membro'}
+                {isManual ? <><UserPlus size={10} /> Sem conta</> : isPending ? <><Clock size={10} /> Pendente</> : m.role === 'admin' ? 'Administrador' : 'Membro'}
               </div>
               {isPending && m.invite_token && (
                 <button onClick={() => handleCopyLink(m.invite_token!)} style={{ fontSize: '11px', color: C.blue, background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: '4px', fontFamily: "'Cabinet Grotesk',sans-serif" }}>
@@ -241,15 +245,45 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
       {isAdmin && (
         <div style={{ background: '#fff', border: `1px solid ${C.rule}`, borderRadius: '14px', padding: '20px' }}>
           <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: C.ink2, marginBottom: '12px' }}>Convidar membro</p>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <Input id="invite-email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} placeholder="email@exemplo.com" type="email" onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }} style={{ flex: 1 }} />
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <Input id="invite-email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} placeholder="email@exemplo.com" type="email" onKeyDown={e => { if (e.key === 'Enter') handleInvite(); }} style={{ flex: 1, minWidth: '180px' }} />
             <Button onClick={handleInvite} disabled={inviteMember.isPending} className="gap-1.5">
               <Mail className="h-4 w-4" /> Convidar
+            </Button>
+            <Button variant="outline" onClick={() => setManualOpen(true)} className="gap-1.5">
+              <UserPlus className="h-4 w-4" /> Adicionar sem conta
             </Button>
           </div>
           <p style={{ fontSize: '11px', color: C.ink3, marginTop: '8px' }}>Um link de convite será gerado e copiado automaticamente.</p>
         </div>
       )}
+
+      {/* DIALOG ADICIONAR MANUAL */}
+      <Dialog open={manualOpen} onOpenChange={setManualOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader><DialogTitle>Adicionar membro sem conta</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">Adicione uma pessoa que não tem conta no app. Ela aparecerá na família para divisão de despesas.</p>
+            <div className="space-y-2">
+              <Label>Nome da pessoa</Label>
+              <Input value={manualName} onChange={e => setManualName(e.target.value)} placeholder="Ex: Maria" onKeyDown={e => { if (e.key === 'Enter') handleAddManual(); }} />
+            </div>
+            <Button onClick={handleAddManual} className="w-full" disabled={addManualMember.isPending}>
+              {addManualMember.isPending ? 'Adicionando...' : 'Adicionar'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
+
+  async function handleAddManual() {
+    if (!manualName.trim()) return;
+    try {
+      await addManualMember.mutateAsync({ familyId: family.id, name: manualName.trim() });
+      toast({ title: 'Membro adicionado!' });
+      setManualName('');
+      setManualOpen(false);
+    } catch { toast({ title: 'Erro ao adicionar', variant: 'destructive' }); }
+  }
 }

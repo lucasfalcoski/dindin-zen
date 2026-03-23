@@ -14,9 +14,9 @@ export interface FamilyMember {
   family_id: string;
   user_id: string | null;
   role: 'admin' | 'member';
-  status: 'pending' | 'active';
+  status: 'pending' | 'active' | 'manual';
   invited_email: string | null;
-  invite_token: string;
+  invite_token: string | null;
   invited_at: string;
   joined_at: string | null;
 }
@@ -47,7 +47,7 @@ export function useFamilyMembers(familyId: string | undefined) {
         .eq('family_id', familyId!)
         .order('joined_at', { ascending: true });
       if (error) throw error;
-      // Filter out ghost members (active but no user_id = orphaned)
+      // Filter out ghost members (active but no user_id = orphaned), keep manual members
       return (data as FamilyMember[]).filter(
         m => !(m.user_id === null && m.status === 'active')
       );
@@ -115,6 +115,28 @@ export function useInviteMember() {
           invited_email: email,
           role: 'member',
           status: 'pending',
+        } as any)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as FamilyMember;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['family_members'] }),
+  });
+}
+
+export function useAddManualMember() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ familyId, name }: { familyId: string; name: string }) => {
+      const { data, error } = await supabase
+        .from('family_members')
+        .insert({
+          family_id: familyId,
+          invited_email: name,
+          role: 'member',
+          status: 'manual',
+          invite_token: null,
         } as any)
         .select()
         .single();
