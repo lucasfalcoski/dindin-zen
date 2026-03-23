@@ -209,7 +209,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
 
   const mobileSlots: (typeof ALL_LINKS[0] | null | 'more')[] = [
     { to: '/',         label: 'Início',   icon: LayoutDashboard },
-    { to: '/expenses', label: 'Despesas', icon: Receipt },
+    { to: '/groups',   label: 'Grupos',   icon: FolderOpen },
     null,
     { to: '/income',   label: 'Receitas', icon: DollarSign },
     'more',
