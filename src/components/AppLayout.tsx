@@ -209,7 +209,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
 
   const mobileSlots: (typeof ALL_LINKS[0] | null | 'more')[] = [
     { to: '/',         label: 'Início',   icon: LayoutDashboard },
-    { to: '/groups',   label: 'Grupos',   icon: FolderOpen },
+    { to: '/family',   label: 'Família',  icon: Users },
     null,
     { to: '/income',   label: 'Receitas', icon: DollarSign },
     'more',
@@ -267,8 +267,8 @@ function AppContent({ children }: { children: React.ReactNode }) {
           );
           return (
             <NavLink key={slot.to} to={slot.to} end={slot.to === '/'}
-              style={({ isActive }) => ({ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '4px 8px', textDecoration: 'none', flex: 1, color: isActive ? C.green : C.ink3, fontSize: 9, fontWeight: 600, fontFamily: "'Cabinet Grotesk', sans-serif", textTransform: 'uppercase', letterSpacing: '0.3px' })}>
-              {({ isActive }) => <><slot.icon size={20} style={{ color: isActive ? C.green : C.ink3 }} />{slot.label}</>}
+              style={({ isActive }) => ({ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '4px 8px', textDecoration: 'none', flex: 1, color: isActive ? C.green : C.ink3, fontSize: 9, fontWeight: 600, fontFamily: "'Cabinet Grotesk', sans-serif", textTransform: 'uppercase', letterSpacing: '0.3px', maxWidth: '72px', overflow: 'hidden' })}>
+              {({ isActive }) => <><slot.icon size={20} style={{ color: isActive ? C.green : C.ink3 }} /><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', display: 'block' }}>{slot.label}</span></>}
             </NavLink>
           );
         })}

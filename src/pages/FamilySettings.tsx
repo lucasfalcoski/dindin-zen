@@ -100,6 +100,12 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
     () => (members || []).filter(m => m.user_id).map(m => m.user_id!),
     [members]
   );
+  const { data: profiles } = useFamilyProfiles(memberUserIds);
+  const profileMap = useMemo(() => {
+    const map: Record<string, { display_name: string | null; avatar_color: string }> = {};
+    (profiles || []).forEach(p => { map[p.id] = { display_name: p.display_name, avatar_color: p.avatar_color }; });
+    return map;
+  }, [profiles]);
   const isAdmin = family.created_by === userId;
   const activeMembers = (members || []).filter(m => m.status === 'active' || m.status === 'manual');
 
@@ -162,9 +168,11 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
           <div style={{ display: 'flex' }}>
             {activeMembers.slice(0, 5).map((m, i) => {
               const col = AVATAR_COLORS[i % AVATAR_COLORS.length];
+              const prof = m.user_id ? profileMap[m.user_id] : null;
+              const initials = (prof?.display_name || m.invited_email || '?').substring(0, 2).toUpperCase();
               return (
                 <div key={m.id} style={{ width: '38px', height: '38px', borderRadius: '50%', border: `2px solid ${C.ink}`, background: col.bg, color: col.text, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, marginLeft: i > 0 ? '-10px' : 0, flexShrink: 0 }}>
-                  {(m.invited_email || '?').substring(0, 2).toUpperCase()}
+                  {initials}
                 </div>
               );
             })}
@@ -179,12 +187,17 @@ function FamilyPanel({ family, userId }: { family: { id: string; name: string; c
           const col = AVATAR_COLORS[i % AVATAR_COLORS.length];
           const isPending = m.status === 'pending';
           const isManual = m.status === 'manual';
+          const prof = m.user_id ? profileMap[m.user_id] : null;
+          const displayName = prof?.display_name || m.invited_email?.split('@')[0] || 'Membro';
+          const initials = (prof?.display_name || m.invited_email || '?').substring(0, 2).toUpperCase();
+          const emailLabel = m.invited_email || (m.user_id && prof ? null : null);
           return (
             <div key={m.id} style={{ background: '#fff', border: `1px solid ${C.rule}`, borderRadius: '14px', padding: '20px', opacity: isPending ? 0.7 : 1 }}>
               <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: col.bg, color: col.text, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 700, marginBottom: '12px' }}>
-                {(m.invited_email || '?').substring(0, 2).toUpperCase()}
+                {initials}
               </div>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: C.ink }}>{m.invited_email?.split('@')[0] || 'Membro'}</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: C.ink }}>{displayName}</div>
+              {m.invited_email && <div style={{ fontSize: '11px', color: C.ink3, marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.invited_email}</div>}
               <div style={{ fontSize: '11px', color: C.ink3, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 {m.role === 'admin' && <Crown size={10} style={{ color: '#f59e0b' }} />}
                 {isManual ? <><UserPlus size={10} /> Sem conta</> : isPending ? <><Clock size={10} /> Pendente</> : m.role === 'admin' ? 'Administrador' : 'Membro'}
