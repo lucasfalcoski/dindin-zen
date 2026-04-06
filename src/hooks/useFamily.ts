@@ -61,7 +61,7 @@ export function useCreateFamily() {
   const { user } = useAuth();
   return useMutation({
     mutationFn: async (name: string) => {
-      const { data, error } = await supabase.rpc('create_family_with_admin', { _name: name });
+      const { data, error } = await supabase.rpc('create_family_with_admin', { _name: name }) as { data: any; error: any };
       if (error) throw error;
       return { id: data.id, name: data.name, created_by: data.created_by, created_at: new Date().toISOString() } as Family;
     },
@@ -90,7 +90,7 @@ export function useInviteMember() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ familyId, email }: { familyId: string; email: string }) => {
-      const { data, error } = await supabase.rpc('invite_family_member', { _family_id: familyId, _email: email });
+      const { data, error } = await supabase.rpc('invite_family_member', { _family_id: familyId, _email: email }) as { data: any; error: any };
       if (error) throw error;
       if (data.error) throw new Error(data.error);
       return { ...data, invite_token: data.invite_token } as FamilyMember;
@@ -103,7 +103,7 @@ export function useAddManualMember() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ familyId, name }: { familyId: string; name: string }) => {
-      const { data, error } = await supabase.rpc('add_manual_family_member', { _family_id: familyId, _name: name });
+      const { data, error } = await supabase.rpc('add_manual_family_member', { _family_id: familyId, _name: name }) as { data: any; error: any };
       if (error) throw error;
       if (data.error) throw new Error(data.error);
       return data as FamilyMember;
