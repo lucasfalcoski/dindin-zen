@@ -58,30 +58,11 @@ export function useFamilyMembers(familyId: string | undefined) {
 
 export function useCreateFamily() {
   const qc = useQueryClient();
-  const { user } = useAuth();
   return useMutation({
     mutationFn: async (name: string) => {
-      // Create family
-      const { data: family, error: famErr } = await supabase
-        .from('families')
-        .insert({ name, created_by: user!.id } as any)
-        .select()
-        .single();
-      if (famErr) throw famErr;
-
-      // Add creator as admin member
-      const { error: memErr } = await supabase
-        .from('family_members')
-        .insert({
-          family_id: family.id,
-          user_id: user!.id,
-          role: 'admin',
-          status: 'active',
-          joined_at: new Date().toISOString(),
-        } as any);
-      if (memErr) throw memErr;
-
-      return family as Family;
+      const { data, error } = await supabase.rpc('create_family_with_admin', { _name: name }) as { data: any; error: any };
+      if (error) throw error;
+      return { id: data.id, name: data.name, created_by: data.created_by, created_at: new Date().toISOString() } as Family;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['families'] });
@@ -108,18 +89,10 @@ export function useInviteMember() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ familyId, email }: { familyId: string; email: string }) => {
-      const { data, error } = await supabase
-        .from('family_members')
-        .insert({
-          family_id: familyId,
-          invited_email: email,
-          role: 'member',
-          status: 'pending',
-        } as any)
-        .select()
-        .single();
+      const { data, error } = await supabase.rpc('invite_family_member', { _family_id: familyId, _email: email }) as { data: any; error: any };
       if (error) throw error;
-      return data as FamilyMember;
+      if (data.error) throw new Error(data.error);
+      return { ...data, invite_token: data.invite_token } as FamilyMember;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['family_members'] }),
   });
@@ -129,18 +102,9 @@ export function useAddManualMember() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ familyId, name }: { familyId: string; name: string }) => {
-      const { data, error } = await supabase
-        .from('family_members')
-        .insert({
-          family_id: familyId,
-          invited_email: name,
-          role: 'member',
-          status: 'active',
-          joined_at: new Date().toISOString(),
-        } as any)
-        .select()
-        .single();
+      const { data, error } = await supabase.rpc('add_manual_family_member', { _family_id: familyId, _name: name }) as { data: any; error: any };
       if (error) throw error;
+      if (data.error) throw new Error(data.error);
       return data as FamilyMember;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['family_members'] }),
