@@ -664,6 +664,11 @@ export type Database = {
     }
     Functions: {
       accept_invite: { Args: { _token: string }; Returns: Json }
+      add_manual_family_member: {
+        Args: { _family_id: string; _name: string }
+        Returns: Json
+      }
+      create_family_with_admin: { Args: { _name: string }; Returns: Json }
       get_family_balance: {
         Args: { _family_id: string; _month_end: string; _month_start: string }
         Returns: Json
@@ -673,6 +678,10 @@ export type Database = {
         Returns: Json
       }
       get_user_family_ids: { Args: { _user_id: string }; Returns: string[] }
+      invite_family_member: {
+        Args: { _email: string; _family_id: string }
+        Returns: Json
+      }
       is_family_admin: {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
