@@ -170,7 +170,7 @@ export function OnboardingWizard() {
                 placeholder="Ex: 5000.00"
                 value={monthlyIncome}
                 onChange={e => setMonthlyIncome(e.target.value)}
-                className="text-xl h-14 currency"
+                className="text-xl h-14 font-medium tabular-nums"
                 autoFocus
               />
               <p className="text-xs text-muted-foreground">Isso criará uma receita recorrente de salário.</p>
