@@ -135,8 +135,8 @@ export function useAddManualMember() {
           family_id: familyId,
           invited_email: name,
           role: 'member',
-          status: 'manual',
-          invite_token: null,
+          status: 'active',
+          joined_at: new Date().toISOString(),
         } as any)
         .select()
         .single();

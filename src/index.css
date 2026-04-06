@@ -54,7 +54,9 @@
   .dark {
     --background: 40 96% 4%;
     --foreground: 42 20% 94%;
-    --card: 40 50% 8%;
+    --card: 222.2 47% 11%;
+    --shadow-card: 0 0 0 1px rgba(255,255,255,0.08), 0 2px 4px rgba(0,0,0,0.3);
+    --shadow-card-hover: 0 0 0 1px rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.4);
     --card-foreground: 42 20% 94%;
     --popover: 40 50% 8%;
     --popover-foreground: 42 20% 94%;

@@ -50,8 +50,12 @@ export default function ResetPassword() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="card-surface w-full max-w-sm p-8 animate-fade-in">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-2xl">💰</span>
+          <span className="font-semibold text-lg tracking-tight text-foreground">Din-Din Zen</span>
+        </div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground mb-1">Nova senha</h1>
-        <p className="text-sm text-muted-foreground mb-6">Digite sua nova senha</p>
+        <p className="text-sm text-muted-foreground mb-6">Digite sua nova senha para acessar o Din-Din Zen</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="password">Nova senha</Label>
