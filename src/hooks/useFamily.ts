@@ -58,7 +58,6 @@ export function useFamilyMembers(familyId: string | undefined) {
 
 export function useCreateFamily() {
   const qc = useQueryClient();
-  const { user } = useAuth();
   return useMutation({
     mutationFn: async (name: string) => {
       const { data, error } = await supabase.rpc('create_family_with_admin', { _name: name }) as { data: any; error: any };
